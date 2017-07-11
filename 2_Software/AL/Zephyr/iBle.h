@@ -111,9 +111,9 @@ typedef struct bt_data										iBle_advdata_t;
 
 typedef struct bt_gatt_attr											iBle_uuid_t;
 #define DEFINE_IBLE_UUID16(_uuid)								_uuid
-#define DEFINE_IBLE_UUID128(_uuid, _base...)		BT_UUID_DECLARE_128(BYTE14(_base, N), BYTE13(_base, N), BYTE12(_base, N), BYTE11(_base, N), BYTE10(_base, N), BYTE9(_base, N),      \
-                                                                    BYTE10(_base, N), BYTE9(_base, N), BYTE8(_base, N), BYTE7(_base, N), BYTE6(_base, N), BYTE5(_base, N),   				\
-                                                                    BYTE4(_base, N), BYTE3(_base, N), ((_uuid & 0xFF00) >> 8), (_uuid & 0x00FF))
+#define DEFINE_IBLE_UUID128(_uuid, _base...)		BT_UUID_DECLARE_128((_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), 					\
+																																		BYTE4(_base, N), BYTE5(_base, N), BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N),		\
+																																	 	BYTE10(_base, N), BYTE11(_base, N), BYTE12(_base, N), BYTE13(_base, N), BYTE14(_base, N))								\
 
 #define BYTE1(b1, ...)    b1
 #define BYTE2(b1, ...)    BYTE1(__VA_ARGS__, N)   // Keep only the last bits

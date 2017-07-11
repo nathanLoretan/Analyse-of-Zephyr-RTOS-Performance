@@ -31,7 +31,7 @@ extern void iTimer_init();
 // Event handlers
 static void on_ble_evt(ble_evt_t* ble_evt)
 {
-	uint32_t error;
+	int error;
 
 	switch (ble_evt->header.evt_id)
 	{
@@ -46,14 +46,34 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 																		error = sd_ble_gap_adv_start(&adv_params_stored, CONN_CFG_TAG);
 																		if(error) {
-																			iPrint("/!\\ Advertising failed to restart: error %lu\n", error);
+																			iPrint("/!\\ Advertising failed to restart: error %d\n", error);
 																			return;
 																		}
 
 																		iPrint("-> Advertising restarted\n");
 		break;
 
-		default:
+		case BLE_GATTC_EVT_TIMEOUT: 		// Disconnect on GATT Client timeout event.
+																		iPrint("-> GATT Client Timeout\n");
+																		error = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
+																																	BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+																	 if(error) {
+																			iPrint("/!\\ disconnect failed : error %d\n", error);
+																			return;
+																		}
+		break;
+
+		case BLE_GATTS_EVT_TIMEOUT: 		// Disconnect on GATT Server timeout event.
+																		iPrint("-> GATT Server Timeout\n");
+																		error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle,
+																																	BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+																		if(error) {
+																			iPrint("/!\\ disconnect failed : error %d\n", error);
+																			return;
+																		}
+		break;
+
+		default:	// NOTHING
 		break;
 	}
 }
@@ -73,21 +93,17 @@ static void on_ble_svc_evt(ble_evt_t* ble_evt)
 
 static void on_ble_pm_evt(pm_evt_t const * pm_evt)
 {
-		// switch(pm_evt->evt_id)
-    // {
-    //     case PM_EVT_BONDED_PEER_CONNECTED:
-    //     case PM_EVT_LINK_SECURED:
-    //     case PM_EVT_LINK_SECURE_FAILED:
-    //     case PM_EVT_STORAGE_FULL:
-    //     case PM_EVT_ERROR_UNEXPECTED:
-    //     case PM_EVT_PEER_DATA_UPDATED:
-    //     case PM_EVT_PEER_DATA_UPDATE_FAILED:
-    //     case PM_EVT_ERROR_LOCAL_DB_CACHE_APPLY:
-    //     case PM_EVT_LOCAL_DB_CACHE_APPLIED:
-    //     case PM_EVT_SERVICE_CHANGED_INDICATION_SENT:
-    //     default:
-    //     break;
-    // }
+		switch(pm_evt->evt_id)
+    {
+    	case PM_EVT_BONDED_PEER_CONNECTED:	iPrint("-> Connected to a previously bonded device.\n");
+			break;
+
+			case PM_EVT_ERROR_UNEXPECTED:	iPrint("/!\\ disconnect failed : error %lu\n", pm_evt->params.error_unexpected.error);
+			break;
+
+			default:	// NOTHING
+			break;
+    }
 }
 
 static void on_connection_params_evt(ble_conn_params_evt_t * evt)

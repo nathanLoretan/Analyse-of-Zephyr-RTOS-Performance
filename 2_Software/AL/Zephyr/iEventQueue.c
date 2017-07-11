@@ -18,11 +18,11 @@ void iEventQueue_add(iEventQueue_t* queue, iEvent_t event)
 {
 	fifo_data_t* p_data;
 
-	if(!k_mem_slab_alloc(&eventsMemory, (void**) &p_data, K_NO_WAIT)) {
+	if(k_mem_slab_alloc(&eventsMemory, (void**) &p_data, K_NO_WAIT) != 0) {
      iPrint("Event Memory full\n");
 		 return;
  	}
-	
+
 	p_data->event = event;
 	k_fifo_put(queue, p_data);
 }

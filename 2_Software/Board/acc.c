@@ -400,7 +400,7 @@ acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
     iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
 
     II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
-    iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
+    iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);    
   }
 
 	return ACC_NO_ERROR;

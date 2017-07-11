@@ -64,7 +64,7 @@
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
-#define EXT_INT_FREQ          1
+#define EXT_INT_FREQ          0.2
 #define SOFT_INT_FREQ         1000
 
 #endif  // __GENERAL_CONFIG_H__

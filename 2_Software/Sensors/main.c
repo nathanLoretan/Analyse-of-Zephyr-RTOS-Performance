@@ -74,7 +74,7 @@ DEFINE_IBLE_SVC_CONFIG(adc_config)
 static DEFINE_IBLE_ADV_DATA(advdata) =
 {
   IBLE_ADV_ADD_DATA(IBLE_DATA_FLAGS, IBLE_FLAGS_GENERAL | IBLE_FLAGS_NO_BREDR),
-  IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0xCA, 0x0C, 0xDA, 0x0C),
+  IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
 };
 
 static DEFINE_IBLE_ADV_DATA(scanrsp) =
@@ -87,6 +87,7 @@ iGpio_t ext_irq;
 IGPIO_HANDLER(on_ext_irq, pin)
 {
   // TODO
+  iPrint("External Interrupt\n");
 }
 
 iTimer_t soft_timer;
@@ -99,8 +100,8 @@ ITIMER_HANDLER(on_soft_timer)
 extern iEventQueue_t acc_EventQueue;
 extern iEventQueue_t adc_EventQueue;
 
-DEFINE_ITHREAD(acc_thread, 4096, 0);
-DEFINE_ITHREAD(adc_thread, 4096, 0);
+DEFINE_ITHREAD(acc_thread, 4096, 1);
+DEFINE_ITHREAD(adc_thread, 4096, 1);
 
 ITHREAD_HANDLER(acc)
 {
@@ -113,6 +114,7 @@ ITHREAD_HANDLER(acc)
     if(accEvent == ACC_EVENT_INT1)  // FIFO full
     {
       acc_getXYZ(&sample, 1);
+      iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
       iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample.x, sizeof(sample.x));
       iBle_svc_notify(&acc_svc, 2, (uint8_t*) &sample.y, sizeof(sample.y));
       iBle_svc_notify(&acc_svc, 3, (uint8_t*) &sample.z, sizeof(sample.z));
@@ -147,6 +149,7 @@ ITHREAD_HANDLER(adc)
     {
       // Notify the central
       adc_getMeasurement(&adc_measurement);
+      iPrint("Measurement: %lu[uV]\n", adc_measurement);
       iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
     }
     else if(adcEvent == ADC_EVENT_SLEEP) // Sleep

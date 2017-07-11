@@ -2,7 +2,8 @@ TODO:
 1. Scenarion
   - max packet size
 
-2. Sleep command via ble central
+2. Sleep command via ble central, create a chrc
+3. correction of acc fifo, first element false after reset
 
 2. Behaviour on BLE central
 - Central BLE interface
