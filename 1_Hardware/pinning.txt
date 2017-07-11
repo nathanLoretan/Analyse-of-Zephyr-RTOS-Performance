@@ -1,0 +1,79 @@
+- Pinning can be used with all processor, only the arduino connector p8 p9 p10
+
+x = already used or not compatible with all Nordic development kit
+
+NRF52840:
+---------
+
+VDD	X				p0.27	(SCLK) 	x
+VDD	X				p0.26	(SDA)	x
+RESET	X				p0.02	(AREF)
+5V	X				GND
+GND	X				p1.15	D13 (SCK)  ADC SCK  (SPI0)
+GND	X				p1.14	D12 (MISO) ADC MISO (SPI0)
+N.C	X				p1.13	D11 (MOSI) ADC MOSI (SPI0)
+					p1.12	D10 (SS)   ADC SS   (SPI0)
+P0.03	A0 Acc. SCL SPC (TWI or SPI)	p1.11	D9		
+p0.04	A1 Acc. SDA SDI (TWI or SPI) 	p1.10	D8
+p0.28	A2 Acc. SA0 SD0 (TWI or SPI)
+p0.29	A3 Acc. CS      (TWI or SPI)	p1.08 	D7 
+p0.30	A4 Acc. INT2			p1.07	D6 
+p0.31	A5 Acc. INT1			p1.06	D5 SWG SCK	(SPI1)
+					p1.05	D4 SWG MIS0	(SPI1)
+					p1.04 	D3 SWG MOSI	(SPI1)
+					p1.03	D2 SWG SS   	(SPI1)
+					p1.02	D1 (RX)
+					p1.01	D0 (TX)
+
+					p0.10	X
+					p0.09	X
+					p0.08	X
+					p0.07	X
+					p0.06	X
+					p0.05	X
+					p0.01	X
+					p0.00	X
+
+p0.11	X		p0.12	X	
+p0.13	X		p0.14	X
+p0.15	X		p0.16	X
+p0.17	X		p0.18	X
+p0.19	X		p0.20	X
+p0.21	X		p0.22	X
+p0.23	X		p0.24	X
+p0.25	X		p1.00	X
+p0.09	X		
+
+-------------------------------------------------------------------------------------------------------
+
+ADC:
+----
+
+SCK	(SPI0)	= SCLK
+MISO	(SPI0) 	= RDY\/DOUt
+MOSI	(SPI0)	= DIN
+SS 	(SPI0)	= CS\
+
+Square wave generator (SWG):
+----------------------------
+
+SCK	(SPI1)	= SCLK
+MIS0	(SPI1)	= N.C
+MOSI	(SPI1)	= SDATA
+SS 	(SPI1)	= FSYNC
+
+Accelerometer:
+--------------
+
+SCL SPC (TWI or SPI)			
+SDA SDI (TWI or SPI) 	
+SA0 SD0 (TWI or SPI)
+CS      (TWI or SPI)	 
+INT2			
+INT1
+
+
+
+
+
+

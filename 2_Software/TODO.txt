@@ -1,0 +1,17 @@
+TODO:
+1. Scenarion
+  - max packet size
+
+2. Sleep command via ble central
+
+2. Behaviour on BLE central
+- Central BLE interface
+
+3. Code Improvement
+- BM, thread priority
+- BM, create memory spare for function
+- RTT
+- push event write or read if ble chrc changed
+- Use SDK queue and scheduler
+- Zephyr execute thread when iThreads_start()
+- add the thread to wake up for the event

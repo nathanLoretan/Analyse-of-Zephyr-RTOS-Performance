@@ -1,0 +1,115 @@
+BLE:
+--------------------------------------------------------------------------------
+slave latency
+connection timeout        * 10ms ranges from 100ms to 32s
+advertising interval min  * 0.625ms ranges from 20ms to 10.24s
+advertising interval max  * 0.625ms ranges from 20ms to 10.24s
+connection interval min   * 1.25ms ranges from 7.5ms to 4s
+connection interval max   * 1.25ms ranges from 7.5ms to 4s
+
+SWG:
+--------------------------------------------------------------------------------
+f = fMCLK / 2^28
+fmax = 16MHz  -> 62.5ns
+fmin = 0.06Hz -> 16s
+
+ADC: 1 svc with 2 chrcs (data, sleep)
+--------------------------------------------------------------------------------
+SPI CLK: 5MHz
+
+Data Rate:
+	Continuous Conversion SCYCLE=0
+	60 120 240 480	[sps]	LINEF=0
+	50 100 200 400	[sps]	LINEF=1
+
+	Single-Cycle Conversion SCYCLE=0
+	1    2.5  5    10   15   30 60 120  [sps]  LINEF=0
+	0.83 2.08 4.17 8.33 12.5 25 50 100  [sps]  LINEF=1
+
+Resolution: 24Bits
+Data Frame: 32Bits (8bits addr + 24bits data)
+
+Time between new data:
+      min = 2.08ms(1/480),
+      max = 20ms(1/50)
+Time data frame transmition:
+      64us (1/5M * 32)
+
+ACC: 1 svc with 6 chrcs (axis x, axis y, axis z, sleep, click, temperature)
+--------------------------------------------------------------------------------
+I2C CLK: 400kHz
+
+Data Rate:
+	HR
+	1 10 25 50 100 200 400 1.344k		    [Hz]
+	Normal
+	1 10 25 50 100 200 400 1.344k		    [Hz]
+	Low-power
+	1 10 25 50 100 200 400 1.6k 5.376k	[Hz]
+
+Resolution:
+	HR 	       12Bits
+	Normal 	   10Bits
+	Low-power   8Bits
+
+Data Frame: 16bits (8bits device addr + 8bits register addr)
+            + 192Bytes data (32*Axis-X LSBytes + 32*Axis-X MSBytes
+                           + 32*Axis-Y LSBytes + 32*Axis-Y MSBytes
+                           + 32*Axis-Z LSBytes + 32*Axis-Z MSBytes)
+
+Time between new data:
+        min = 1s(1/1),
+        max = 0,186ms(1/5376) or max = 0,744ms(1/1344)
+Time data frame transmition:
+        min = 80us   (1/400k * (16 + 16bits (MSBytes and LSBytes of one axis)))
+        max = 3.88ms (1/400k * (16 + 192Bytes))
+
+interruption 1: data ready
+interruption 2: click, threshold
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+Scenario Case 1 (SDK mouse):
+--------------------------------------------------------------------------------
+BLE slave latency             20
+BLE connection timeout        3000mss
+BLE connection interval min   7.5ms
+BLE connection interval max   15ms
+
+ACC data Rate = 5.95ms
+ACC FIFO = 8      \_ 1ms Time data frame transmition
+ACC DATA = X Y Z  /
+
+ADC data Rate = 120sps -> 8.3ms(1/120)
+
+External interrupt  7.5ms (120000)
+Software interrput  >= 1ms
+
+Scenario Case 2 (SDK keyboard):
+--------------------------------------------------------------------------------
+BLE slave latency             6
+BLE connection timeout        430ms
+BLE connection interval min   7.5ms
+BLE connection interval max   30ms
+
+Scenario Case 3 (SDK Heart Rate Service):
+--------------------------------------------------------------------------------
+BLE slave latency             0
+BLE connection timeout        4000ms
+BLE connection interval min   400ms
+BLE connection interval max   550ms
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+measurements:
+--------------------------------------------------------------------------------
+Max data length that can be transmit
+- interrupt latency
+- power consumption
+- Latency between the Application Layer and Physical layer
+- Connection interval
+-It is interesting to try to send always 6 packets per connection interval and send always 1 packet per connection interval and see the difference

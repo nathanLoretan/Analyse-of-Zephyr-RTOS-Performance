@@ -1,0 +1,56 @@
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4327007/
+
+https://devzone.nordicsemi.com/question/60/what-is-connection-parameters/
+https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
+https://learn.adafruit.com/introduction-to-bluetooth-low-energy/gatt
+https://docs.mbed.com/docs/ble-intros/en/latest/Introduction/ConnectionParameters/
+
+- Advertising
+ADV_IND: General connectable and scannable advertisement packets' time period ranges from 20 ms to 10.24s in steps of 0.625ms.
+ADV_DIRECT_IND: Directed advertisement packets' time period is less than or equal to 3.75 ms. This kind of advertisement events can happen consecutively only for 1.28s. This is for a establishing a quick connection (if there is a device listening).
+ADV_NONCONN_IND: Non-connectable and non-scannable advertisement packets' time period ranges from 100 ms to 10.24s in steps of 0.625ms.
+ADV_SCAN_IND: Scannable advertisement packets' time period ranges from 100 ms to 10.24s in steps of 0.625ms.
+
+Connection Interval:
+  - when establishing a connection, the peripheral will suggest a 'Connection Interval' to the central device, and the central device will try to reconnect every connection interval to see if any new data is available,
+  - to process information or respond to connection events (ex: synchronisation)
+  - set by the central
+  - suggest by peripheral
+  - min and max value
+  - min value = 7.5ms, max value = 4s in steps of 1.25ms
+
+Slave latency:
+  - If there is no new data to send, the peripheral can ignore the number of consecutive connection events specified in the parameter
+  - Even while there is no new data, the peripheral must still respond to the client periodically in order to prove that the connection is still alive.
+  - If there is new data to send, the peripheral will respond to a connection event no matter how long it�s been since the last time it responded to an event.
+  - set by the central
+  - suggest by peripheral
+
+Connection timeout:
+  - time before the central consider the peripheral lost
+
+https://stackoverflow.com/questions/36549695/ble-max-number-of-packets-in-connection-interval
+https://stackoverflow.com/questions/38913743/maximum-packet-length-for-bluetooth-le
+https://punchthrough.com/blog/posts/maximizing-ble-throughput-on-ios-and-android
+https://punchthrough.com/blog/posts/maximizing-ble-throughput-part-2-use-larger-att-mtu
+https://devzone.nordicsemi.com/question/69761/ble-packet-structure/
+Packet:
+-------
+
+Packet Length:
+--------------
+    - 2 bytes for packet header (type and length),
+    - 4 bytes for MIC (when encryption is enabled),
+    - 4 bytes for L2CAP header (channel ID and packet length),
+    - ATT protocol is left with 23 bytes, which is the default and minimal MTU for ATT protocol.
+
+With an ATT write request (or notification), 3 bytes are used by command type and attribute ID, 20 bytes are left for the attribute data.
+
+- MTU (maximum transmission unit - packet size) p.1781
+- ATT data size : 23bytes - infinite, define per MTU
+- The data size per packet is 23Bytes.
+- Nbr Packet max = MTU/23bytes
+
+Throughtput = Nbr of Packets in Connection Interval * Data Per Packet / Connection Interval
+
+Max nbr packet per connection interval = 6

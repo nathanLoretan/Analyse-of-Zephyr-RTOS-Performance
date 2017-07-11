@@ -1,0 +1,56 @@
+Management:
+-----------
+- Planning
+- budget
+
+Equipement:
+-----------
+- PCB designer
+- Nordic development kit NRF52840
+- Nordic Bluetooth dongle and Nordic central device
+
+how to order electronics components?
+where to print the PCB?
+
+Component:
+----------
+- Sensor for Voltage generator
+- Interrupt generator
+- ADC
+- Accelerometer
+- Connection between board NRF52840 and extension board
+- Connection between sensor and extension board
+- Supply of the extension board
+
+The precision of the components must be defined
+
+Communication:
+--------------
+- Computer and NRF52840 BLE with bandwidth
+- SPI ADC and NRF52840
+- Accelerometer and NRF52840
+
+Programmation:
+--------------
+- Definition of scenarios	\_ Same code with bare metal and Zephyr
+- Data acquisition		/
+- Base bare metal
+- Base Zephyr
+- To display the result
+
+Where the result must be displayed?
+
+To Try to be able to use the scenario easily with different operating system.
+To Try to be able to use the system with different processor.
+
+tests:
+------
+- Interruption latency time
+- Power consumption		-- How to procede
+- Comparison between bare metal and Zephyr
+
+
+
+
+
+

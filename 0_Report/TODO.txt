@@ -1,0 +1,2 @@
+- Nordic veut tester l'OS car leur processeur on maintenant assez de mémoire pour accueillir un OS. De plus le bare metal demande de tous faire soit même ce qui n'est pas obligatoire avec
+un OS déjà fait.
