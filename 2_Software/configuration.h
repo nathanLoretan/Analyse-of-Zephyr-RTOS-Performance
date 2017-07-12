@@ -51,7 +51,7 @@
 #define ADC_DATA_RATE         ADC_DATA_RATE_5
 #define ADC_CONVERSION_MODE   ADC_CONVERSION_CONTINUOUS
 
-#define ACC_DATA_RATE         ACC_DATA_RATE_1
+#define ACC_DATA_RATE         ACC_DATA_RATE_9
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 

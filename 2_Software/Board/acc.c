@@ -150,7 +150,8 @@
 #define FIFO_EVENT_ON_INT1			0x00
 #define FIFO_EVENT_ON_INT2			0x20
 //Bit[4:0]
-#define FIFO_NBR_SAMPLE					(ACC_FIFO-1) // 0 = 1 sample
+#define FIFO_NBR_SAMPLE					ACC_FIFO
+// WTM = 1 if STATUS_NBR_SAMPLE > FIFO_NBR_SAMPLE
 
 //REGISTER_CLICK_CFG---------------
 #define DOUBLE_CLICK_Z          0x20
@@ -313,8 +314,8 @@ void acc_init()
   // Reset the Data read signal
   iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, 6);
 
-  // Reset the FIFO. The FIFO must be first set to bypass mode and then enabled
-  II2C_CREATE_DATA(tx_buf, MODE_BYPASS | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
+  // Reset the FIFO. The FIFO must be first set to bypass mode to reset status and then enabled
+  II2C_CREATE_DATA(tx_buf, MODE_BYPASS);
   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
 
   II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
@@ -365,19 +366,54 @@ static acc_fifo_status_t acc_getFifoStatus()
     .fifo_unread_samples	= (rx_buf[0] & 0x1F),
   };
 
+  // iPrint("WTM: %d\n", acc_fifo_status.fifo_watermark);
+  // iPrint("OVRN: %d\n", acc_fifo_status.fifo_overrun);
+  // iPrint("EMPTY: %d\n", acc_fifo_status.fifo_empty);
+  // iPrint("UNREAD SAMPLES: %d\n", acc_fifo_status.fifo_unread_samples);
+
 	return acc_fifo_status;
 }
 
 acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
 {
-  uint8_t tx_buf[1];
-  uint8_t rx_buf[sizeof(sample_t) * nbr_samples];
-
-	// Check the status register
+  // uint8_t tx_buf[1];
+  // uint8_t rx_buf[sizeof(sample_t) * nbr_samples];
+  //
+	// // Check the status register
 	// acc_status_t acc_status	= acc_getStatus();
 	// if(!acc_status.data_available_123) {
   // 	return ACC_ERROR_NO_DATA_AVAILABLE;
 	// }
+  //
+  // // Check the fifo status register
+  // acc_fifo_status_t acc_fifo_status = acc_getFifoStatus();
+  // if(acc_fifo_status.fifo_watermark == 0) {
+  //   return ACC_ERROR_NO_DATA_AVAILABLE;
+  // }
+  //
+  // iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(sample_t) * nbr_samples);
+  // II2C_CONVERT_DATA(samples, rx_buf, sizeof(sample_t) * nbr_samples);
+  //
+  // acc_fifo_status = acc_getFifoStatus();
+  // if(acc_fifo_status.fifo_unread_samples > 0)  // If the fifo has other samples
+  // {
+  //   iEventQueue_add(&acc_EventQueue, ACC_EVENT_INT1);
+  // }
+  // else  // When the fifo is empty, it must be reset to enable the fifo interrupt
+  // {
+  //   // Reset the FIFO. The FIFO must be first set to bypass mode and then enabled
+  //   II2C_CREATE_DATA(tx_buf, MODE_BYPASS | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
+  //   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
+  //
+  //   II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
+  //   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
+  //
+  //   // This read allows the acceleromter to correctly empty the fifo
+  //   iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, 1);
+  // }
+
+  uint8_t tx_buf[1];
+  uint8_t rx_buf[sizeof(sample_t) * nbr_samples];
 
   // Check the fifo status register
   acc_fifo_status_t acc_fifo_status = acc_getFifoStatus();
@@ -385,23 +421,17 @@ acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
     return ACC_ERROR_NO_DATA_AVAILABLE;
   }
 
+  // Stop fulling fifo with samples and reset fifo status
+  II2C_CREATE_DATA(tx_buf, MODE_BYPASS);
+  iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
+
+  // Read measurements
   iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(sample_t) * nbr_samples);
   II2C_CONVERT_DATA(samples, rx_buf, sizeof(sample_t) * nbr_samples);
 
-  acc_fifo_status = acc_getFifoStatus();
-  if(acc_fifo_status.fifo_watermark)  // If the fifo has other samples
-  {
-    iEventQueue_add(&acc_EventQueue, ACC_EVENT_INT1);
-  }
-  else  // When the fifo is empty, it must be reset to enable the fifo interrupt
-  {
-    // Reset the FIFO. The FIFO must be first set to bypass mode and then enabled
-    II2C_CREATE_DATA(tx_buf, MODE_BYPASS | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
-    iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
-
-    II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
-    iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);    
-  }
+  // Start fulling fifo
+  II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
+  iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
 
 	return ACC_NO_ERROR;
 }
