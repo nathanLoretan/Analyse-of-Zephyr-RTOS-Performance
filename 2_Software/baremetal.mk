@@ -70,8 +70,8 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Board/acc.c \
 	$(PROJECT_BASE)/Board/adc.c \
 	$(PROJECT_BASE)/Board/swg.c \
-	$(PROJECT_BASE)/Test/main.c
-	# $(PROJECT_BASE)/Sensors/main.c
+	# $(PROJECT_BASE)/Test/main.c
+	$(PROJECT_BASE)/Sensors/main.c
 
 
 # Include folders common to all targets

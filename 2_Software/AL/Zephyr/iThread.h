@@ -23,7 +23,7 @@ typedef struct {
                                                           .prio       = _prio,                                            \
                                                         }
 
-#define iThread_init(_thread, _handler)  k_thread_create(&_k_thread_obj_##_handler, (_thread)->stack, (_thread)->stack_size, _handler, NULL, NULL, NULL, (_thread)->prio, 0, K_NO_WAIT)
+#define iThread_run(_thread, _handler)  k_thread_create(&_k_thread_obj_##_handler, (_thread)->stack, (_thread)->stack_size, _handler, NULL, NULL, NULL, (_thread)->prio, 0, K_NO_WAIT)
 #define iThread_yield()                  k_yield()
 #define iThread_sleep()                  k_sleep(K_FOREVER)
 #define iThreads_start()                 k_sleep(K_FOREVER)

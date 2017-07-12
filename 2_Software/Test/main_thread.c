@@ -94,10 +94,10 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iThread_init(&th1, thread1);
-  iThread_init(&th2, thread2);
-  iThread_init(&th3, thread3);
-  iThread_init(&th4, thread4);
+  iThread_run(&th1, thread1);
+  iThread_run(&th2, thread2);
+  iThread_run(&th3, thread3);
+  iThread_run(&th4, thread4);
 
   iEventQueue_init(&eventTh1);
   iEventQueue_init(&eventTh2);

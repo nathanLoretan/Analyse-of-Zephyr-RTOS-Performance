@@ -15,7 +15,7 @@ static iThread_list_t* thread_list[ITHREAD_MAX_PRIO];
 extern volatile bool isEvent;
 extern void iEventQueue_isEvent();
 
-void iThread_init(iThread_t* thread, iThread_handler_t handler)
+void iThread_run(iThread_t* thread, iThread_handler_t handler)
 {
   // Configure stack
   // int diff = (&main - &function2);

@@ -21,7 +21,7 @@ typedef struct {
                                                         .stack_size = _stack_size         \
                                                       }
 
-void iThread_init(iThread_t* thread, iThread_handler_t handler);
+void iThread_run(iThread_t* thread, iThread_handler_t handler);
 void iThreads_start();
 #define iThread_yield()       return
 #define iThread_sleep()       return

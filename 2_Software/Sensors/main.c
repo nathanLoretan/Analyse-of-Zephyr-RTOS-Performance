@@ -176,8 +176,8 @@ int main()
   iPrint("\t--------------\n");
 
   // Thread must be declare before the driver to avoid full filling the event queues
-  iThread_init(&acc_thread, acc);
-  iThread_init(&adc_thread, adc);
+  iThread_run(&acc_thread, acc);
+  iThread_run(&adc_thread, adc);
 
   bluetooth_init();
   extBoad_init();
