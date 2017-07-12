@@ -394,13 +394,20 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 
 	// Add read/write properties to the characteristic
 	ble_gatts_char_md_t chrc_md = {0};
-	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					&& IBLE_CHRC_PERM_BROADCAST;
-	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								&& IBLE_CHRC_PERM_READ;
-	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	&& IBLE_CHRC_PERM_WRITE_WITHOUT_RESP;
-	chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)						 		&& IBLE_CHRC_PERM_WRITE;
-	chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLE_CHRC_PERM_AUTH) 								&& IBLE_CHRC_PERM_AUTH;
-	chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_NOTIFY) 							&& IBLE_CHRC_PERM_NOTIFY;
-	chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_INDICATE) 						&& IBLE_CHRC_PERM_INDICATE;
+	// chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					&& IBLE_CHRC_PERM_BROADCAST;
+	// chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								&& IBLE_CHRC_PERM_READ;
+	// chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	&& IBLE_CHRC_PERM_WRITE_WITHOUT_RESP;
+	// chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)						 		&& IBLE_CHRC_PERM_WRITE;
+	// chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLE_CHRC_PERM_AUTH) 								&& IBLE_CHRC_PERM_AUTH;
+	// chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_NOTIFY) 							&& IBLE_CHRC_PERM_NOTIFY;
+	// chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_INDICATE) 						&& IBLE_CHRC_PERM_INDICATE;
+	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					? 1 : 0;
+	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								? 1 : 0;
+	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	? 1 : 0;
+	chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)						 		? 1 : 0;
+	chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLE_CHRC_PERM_AUTH) 								? 1 : 0;
+	chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_NOTIFY) 							? 1 : 0;
+	chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_INDICATE) 						? 1 : 0;
 
 	// Configuring Client Characteristic Configuration Descriptor metadata and add to char_md structure
 	ble_gatts_attr_md_t cccd_md = {0};
@@ -415,10 +422,16 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	attr_md.vlen = 1;
 
 	// Set read/write security levels to the attribute
-	if((chrc->attr_config.perm & IBLE_GATT_PERM_READ) && IBLE_GATT_PERM_READ) {
+	// if((chrc->attr_config.perm & IBLE_GATT_PERM_READ) && IBLE_GATT_PERM_READ) {
+	// 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
+	// }
+	// if((chrc->attr_config.perm & IBLE_GATT_PERM_WRITE) && IBLE_GATT_PERM_WRITE) {
+	// 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
+	// }
+	if((chrc->attr_config.perm & IBLE_GATT_PERM_READ)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
 	}
-	if((chrc->attr_config.perm & IBLE_GATT_PERM_WRITE) && IBLE_GATT_PERM_WRITE) {
+	if((chrc->attr_config.perm & IBLE_GATT_PERM_WRITE)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
 	}
 

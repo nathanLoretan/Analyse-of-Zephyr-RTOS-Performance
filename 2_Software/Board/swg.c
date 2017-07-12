@@ -44,7 +44,7 @@
 
 extern iSpi_id_t spi;
 
-void swg_init(uint32_t frequency)
+void swg_init(float frequency)
 {
 	uint8_t tx_buf[2];
 

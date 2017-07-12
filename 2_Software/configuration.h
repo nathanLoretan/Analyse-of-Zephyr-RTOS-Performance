@@ -13,33 +13,24 @@
   #include "AL/BareMetal/nrf5x_interface.h"
 #endif
 
-// Mapping----------------------------------------------------------------------
+// Externa. Interrupt----------------------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31
 
 #define INTERRUPT_PIN		   13
-
-#define SPI1_SCK		       27
-#define SPI1_MISO		       26
-#define SPI1_MOSI		       2
-#define SPI1_CS0			     11
-#define SPI1_CS1			     12
-
-#define I2C0_SCL           3
-#define I2C0_SDA           4
 
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI_CS              CS0
 #define ADC_SPI_FREQUENCY       ISPI_FREQ_1M
 #define ADC_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define ADC_SPI_IRQ_PRIORITY    ISPI_DEFAULT_IRQ_PRIORITY
-#define ADC_SPI_MODE            ISPI_MODE_SCK_HIGH_CAPTURE_L_TO_H
+#define ADC_SPI_MODE            ISPI_MODE_SCK_HIGH_CAPTURE_LEADING
 
 #define SWG_SPI_CS              CS1
 #define SWG_SPI_FREQUENCY       ISPI_FREQ_1M
 #define SWG_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define SWG_SPI_IRQ_PRIORITY    ISPI_DEFAULT_IRQ_PRIORITY
-#define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_L_TO_H
+#define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING
 
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 #define ACC_I2C_IRQ_PRIORITY    II2C_DEFAULT_IRQ_PRIORITY
@@ -64,7 +55,7 @@
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
-#define EXT_INT_FREQ          0.2
+#define EXT_INT_FREQ          0.5
 #define SOFT_INT_FREQ         1000
 
 #endif  // __GENERAL_CONFIG_H__

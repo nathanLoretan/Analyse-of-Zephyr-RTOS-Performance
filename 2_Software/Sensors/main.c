@@ -114,7 +114,7 @@ ITHREAD_HANDLER(acc)
     if(accEvent == ACC_EVENT_INT1)  // FIFO full
     {
       acc_getXYZ(&sample, 1);
-      iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
+      // iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
       iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample.x, sizeof(sample.x));
       iBle_svc_notify(&acc_svc, 2, (uint8_t*) &sample.y, sizeof(sample.y));
       iBle_svc_notify(&acc_svc, 3, (uint8_t*) &sample.z, sizeof(sample.z));
@@ -149,7 +149,7 @@ ITHREAD_HANDLER(adc)
     {
       // Notify the central
       adc_getMeasurement(&adc_measurement);
-      iPrint("Measurement: %lu[uV]\n", adc_measurement);
+      // iPrint("Measurement: %lu[uV]\n", adc_measurement);
       iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
     }
     else if(adcEvent == ADC_EVENT_SLEEP) // Sleep

@@ -5,6 +5,15 @@
 // <h> GENERAL INFORMATION
 //==========================================================
 
+#define SPI1_SCK		       27
+#define SPI1_MISO		       26
+#define SPI1_MOSI		       2
+#define SPI1_CS0			     11
+#define SPI1_CS1			     12
+
+#define I2C0_SCL           3
+#define I2C0_SDA           4
+
 // <e> PIN MAPPING
 //==========================================================
 // <0=> 0 (P0.0)

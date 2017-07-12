@@ -1,0 +1,14 @@
+zephyr/drivers/spi/spim_nrf52.c :
+  - line 431
+  - CONFIG_SPIM0_NRF52_ORC must be replace by CONFIG_SPIM1_NRF52_ORC
+
+Zephyr/ext/hal/nordic/mdk/nrf52840_bitfields.h :
+  - modifications removed
+
+Zephyr/ext/hal/nordic/mdk/nrf52_bitfields.h :
+  - modifications removed
+
+Zephyr/drivers/spi/spim_nrf52.c :
+    - lines 161 -166
+    - Error because config only equal 0 or 1, bit 1 and 2 never set
+    - bit2 = CPOL, bit1 = CPHA, bit0 = MSB or LSB first

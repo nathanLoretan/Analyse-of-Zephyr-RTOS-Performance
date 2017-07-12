@@ -3,7 +3,7 @@
 
 #include "../configuration.h"
 
-void swg_init(uint32_t frequency);
+void swg_init(float frequency);
 void swg_sleep();
 void swg_wakeup();
 

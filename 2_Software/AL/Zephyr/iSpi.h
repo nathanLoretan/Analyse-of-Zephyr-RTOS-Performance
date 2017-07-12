@@ -4,6 +4,9 @@
 // /!\ Zephyr bug file zephyr'path/drivers/spi/spim_nrf52.c line 431:
 // CONFIG_SPIM0_NRF52_ORC must be replace by CONFIG_SPIM1_NRF52_ORC
 
+// /!\ Zephyr bug file Zephyr/drivers/spi/spim_nrf52.c lines 161 -166:
+// Error because config only equal 0 or 1, bit 1 and 2 never set
+
 #include "zephyr_interface.h"
 
 // Zephyr headers
@@ -15,10 +18,10 @@
 #define ISPI_BIT_ORDER_MSB_FIRST						SPI_TRANSFER_MSB
 #define ISPI_BIT_ORDER_LSB_FIRST						SPI_TRANSFER_LSB
 
-#define ISPI_MODE_SCK_HIGH_CAPTURE_L_TO_H		0
-#define ISPI_MODE_SCK_HIGH_CAPTURE_H_TO_L		SPI_MODE_CPHA												// /!\ Zephyr bug
-#define ISPI_MODE_SCK_LOW_CAPTURE_L_TO_H	  (SPI_MODE_CPOL | SPI_MODE_CPHA)			// /!\ Zephyr bug
-#define ISPI_MODE_SCK_LOW_CAPTURE_H_TO_L		SPI_MODE_CPOL												// /!\ Zephyr bug
+#define ISPI_MODE_SCK_HIGH_CAPTURE_LEADING		SPI_MODE_CPHA
+#define ISPI_MODE_SCK_HIGH_CAPTURE_TRAILING		0																		// /!\ Zephyr bug
+#define ISPI_MODE_SCK_LOW_CAPTURE_LEADING	  	(SPI_MODE_CPOL | SPI_MODE_CPHA)			// /!\ Zephyr bug
+#define ISPI_MODE_SCK_LOW_CAPTURE_TRAILING		SPI_MODE_CPOL												// /!\ Zephyr bug
 
 #define ISPI_FREQ_125K			125000
 #define ISPI_FREQ_250K			250000
@@ -43,7 +46,7 @@ typedef enum {
 } iSpi_id_t;
 
 typedef enum {
-	CS0 = 1,	// CS0 = 1 with spi_slave_select() 
+	CS0 = 1,	// CS0 = 1 with spi_slave_select()
 	CS1,
 	CS2,
 	CS3

@@ -21,6 +21,7 @@ int main()
 
   swg_init(EXT_INT_FREQ);
 
+
   iGpio_interrupt_init(&ext_int, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_ext_int);
   iGpio_enable_interrupt(&ext_int);
 

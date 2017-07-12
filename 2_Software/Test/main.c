@@ -6,7 +6,6 @@
 void bluetooth_init();
 void bluetooth_test();
 
-
 // The attribute value must be static
 static uint32_t current_time;
 
@@ -15,7 +14,7 @@ static DEFINE_IBLE_ADV_DATA(advdata) =
   IBLE_ADV_ADD_DATA(IBLE_DATA_FLAGS, IBLE_FLAGS_GENERAL | IBLE_FLAGS_NO_BREDR),
 
   // Heart Rate(0x180D),  Current Time Service(0x1805), my Service(0xAAAA)
-  // IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0x0d, 0x18, 0x05, 0x18, 0xAA, 0xAA),
+  IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0x0d, 0x18, 0x05, 0x18, 0xAA, 0xAA),
 };
 
 static DEFINE_IBLE_ADV_DATA(scanrsp) =
