@@ -126,11 +126,11 @@ void bluetooth_test()
   {
     if(iBle_isConnected())
     {
-      iSleep_ms(1000);
-      current_time++;
+      // iSleep_ms(1000);
+      // current_time++;
 
-      iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
-      iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      // iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      // iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
     }
   }
 }

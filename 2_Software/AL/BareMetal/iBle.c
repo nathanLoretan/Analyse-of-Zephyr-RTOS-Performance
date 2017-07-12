@@ -1,6 +1,8 @@
 #include "iBle.h"
 
-static bool isConnected = false;
+// The default address set is BLE_GAP_ADDR_TYPE_RANDOM_STATIC
+
+static volatile bool isConnected = false;
 static uint16_t	connection;
 static ble_gap_adv_params_t adv_params_stored;
 static nrf_ble_gatt_t gatt_module;
@@ -321,7 +323,7 @@ int iBle_init()
 	return 0;
 }
 
-bool iBle_isConnected()
+volatile bool iBle_isConnected()
 {
 	return isConnected;
 }

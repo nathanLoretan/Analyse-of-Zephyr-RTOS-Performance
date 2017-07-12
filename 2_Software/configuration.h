@@ -1,5 +1,5 @@
-#ifndef __GENERAL_CONFIG_H__
-#define __GENERAL_CONFIG_H__
+#ifndef __CONFIGURATION_H__
+#define __CONFIGURATION_H__
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -58,4 +58,4 @@
 #define EXT_INT_FREQ          0.5
 #define SOFT_INT_FREQ         1000
 
-#endif  // __GENERAL_CONFIG_H__
+#endif  // __CONFIGURATION_H__

@@ -8,7 +8,7 @@ typedef struct {
 
 // /!\ IMPORTANT /!\.
 // 1. The default thread's stack created for a timer IRQ is really small, 520Bytes -> 65 Events,
-// and the memory is quickly full if to many events stay within the queue.
+// and the thread's memory is quickly full if to many events stay within the queue.
 // Therefore, a specific space memory is used to store the events to avoid this problem
 
 #define NBR_MAX_EVENTS		4096

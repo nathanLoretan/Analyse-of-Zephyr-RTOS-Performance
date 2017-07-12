@@ -4,6 +4,7 @@ TODO:
 
 2. Sleep command via ble central, create a chrc
 3. correction of acc fifo, first element false after reset
+4. correct BLE address type setting
 
 2. Behaviour on BLE central
 - Central BLE interface
@@ -16,3 +17,19 @@ TODO:
 - Use SDK queue and scheduler
 - Zephyr execute thread when iThreads_start()
 - add the thread to wake up for the event
+
+git config --global -e
+git commit -a -s
+git commit --amend
+git branch -a
+git branch -aav
+git remote add nathan https://github.com/nathanLoretan/zephyr
+git remote -m origin upstream
+git remote rename origin upstream
+git fetch --all -p
+git checkout -b nathan_fix_spim_config
+git rebase upstream/master
+git log
+git show
+git push -u nathan
+git push --set-upstream nathan nathan_fix_spim_config

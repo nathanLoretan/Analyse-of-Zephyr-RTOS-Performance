@@ -168,7 +168,7 @@ typedef struct {
 
 int iBle_init();
 #define iBle_sleep()			sd_power_system_off()
-bool iBle_isConnected();
+volatile bool iBle_isConnected();
 int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size);
 int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs);
 int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);

@@ -1,6 +1,6 @@
 #include "iBle.h"
 
-bool isConnected = false;
+volatile static bool isConnected = false;
 static struct bt_conn* 									connection;
 static struct k_mutex 									indicate_mutex;
 static struct bt_gatt_indicate_params 	ind_params;
@@ -33,7 +33,12 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
 
 static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
 {
-	isConnected = false;;
+  if(connection) {
+  bt_conn_unref(connection);
+  connection = NULL;
+  }
+
+	isConnected = false;
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
@@ -63,7 +68,7 @@ int iBle_init()
 	return 0;
 }
 
-bool iBle_isConnected()
+volatile bool iBle_isConnected()
 {
 	return isConnected;
 }
@@ -83,10 +88,10 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t*
 	struct bt_le_adv_param* adv_params;
 
 	// default advertising parameters
-	// adv_params = BT_LE_ADV_CONN;
+	adv_params = BT_LE_ADV_CONN;
 
 	// Personalized advertising parameters
-	adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, MSEC_TO_UNITS(ADV_INTERVAL_MIN, UNIT_0_625_MS), MSEC_TO_UNITS(ADV_INTERVAL_MAX, UNIT_0_625_MS));
+	// adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, MSEC_TO_UNITS(ADV_INTERVAL_MIN, UNIT_0_625_MS), MSEC_TO_UNITS(ADV_INTERVAL_MAX, UNIT_0_625_MS));
 
 	// Start advertising fast
 	error = bt_le_adv_start(adv_params, advdata, advdata_size, scanrsp,  scanrsp_size);
