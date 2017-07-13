@@ -8,7 +8,7 @@
 	static struct device* i2c1;
 #endif	// CONFIG_I2C_1
 
-int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq, iI2c_priority_t prio)
+int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq)
 {
 	#if CONFIG_I2C_0 || CONFIG_I2C_1
 	int error;

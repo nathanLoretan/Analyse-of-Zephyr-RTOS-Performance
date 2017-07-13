@@ -10,10 +10,10 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_IRQ_PRIORITY, SWG_SPI_BIT_ORDER);
+  iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
   swg_init(EXT_INT_FREQ);
 
-  iSpi_init(spi, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_IRQ_PRIORITY, ADC_SPI_BIT_ORDER);
+  iSpi_init(spi, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
   adc_init();
 
   uint32_t measurement = 0;

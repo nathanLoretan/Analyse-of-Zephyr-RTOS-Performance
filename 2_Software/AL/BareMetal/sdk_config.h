@@ -10,9 +10,11 @@
 #define SPI1_MOSI		       2
 #define SPI1_CS0			     11
 #define SPI1_CS1			     12
+#define SPI1_IRQ_PRIORITY  SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define I2C0_SCL           3
 #define I2C0_SDA           4
+#define I2C0_IRQ_PRIORITY TWI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 // <e> PIN MAPPING
 //==========================================================

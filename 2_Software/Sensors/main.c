@@ -94,6 +94,7 @@ iTimer_t soft_timer;
 ITIMER_HANDLER(on_soft_timer)
 {
   // TODO
+  iPrint("Software Interrupt\n");
 }
 
 // Threads----------------------------------------------------------------------
@@ -166,7 +167,6 @@ ITHREAD_HANDLER(adc)
 }
 
 // -----------------------------------------------------------------------------
-
 void bluetooth_init();
 void extBoad_init();
 
@@ -209,12 +209,12 @@ void extBoad_init()
   iPrint("\nInitialize extBoard\n");
   iPrint("-------------------\n");
 
-  iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_IRQ_PRIORITY, SWG_SPI_BIT_ORDER);
+  iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
   swg_init(EXT_INT_FREQ);
 
-  iSpi_init(spi, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_IRQ_PRIORITY, ADC_SPI_BIT_ORDER);
+  iSpi_init(spi, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
   adc_init();
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY, ACC_I2C_IRQ_PRIORITY);
+  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
   acc_init();
 }

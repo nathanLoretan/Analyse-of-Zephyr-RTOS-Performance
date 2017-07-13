@@ -21,7 +21,7 @@ static void on_twi_event(nrf_drv_twi_evt_t const * p_event, void * p_context)
 }
 #endif	// TWI0_ENABLED || TWI1_ENABLED
 
-int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq, iI2c_priority_t prio)
+int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq)
 {
 	#if TWI0_ENABLED || TWI1_ENABLED
 	int error;
@@ -36,7 +36,7 @@ int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq, iI2c_priority_t prio)
 										.scl 								= I2C0_SCL,
 										.sda 								= I2C0_SDA,
 										.frequency          = freq,
-										.interrupt_priority = prio,
+										.interrupt_priority = I2C0_IRQ_PRIORITY,
 										.clear_bus_init     = false
 									};
 

@@ -9,9 +9,6 @@ static nrf_ble_gatt_t gatt_module;
 
 // GAP init
 #define CONN_CFG_TAG						1
-// #define CONN_SUP_TIMEOUT				MSEC_TO_UNITS(4000, UNIT_10_MS)
-// #define MIN_CONN_INTERVAL				MSEC_TO_UNITS(100, UNIT_1_25_MS)
-// #define MAX_CONN_INTERVAL				MSEC_TO_UNITS(200, UNIT_1_25_MS)
 
 // Connection parameters init
 #define MAX_CONN_PARAMS_UPDATE_COUNT			3
@@ -29,6 +26,14 @@ static nrf_ble_gatt_t gatt_module;
 
 // iTimer element only used by the system
 extern void iTimer_init();
+
+typedef struct iBle_writeHandler_list {
+	iBle_write_handler_t						write_handler;
+	uint16_t 												attr_handle;
+	struct iBle_writeHandler_list* 	next;
+}	iBle_writeHandler_list_t;
+
+static iBle_writeHandler_list_t* writeHandler_list = NULL;
 
 // Event handlers
 static void on_ble_evt(ble_evt_t* ble_evt)
@@ -100,8 +105,22 @@ static void on_ble_svc_evt(ble_evt_t* ble_evt)
 {
 	switch (ble_evt->header.evt_id)
 	{
-		case BLE_GATTS_EVT_WRITE:
+		case BLE_GATTS_EVT_WRITE:		{
+																	iBle_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+																	void *buf					= (void*) ble_evt->evt.gatts_evt.params.write.data;
+																	size_t offset			= ble_evt->evt.gatts_evt.params.write.offset;
+																	uint16_t handle		= ble_evt->evt.gatts_evt.params.write.handle;
+																	size_t buf_length	= ble_evt->evt.gatts_evt.params.write.len;
 
+																	// Browse all the elements of the list
+																	while(*nextWriteHandler != NULL && (*nextWriteHandler)->attr_handle != handle) {
+																		nextWriteHandler = &(*nextWriteHandler)->next;
+																	}
+
+																	if(*nextWriteHandler != NULL) {
+																		(*nextWriteHandler)->write_handler(buf, buf_length, offset);
+																	}
+																}
 		break;
 
 		default:
@@ -414,13 +433,6 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 
 	// Add read/write properties to the characteristic
 	ble_gatts_char_md_t chrc_md = {0};
-	// chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					&& IBLE_CHRC_PERM_BROADCAST;
-	// chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								&& IBLE_CHRC_PERM_READ;
-	// chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	&& IBLE_CHRC_PERM_WRITE_WITHOUT_RESP;
-	// chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)						 		&& IBLE_CHRC_PERM_WRITE;
-	// chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLE_CHRC_PERM_AUTH) 								&& IBLE_CHRC_PERM_AUTH;
-	// chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_NOTIFY) 							&& IBLE_CHRC_PERM_NOTIFY;
-	// chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_INDICATE) 						&& IBLE_CHRC_PERM_INDICATE;
 	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					? 1 : 0;
 	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								? 1 : 0;
 	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	? 1 : 0;
@@ -438,16 +450,9 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 
 	// Configure the attributes
 	ble_gatts_attr_md_t attr_md = {0};
-	attr_md.vloc = BLE_GATTS_VLOC_USER;
+	attr_md.vloc = BLE_GATTS_VLOC_STACK;
 	attr_md.vlen = 1;
 
-	// Set read/write security levels to the attribute
-	// if((chrc->attr_config.perm & IBLE_GATT_PERM_READ) && IBLE_GATT_PERM_READ) {
-	// 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
-	// }
-	// if((chrc->attr_config.perm & IBLE_GATT_PERM_WRITE) && IBLE_GATT_PERM_WRITE) {
-	// 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
-	// }
 	if((chrc->attr_config.perm & IBLE_GATT_PERM_READ)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
 	}
@@ -478,6 +483,23 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	if(error) {
 		iPrint("/!\\ GATT failed to add the characteristic: error %d\n", error);
 		return error;
+	}
+
+	// Store where to notify a write request
+	if(chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)
+	{
+		iBle_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+
+		// Search the last element of the list
+		while(*nextWriteHandler != NULL)  {
+			nextWriteHandler = &(*nextWriteHandler)->next;
+		}
+
+		// Add a new element in the list
+		*nextWriteHandler =	(iBle_writeHandler_list_t*) malloc(sizeof(iBle_writeHandler_list_t));
+		(*nextWriteHandler)->write_handler  = chrc->attr_config.write_handler;
+		(*nextWriteHandler)->attr_handle  	= svc->chrcs_handle[chrc_nbr].value_handle;
+		(*nextWriteHandler)->next 	  			= NULL;
 	}
 
 	return 0;

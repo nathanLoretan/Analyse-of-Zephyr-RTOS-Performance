@@ -1,15 +1,12 @@
 TODO:
 
-folder to generate bm code in outdir
-
-ble event write
-
 2. Behaviour on BLE central
 - Central BLE interface
+- RTT
 
 3. Code Improvement
+- ble event write
 - BM, thread priority
-- RTT
 - Use SDK queue and scheduler
 
 

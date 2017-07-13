@@ -7,11 +7,11 @@ PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
 # PINNING := $(foreach v, $(filter-out $(VARS_OLD) VARS_OLD,$(.VARIABLES)), -D$(v)=$($(v)))
 # PROJ_FLAGS += $(PINNING)
 
-# ifeq ($(sys),zephyr)
-# 	include $(PROJ_DIR)/zephyr.mk
-ifeq ($(sys),baremetal)
-	include $(PROJ_DIR)/baremetal.mk
-else
+ifeq ($(sys),zephyr)
 	include $(PROJ_DIR)/zephyr.mk
-	# include $(PROJ_DIR)/baremetal.mk
+# ifeq ($(sys),baremetal)
+# 	include $(PROJ_DIR)/baremetal.mk
+else
+	# include $(PROJ_DIR)/zephyr.mk
+	include $(PROJ_DIR)/baremetal.mk
 endif

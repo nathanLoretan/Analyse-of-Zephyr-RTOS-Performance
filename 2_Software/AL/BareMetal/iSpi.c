@@ -23,7 +23,7 @@ static void on_spi_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
 }
 #endif	// SPI0_ENABLED || SPI1_ENABLED
 
-int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priority_t prio, iSpi_bit_order_t order)
+int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order)
 {
 	#if SPI0_ENABLED || SPI1_ENABLED
 	int error;
@@ -39,7 +39,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 										.mosi_pin     = SPI0_MOSI,
 										.miso_pin     = SPI0_MISO,
 										.ss_pin       = NRF_DRV_SPI_PIN_NOT_USED,
-										.irq_priority = prio,
+										.irq_priority = SPI0_IRQ_PRIORITY,
 										.orc          = 0xFF,
 										.frequency    = freq,
 										.mode         = mode
@@ -89,7 +89,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 										.mosi_pin     = SPI1_MOSI,
 										.miso_pin     = SPI1_MISO,
 										.ss_pin       = NRF_DRV_SPI_PIN_NOT_USED,
-										.irq_priority = prio,
+										.irq_priority = SPI1_IRQ_PRIORITY,
 										.orc          = 0xFF,
 										.frequency    = freq,
 										.mode         = mode,

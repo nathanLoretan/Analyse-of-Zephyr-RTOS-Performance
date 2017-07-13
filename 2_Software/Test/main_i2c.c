@@ -10,7 +10,7 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY, ACC_I2C_IRQ_PRIORITY);
+  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
 
   uint8_t cmd      = 0x12;
   uint8_t addr_dev = 0x01;

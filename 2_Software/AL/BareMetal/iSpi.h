@@ -7,7 +7,6 @@
 #include "nrf_drv_spi.h"
 
 #define ISPI_PIN_NOT_USED										NRF_DRV_SPI_PIN_NOT_USED
-#define ISPI_DEFAULT_IRQ_PRIORITY						SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define ISPI_BIT_ORDER_MSB_FIRST						NRF_DRV_SPI_BIT_ORDER_MSB_FIRST
 #define ISPI_BIT_ORDER_LSB_FIRST						NRF_DRV_SPI_BIT_ORDER_LSB_FIRST
@@ -48,10 +47,9 @@ typedef enum {
 
 typedef uint32_t	iSpi_frequency_t;
 typedef uint8_t 	iSpi_mode_t;
-typedef uint8_t		iSpi_priority_t;
 typedef uint8_t		iSpi_bit_order_t;
 
-int 		iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priority_t prio, iSpi_bit_order_t order);
+int 		iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order);
 int 		iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length, uint8_t* rx_data, size_t rx_data_length);
 #define iSPI_read(_id, _slave, _rx_data, _rx_data_length)			iSpi_transmit(_id, _slave, NULL, 0, _rx_data, _rx_data_length)
 #define iSPI_write(_id, _slave, _tx_data, _tx_data_length) 		iSpi_transmit(_id, _slave, _tx_data, _tx_data_length, NULL, 0)

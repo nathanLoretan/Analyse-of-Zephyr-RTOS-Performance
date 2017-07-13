@@ -12,7 +12,7 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY, ACC_I2C_IRQ_PRIORITY);
+  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
 
   acc_init();
 

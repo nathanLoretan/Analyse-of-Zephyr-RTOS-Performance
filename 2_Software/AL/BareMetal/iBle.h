@@ -83,6 +83,9 @@
 #define IBLE_ADV_INT_MIN             				BLE_GAP_ADV_INTERVAL_MIN
 #define IBLE_ADV_INT_MAX             				BLE_GAP_ADV_INTERVAL_MAX
 
+typedef size_t (*iBle_write_handler_t)(void *buf, size_t buf_length, size_t offset);
+#define IBLE_WRITE_HANDLER(fn, buf, buf_length, offset)  size_t fn(void *buf, size_t buf_length, size_t offset)
+
 typedef struct {
 	ble_uuid_t			uuid16;
 	ble_uuid128_t		uuid128;
@@ -100,9 +103,10 @@ typedef struct {
 } iBle_chrc_config_t;
 
 typedef struct {
-	iBle_uuid_t		uuid;
-	uint8_t		 		perm;
-	uint8_t*			data;
+	iBle_uuid_t						uuid;
+	uint8_t		 						perm;
+	uint8_t*							data;
+	iBle_write_handler_t 	write_handler;
 } iBle_attr_config_t;
 
 typedef struct {
@@ -159,12 +163,13 @@ typedef struct {
 																													.uuid 		= _uuid,																										\
 																													.perm 		= _perm																											\
 																												}
-#define IBLE_ATTR_CONFIG(_uuid, _perm, _p_data)					.attr_config 		=																												\
-																												{																																				\
-																													.uuid		= _uuid,																											\
-																													.perm 	= _perm,																											\
-																													.data 		= (uint8_t*)(_p_data)																				\
-																												}
+#define IBLE_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)			.attr_config 		=																						\
+																																		{																														\
+																																			.uuid						= _uuid,																	\
+																																			.perm 					= _perm,																	\
+																																			.write_handler	= _write_handler,													\
+																																			.data 					= (uint8_t*)(_p_data)											\
+																																		}
 
 int iBle_init();
 volatile bool iBle_isConnected();

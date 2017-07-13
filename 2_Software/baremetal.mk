@@ -1,6 +1,6 @@
 PROJECT_NAME     := extBoard
 TARGETS          := nrf52840_xxaa
-OUTPUT_DIRECTORY := outdir/
+OUTPUT_DIRECTORY := outdir/nrf52840_xxaa
 
 SDK_ROOT 			:= ./nordic_components
 PROJECT_BASE 	:= $(PROJ_DIR)
@@ -70,8 +70,8 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Board/acc.c \
 	$(PROJECT_BASE)/Board/adc.c \
 	$(PROJECT_BASE)/Board/swg.c \
-	$(PROJECT_BASE)/Sensors/main.c
-	# $(PROJECT_BASE)/Test/main.c
+	$(PROJECT_BASE)/Test/main.c
+	# $(PROJECT_BASE)/Sensors/main.c
 
 
 # Include folders common to all targets
@@ -201,6 +201,10 @@ include $(TEMPLATE_PATH)/Makefile.common
 
 $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
+# Create the output directory if it doesn't exist
+$(OUTPUT_DIRECTORY):
+	@mkdir -p $(OUTPUT_DIRECTORY)
+
 # Flash the program
 flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 	@echo Flashing: $<
@@ -209,6 +213,7 @@ flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 
 # Flash softdevice
 flash_softdevice:
+	@mkdir -p $(OUTPUT_DIRECTORY)
 	@echo Flashing: s140_nrf52840_5.0.0-2.alpha_softdevice.hex
 	nrfjprog --program $(SDK_ROOT)/components/softdevice/s140/hex/s140_nrf52840_5.0.0-2.alpha_softdevice.hex -f nrf52 --sectorerase
 	nrfjprog --reset -f nrf52

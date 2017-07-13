@@ -12,7 +12,7 @@
 	static struct device* spi2;
 #endif	// CONFIG_SPI_2
 
-int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priority_t prio, iSpi_bit_order_t order)
+int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order)
 {
 	#if	 CONFIG_SPI_0 || CONFIG_SPI_1
 	int error;

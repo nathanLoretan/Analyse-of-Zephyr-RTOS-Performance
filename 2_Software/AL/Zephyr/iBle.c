@@ -13,11 +13,11 @@ ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr 
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
-ssize_t iBle_write_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
-{
-  memcpy(chrc->user_data + offset, buf, buf_length);
-  return buf_length;
-}
+// ssize_t iBle_write_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
+// {
+//   memcpy(chrc->user_data + offset, buf, buf_length);
+//   return buf_length;
+// }
 
 static void iBle_connected(struct bt_conn *conn, u8_t error)
 {

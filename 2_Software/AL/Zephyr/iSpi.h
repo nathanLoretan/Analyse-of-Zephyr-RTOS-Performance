@@ -13,7 +13,6 @@
 #include <spi.h>
 
 #define ISPI_PIN_NOT_USED										0xFF
-#define ISPI_DEFAULT_IRQ_PRIORITY						0	// NOT USED
 
 #define ISPI_BIT_ORDER_MSB_FIRST						SPI_TRANSFER_MSB
 #define ISPI_BIT_ORDER_LSB_FIRST						SPI_TRANSFER_LSB
@@ -54,10 +53,9 @@ typedef enum {
 
 typedef uint32_t	iSpi_frequency_t;
 typedef uint8_t 	iSpi_mode_t;
-typedef uint8_t		iSpi_priority_t;
 typedef uint8_t		iSpi_bit_order_t;
 
-int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priority_t prio, iSpi_bit_order_t order);
+int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order);
 int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length, uint8_t* rx_data, size_t rx_data_length);
 int iSPI_read(iSpi_id_t id, iSpi_slave_t slave, uint8_t* rx_data, size_t rx_data_length);
 int iSPI_write(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length);

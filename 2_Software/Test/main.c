@@ -30,6 +30,12 @@ static DEFINE_IBLE_ADV_DATA(scanrsp) =
 // 	.timeout         = IBLE_ADV_NO_TIMEOUT,
 // };
 
+IBLE_WRITE_HANDLER(write_current_time, buf, buf_length, offset)
+{
+  memcpy(&current_time + offset, buf, buf_length);
+  return buf_length;
+}
+
 iBle_svc_t cts_svc;
 // size_t cts_nbr_attrs = 4;
 size_t cts_nbr_chrcs = 1;
@@ -39,7 +45,7 @@ DEFINE_IBLE_SVC_CONFIG(cts_config)
   DEFINE_IBLE_CHRCS (
     DEFINE_IBLE_CHRC (
     	IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY | IBLE_CHRC_PERM_WRITE),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, &current_time)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &current_time)
     ),
   )
 };
@@ -53,15 +59,15 @@ DEFINE_IBLE_SVC_CONFIG(hrs_config)
   DEFINE_IBLE_CHRCS (
     DEFINE_IBLE_CHRC (
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_INDICATE | IBLE_CHRC_PERM_WRITE),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, &current_time)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &current_time)
     ),
     DEFINE_IBLE_CHRC_NO_CCCD (
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_BODY_SENSOR), IBLE_CHRC_PERM_READ),
-    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_BODY_SENSOR), IBLE_GATT_PERM_READ, NULL)
+    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_BODY_SENSOR), IBLE_GATT_PERM_READ, NULL, NULL)
     ),
     DEFINE_IBLE_CHRC_NO_CCCD (
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_CONTROL_POINT), IBLE_CHRC_PERM_WRITE),
-    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_CONTROL_POINT), IBLE_GATT_PERM_READ, NULL)
+    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_CONTROL_POINT), IBLE_GATT_PERM_READ, NULL, NULL)
     )
   )
 };
@@ -79,7 +85,7 @@ DEFINE_IBLE_SVC_CONFIG(my_config)
   DEFINE_IBLE_CHRCS (
     DEFINE_IBLE_CHRC_NO_CCCD (
     	IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(MY_UUID_CHRC, MY_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_WRITE),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(MY_UUID_CHRC, MY_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, &current_time)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(MY_UUID_CHRC, MY_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &current_time)
     ),
   )
 };
@@ -90,12 +96,12 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iPrint("\tInitialization\n");
-  iPrint("\t--------------\n");
+  iPrint("Initialization\n");
+  iPrint("--------------\n");
 
   bluetooth_init();
 
-  iPrint("\t--------------\n");
+  iPrint("--------------\n");
 
   bluetooth_test();
 
@@ -126,11 +132,13 @@ void bluetooth_test()
   {
     if(iBle_isConnected())
     {
-      // iSleep_ms(1000);
-      // current_time++;
+      iSleep_ms(1000);
+      current_time++;
 
-      // iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
-      // iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      iPrint("current time: %lu\n", current_time);
+
+      iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
     }
   }
 }

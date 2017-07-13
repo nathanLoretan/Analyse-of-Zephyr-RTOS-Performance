@@ -6,8 +6,8 @@ SOURCE_DIR 		= 	$(PROJECT_BASE)
 KBUILD_CFLAGS += 	-DZEPHYR_USED
 
 obj-y += Board/
-# obj-y += Test/
-obj-y += Sensors/
+obj-y += Test/
+# obj-y += Sensors/
 obj-y += AL/Zephyr/
 
 include ${ZEPHYR_BASE}/Makefile.inc
