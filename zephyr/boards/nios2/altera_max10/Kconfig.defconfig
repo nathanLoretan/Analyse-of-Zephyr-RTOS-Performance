@@ -1,7 +1,0 @@
-if BOARD_ALTERA_MAX10
-
-config BOARD
-	default "altera_max10"
-
-endif
-

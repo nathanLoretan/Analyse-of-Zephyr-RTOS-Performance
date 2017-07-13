@@ -6,7 +6,7 @@ static struct k_mutex 									indicate_mutex;
 static struct bt_gatt_indicate_params 	ind_params;
 
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
-struct bt_gatt_ccc_cfg ccc_cfg[CONFIG_BLUETOOTH_MAX_PAIRED] = {};
+struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 
 ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset)
 {

@@ -92,7 +92,7 @@ ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr 
 ssize_t iBle_write_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, const void *buf, u16_t buf_length, u16_t offset, u8_t flags);
 
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
-extern struct bt_gatt_ccc_cfg ccc_cfg[CONFIG_BLUETOOTH_MAX_PAIRED];
+extern struct bt_gatt_ccc_cfg ccc_cfg[5];
 
 typedef enum {
 	IBLE_ADV_MODE_FAST,
@@ -111,9 +111,9 @@ typedef struct bt_data										iBle_advdata_t;
 
 typedef struct bt_gatt_attr											iBle_uuid_t;
 #define DEFINE_IBLE_UUID16(_uuid)								_uuid
-#define DEFINE_IBLE_UUID128(_uuid, _base...)		BT_UUID_DECLARE_128((_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), 					\
-																																		BYTE4(_base, N), BYTE5(_base, N), BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N),		\
-																																	 	BYTE10(_base, N), BYTE11(_base, N), BYTE12(_base, N), BYTE13(_base, N), BYTE14(_base, N))								\
+#define DEFINE_IBLE_UUID128(_uuid, _base...)		BT_UUID_DECLARE_128(BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),										\
+																																		BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),	\
+																																		BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, N))
 
 #define BYTE1(b1, ...)    b1
 #define BYTE2(b1, ...)    BYTE1(__VA_ARGS__, N)   // Keep only the last bits
@@ -129,6 +129,8 @@ typedef struct bt_gatt_attr											iBle_uuid_t;
 #define BYTE12(b1, ...)   BYTE11(__VA_ARGS__, N)  // Keep only the 11 last bits
 #define BYTE13(b1, ...)   BYTE12(__VA_ARGS__, N)  // Keep only the 12 last bits
 #define BYTE14(b1, ...)   BYTE13(__VA_ARGS__, N)  // Keep only the 13 last bits
+#define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
+#define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
 typedef struct bt_gatt_service 						iBle_svc_t;
 typedef struct bt_gatt_attr		 						iBle_chrc_t;

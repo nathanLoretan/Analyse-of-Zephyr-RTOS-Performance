@@ -1,7 +1,0 @@
-
-if BOARD_MINNOWBOARD
-
-config BOARD
-	default minnowboard
-
-endif # BOARD_MINNOWBOARD
