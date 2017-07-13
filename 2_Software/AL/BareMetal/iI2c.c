@@ -52,7 +52,7 @@ int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq, iI2c_priority_t prio)
 
 									nrf_mtx_init(&twi0_mutex);
 
-									iPrint("-> I2C0 initialized\n");
+									iPrint("[INIT] I2C0 initialized\n");
 								}
 		break;
 	#endif	// TWI0_ENABLED
@@ -80,7 +80,7 @@ int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq, iI2c_priority_t prio)
 
 									nrf_mtx_init(&twi1_mutex);
 
-									iPrint("-> I2C1 initialized\n");
+									iPrint("[INIT] I2C1 initialized\n");
 								}
 		break;
 	#endif	// TWI1_ENABLED

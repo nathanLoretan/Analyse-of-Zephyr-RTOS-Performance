@@ -41,7 +41,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 										return error;
 									}
 
-									iPrint("-> SPI0 initialized\n");
+									iPrint("[INIT] SPI0 initialized\n");
 								}
 		break;
 	#endif	// CONFIG_SPI_0
@@ -68,7 +68,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 										return error;
 									}
 
-									iPrint("-> SPI1 initialized\n");
+									iPrint("[INIT] SPI1 initialized\n");
 								}
 		break;
 	#endif	// CONFIG_SPI_1

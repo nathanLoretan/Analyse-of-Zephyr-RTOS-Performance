@@ -172,9 +172,6 @@ void extBoad_init();
 
 int main()
 {
-  iPrint("\tInitialization\n");
-  iPrint("\t--------------\n");
-
   // Thread must be declare before the driver to avoid full filling the event queues
   iThread_run(&acc_thread, acc);
   iThread_run(&adc_thread, adc);
@@ -198,7 +195,8 @@ int main()
 
 void bluetooth_init()
 {
-  iPrint("\n- Initialize Bluetooth\n");
+  iPrint("\nInitialize Bluetooth\n");
+  iPrint("--------------------\n");
 
   iBle_init();
   iBle_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
@@ -208,7 +206,8 @@ void bluetooth_init()
 
 void extBoad_init()
 {
-  iPrint("\n- Initialize extBoard\n");
+  iPrint("\nInitialize extBoard\n");
+  iPrint("-------------------\n");
 
   iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_IRQ_PRIORITY, SWG_SPI_BIT_ORDER);
   swg_init(EXT_INT_FREQ);

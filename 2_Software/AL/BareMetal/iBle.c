@@ -39,7 +39,13 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 	{
 		case BLE_GAP_EVT_CONNECTED: 		connection = ble_evt->evt.gap_evt.conn_handle;
 																		isConnected = true;
-																		iPrint("-> Central connected\n");
+
+																		iPrint("\n-> Central connected\n");
+																		iPrint("--------------------\n");
+																    iPrint("Connection Interval Min: %u[us]\n", ble_evt->evt.gap_evt.params.connected.conn_params.min_conn_interval * UNIT_1_25_MS);
+																		iPrint("Connection Interval Max: %u[us]\n", ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval * UNIT_1_25_MS);
+																    iPrint("Connection Slave Latency: %u\n", ble_evt->evt.gap_evt.params.connected.conn_params.slave_latency);
+																    iPrint("Connection Timeout: %u[ms]\n", ble_evt->evt.gap_evt.params.connected.conn_params.conn_sup_timeout * UNIT_10_MS / 1000);
 		break;
 
 		case BLE_GAP_EVT_DISCONNECTED: 	connection = BLE_CONN_HANDLE_INVALID;
@@ -53,6 +59,16 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 																		}
 
 																		iPrint("-> Advertising restarted\n");
+		break;
+
+		case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+
+																		iPrint("\n-> Connection Parameters Update\n");
+																		iPrint("-------------------------------\n");
+																		iPrint("Connection Interval Min: %u[us]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval * UNIT_1_25_MS);
+																		iPrint("Connection Interval Max: %u[us]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval * UNIT_1_25_MS);
+																		iPrint("Connection Slave Latency: %u\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.slave_latency);
+																		iPrint("Connection Timeout: %u[ms]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.conn_sup_timeout * UNIT_10_MS / 1000);
 		break;
 
 		case BLE_GATTC_EVT_TIMEOUT: 		// Disconnect on GATT Client timeout event.
@@ -320,6 +336,8 @@ int iBle_init()
 		return error;
 	}
 
+	iPrint("[INIT] Bluetooth initialized\n");
+
 	return 0;
 }
 
@@ -496,7 +514,7 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 		 }
 	}
 
-	iPrint("-> Service initialized\n");
+	iPrint("[INIT] Service 0x%04x initialized\n", svc_config->uuid.uuid16.uuid);
 	return 0;
 }
 

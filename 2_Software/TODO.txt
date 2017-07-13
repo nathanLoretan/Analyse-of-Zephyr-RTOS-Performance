@@ -1,5 +1,7 @@
 TODO:
 
+folder to generate bm code in outdir
+
 ble event write
 
 2. Behaviour on BLE central

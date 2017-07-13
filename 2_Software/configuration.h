@@ -41,8 +41,8 @@
 #define ADV_INTERVAL_MAX       60                         // [ms] ranges from 20ms to 10.24s
 #define ADV_TIMEOUT            IBLE_ADV_TIMEOUT_NONE      // [ms]
 
-#define CONN_MIN_INTERVAL     10                        // [ms] ranges from 7.5ms to 4s
-#define CONN_MAX_INTERVAL     20                        // [ms] ranges from 7.5ms to 4s
+#define CONN_MIN_INTERVAL     50                        // [ms] ranges from 7.5ms to 4s
+#define CONN_MAX_INTERVAL     100                        // [ms] ranges from 7.5ms to 4s
 #define CONN_TIMEOUT          4000                      // [ms]
 
 #define SLAVE_LATENCY         0

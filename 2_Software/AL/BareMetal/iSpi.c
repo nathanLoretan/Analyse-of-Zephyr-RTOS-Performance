@@ -76,7 +76,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 
 									nrf_mtx_init(&spi0_mutex);
 
-									iPrint("-> SPI0 initialized\n");
+									iPrint("[INIT] SPI0 initialized\n");
 								}
 		break;
 	#endif	// SPI0_ENABLED
@@ -127,7 +127,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_priori
 
 									nrf_mtx_init(&spi1_mutex);
 
-									iPrint("-> SPI1 initialized\n");
+									iPrint("[INIT] SPI1 initialized\n");
 								}
 		break;
 	#endif	// SPI1_ENABLED

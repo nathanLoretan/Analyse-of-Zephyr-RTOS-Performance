@@ -24,10 +24,23 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
 	if (error) {
 		iPrint("-> Connection failed: %u\n", error);
 	}
-	else {
+	else
+  {
 		connection = bt_conn_ref(conn);
+
+    struct bt_conn_info info;
+    error = bt_conn_get_info(conn, &info);
+    if(error) {
+      iPrint("/!\\ Bluetooth get connection information failed: error %d\n", error);
+    }
+
 		isConnected = true;
-		iPrint("-> Central connected\n");
+
+		iPrint("\n-> Central connected\n");
+    iPrint("--------------------\n");
+    iPrint("Connection Interval: %u[us]\n", info.le.interval * UNIT_1_25_MS);
+    iPrint("Connection Slave Latency: %u\n", info.le.latency);
+    iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 	}
 }
 
@@ -42,10 +55,20 @@ static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
+static void iBle_conn_parameters_update(struct bt_conn *conn, u16_t interval, u16_t latency, u16_t timeout)
+{
+  iPrint("\n-> Connection Parameters Update\n");
+  iPrint("-------------------------------\n");
+  iPrint("Connection Interval: %u[us]\n", interval * UNIT_1_25_MS);
+  iPrint("Connection Slave Latency: %u\n", latency);
+  iPrint("Connection Timeout: %u[ms]\n", timeout * UNIT_10_MS / 1000);
+}
+
 static struct bt_conn_cb connection_callback =
 {
-	.connected 		= iBle_connected,
-	.disconnected = iBle_disconnected,
+	.connected 		    = iBle_connected,
+	.disconnected     = iBle_disconnected,
+  .le_param_updated = iBle_conn_parameters_update
 };
 
 int iBle_init()
@@ -56,7 +79,7 @@ int iBle_init()
 	if(error) {
 		iPrint("/!\\ Bluetooth init failed to initialized: error %d\n", error);
 		return error;
-	}
+  }
 
 	// Call back for connection and disconnection event
 	bt_conn_cb_register(&connection_callback);
@@ -64,7 +87,7 @@ int iBle_init()
 	// Initialize the mutex for the indication
 	k_mutex_init(&indicate_mutex);
 
-	iPrint("-> Bluetooth initialized\n");
+	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
 }
 
@@ -77,7 +100,6 @@ static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
 {
 	iPrint("-> Advertising timeout\n");
 	bt_le_adv_stop();
-	iBle_sleep();
 }
 
 K_TIMER_DEFINE(adv_timeout_timer, on_advertise_timeout, NULL);
@@ -144,7 +166,9 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 		return error;
 	}
 
-	printk("-> Service initialized\n");
+  struct bt_uuid_128* uuid = (struct bt_uuid_128*)svc_config[0].user_data;
+
+	iPrint("[INIT] Service 0x%02x%02x initialized\n", uuid->val[1], uuid->val[0]);
 	return 0;
 }
 

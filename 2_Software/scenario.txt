@@ -7,6 +7,14 @@ advertising interval max  * 0.625ms ranges from 20ms to 10.24s
 connection interval min   * 1.25ms ranges from 7.5ms to 4s
 connection interval max   * 1.25ms ranges from 7.5ms to 4s
 
+	Address random static
+
+	Nbr Packet max = MTU/23bytes
+	Max nbr packet per connection interval = 6
+	Throughtput = Nbr of Packets in Connection Interval * Data Per Packet / Connection Interval
+
+Send always one packet per connection interval and 6 packet per connection interval
+
 SWG:
 --------------------------------------------------------------------------------
 f = fMCLK / 2^28

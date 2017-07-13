@@ -85,7 +85,7 @@ typedef struct {
 static bool isSleeping = false;
 
 static iTimer_t adc_timer;
-ITIMER_HANDLER(on_adc_data_timer) {	
+ITIMER_HANDLER(on_adc_data_timer) {
 	iEventQueue_add(&adc_EventQueue, ADC_EVENT_DATA);
 }
 
@@ -121,7 +121,7 @@ void adc_init()
 	iEventQueue_init(&adc_EventQueue);
   iTimer_start(&adc_timer, on_adc_data_timer, ADC_TIMER);
 
-	iPrint("-> ADC initialized\n");
+	iPrint("[INIT] ADC initialized\n");
 }
 
 static adc_status_t adc_getStatus()

@@ -71,7 +71,7 @@ void swg_init(float frequency)
 	ISPI_CREATE_DATA(tx_buf, REGISTER_CONTROL | SELECT_28BITS | SELECT_FREQ0 | SELECT_PHASE0 , SLEEP_NO | WAVE_SQUARE);
 	iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
 
-	iPrint("-> SWG initialized\n");
+	iPrint("[INIT] SWG initialized\n");
 }
 
 void swg_sleep()

@@ -328,7 +328,7 @@ void acc_init()
 	iGpio_enable_interrupt(&int2);
   iEventQueue_init(&acc_EventQueue);
 
-  iPrint("-> ACC initialized\n");
+  iPrint("[INIT] ACC initialized\n");
 }
 
 // static acc_status_t acc_getStatus()
