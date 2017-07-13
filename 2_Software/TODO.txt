@@ -5,7 +5,6 @@ TODO:
 - RTT
 
 3. Code Improvement
-- ble event write
 - BM, thread priority
 - Use SDK queue and scheduler
 

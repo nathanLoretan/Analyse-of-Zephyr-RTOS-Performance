@@ -92,7 +92,7 @@ ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr 
 // ssize_t iBle_write_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, const void *buf, u16_t buf_length, u16_t offset, u8_t flags);
 
 typedef ssize_t (*iBle_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t len, u16_t offset, u8_t flags);
-#define IBLE_WRITE_HANDLER(fn, buf, buf_length, offset)  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
+#define IBLE_WRITE_HANDLER(fn, attr, buf, buf_length, offset)  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
 
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
 extern struct bt_gatt_ccc_cfg ccc_cfg[5];
@@ -158,5 +158,6 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t*
 int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs);
 int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
 int	iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
+#define iBle_attr_set_data(_attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
 
 #endif	// __IBLE__

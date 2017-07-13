@@ -28,7 +28,7 @@ static nrf_ble_gatt_t gatt_module;
 extern void iTimer_init();
 
 typedef struct iBle_writeHandler_list {
-	iBle_write_handler_t						write_handler;
+	iBle_attr_config_t*							attr;
 	uint16_t 												attr_handle;
 	struct iBle_writeHandler_list* 	next;
 }	iBle_writeHandler_list_t;
@@ -118,7 +118,7 @@ static void on_ble_svc_evt(ble_evt_t* ble_evt)
 																	}
 
 																	if(*nextWriteHandler != NULL) {
-																		(*nextWriteHandler)->write_handler(buf, buf_length, offset);
+																		(*nextWriteHandler)->attr->write_handler((*nextWriteHandler)->attr, buf, buf_length, offset);
 																	}
 																}
 		break;
@@ -450,7 +450,7 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 
 	// Configure the attributes
 	ble_gatts_attr_md_t attr_md = {0};
-	attr_md.vloc = BLE_GATTS_VLOC_STACK;
+	attr_md.vloc = BLE_GATTS_VLOC_USER;
 	attr_md.vlen = 1;
 
 	if((chrc->attr_config.perm & IBLE_GATT_PERM_READ)) {
@@ -497,7 +497,7 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 
 		// Add a new element in the list
 		*nextWriteHandler =	(iBle_writeHandler_list_t*) malloc(sizeof(iBle_writeHandler_list_t));
-		(*nextWriteHandler)->write_handler  = chrc->attr_config.write_handler;
+		(*nextWriteHandler)->attr 					= &chrc->attr_config;
 		(*nextWriteHandler)->attr_handle  	= svc->chrcs_handle[chrc_nbr].value_handle;
 		(*nextWriteHandler)->next 	  			= NULL;
 	}

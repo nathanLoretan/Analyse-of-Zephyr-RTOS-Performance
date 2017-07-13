@@ -30,9 +30,10 @@ static DEFINE_IBLE_ADV_DATA(scanrsp) =
 // 	.timeout         = IBLE_ADV_NO_TIMEOUT,
 // };
 
-IBLE_WRITE_HANDLER(write_current_time, buf, buf_length, offset)
+IBLE_WRITE_HANDLER(write_current_time, attr, buf, buf_length, offset)
 {
-  memcpy(&current_time + offset, buf, buf_length);
+  iBle_attr_set_data(attr, buf, buf_length, offset);
+
   return buf_length;
 }
 

@@ -83,8 +83,10 @@
 #define IBLE_ADV_INT_MIN             				BLE_GAP_ADV_INTERVAL_MIN
 #define IBLE_ADV_INT_MAX             				BLE_GAP_ADV_INTERVAL_MAX
 
-typedef size_t (*iBle_write_handler_t)(void *buf, size_t buf_length, size_t offset);
-#define IBLE_WRITE_HANDLER(fn, buf, buf_length, offset)  size_t fn(void *buf, size_t buf_length, size_t offset)
+struct iBle_attr_config;
+
+typedef size_t (*iBle_write_handler_t)(struct iBle_attr_config* attr, void *buf, size_t buf_length, size_t offset);
+#define IBLE_WRITE_HANDLER(fn, attr, buf, buf_length, offset)  	size_t fn(struct iBle_attr_config* attr, void *buf, size_t buf_length, size_t offset)
 
 typedef struct {
 	ble_uuid_t			uuid16;
@@ -102,7 +104,7 @@ typedef struct {
 	uint8_t				perm;
 } iBle_chrc_config_t;
 
-typedef struct {
+typedef struct iBle_attr_config {
 	iBle_uuid_t						uuid;
 	uint8_t		 						perm;
 	uint8_t*							data;
@@ -177,5 +179,6 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t*
 int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs);
 int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
 int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
+#define iBle_attr_set_data(_attr, _buf, _buf_length, _offset) 	memcpy((_attr)->data + _offset, _buf, _buf_length)
 
 #endif  // __IBLE__
