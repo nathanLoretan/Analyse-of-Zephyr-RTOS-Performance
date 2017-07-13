@@ -1,0 +1,54 @@
+
+if BOARD_TINYTILE
+
+config BOARD
+	default "tinytile"
+
+config TEXT_SECTION_OFFSET
+	default 0x30
+
+config SS_RESET_VECTOR
+	default 0x40034000
+
+config ROM_SIZE
+	default 192
+
+config PHYS_LOAD_ADDR
+	default 0x40010000
+
+if BLUETOOTH_H4
+
+config BLUETOOTH_UART_ON_DEV_NAME
+	default UART_QMSI_0_NAME
+
+endif
+
+if UART_PIPE
+
+config UART_PIPE_ON_DEV_NAME
+	default UART_QMSI_1_NAME
+
+endif
+
+config BLUETOOTH_MONITOR_ON_DEV_NAME
+	default UART_QMSI_1_NAME if BLUETOOTH_DEBUG_MONITOR
+
+if USB
+
+config USB_DW
+	def_bool y
+
+config USB_DEVICE_STACK
+	def_bool y
+
+if USB_UART_CONSOLE
+
+config UART_INTERRUPT_DRIVEN
+	def_bool y
+
+config UART_LINE_CTRL
+	def_bool y
+
+endif
+endif
+endif # BOARD_TINYTILE
