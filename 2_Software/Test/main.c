@@ -34,6 +34,7 @@ IBLE_WRITE_HANDLER(write_current_time, attr, buf, buf_length, offset)
 {
   iBle_attr_set_data(attr, buf, buf_length, offset);
 
+  // Return the number of data written
   return buf_length;
 }
 

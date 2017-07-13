@@ -87,9 +87,7 @@
 
 // Read and Write handler
 typedef ssize_t (*iBle_read_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, u16_t len, u16_t offset);
-// typedef ssize_t (*iBle_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t len, u16_t offset, u8_t flags);
 ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset);
-// ssize_t iBle_write_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, const void *buf, u16_t buf_length, u16_t offset, u8_t flags);
 
 typedef ssize_t (*iBle_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t len, u16_t offset, u8_t flags);
 #define IBLE_WRITE_HANDLER(fn, attr, buf, buf_length, offset)  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
@@ -150,7 +148,6 @@ typedef struct bt_gatt_attr		 						iBle_cccd_config_t;
 #define IBLE_SVC_UUID(_uuid)  																			BT_GATT_PRIMARY_SERVICE(_uuid)
 #define IBLE_CHRC_CONFIG(_uuid, _perm) 															BT_GATT_CHARACTERISTIC(_uuid, _perm)
 #define IBLE_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)  	BT_GATT_DESCRIPTOR(_uuid, _perm, iBle_read_handler, _write_handler, _p_data)
-// #define IBLE_ATTR_CONFIG(_uuid, _perm, _value)  	BT_GATT_DESCRIPTOR(_uuid, _perm, iBle_read_handler, iBle_write_handler, _value)
 
 int	iBle_init();
 volatile bool iBle_isConnected();

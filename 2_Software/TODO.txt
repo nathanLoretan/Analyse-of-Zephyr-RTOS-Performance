@@ -6,7 +6,6 @@ TODO:
 
 3. Code Improvement
 - BM, thread priority
-- Use SDK queue and scheduler
 
 
 git config --global -e
