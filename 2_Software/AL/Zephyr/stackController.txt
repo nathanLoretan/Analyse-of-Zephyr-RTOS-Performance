@@ -1,0 +1,9 @@
+
+Controller:
+          -> hci_driver_send()                                                  controller/hci_driver.c
+
+            -> hci_acl_handle()                                                 controller/hci.c              acl = Asynchronous Connection-Less
+              -----------------
+
+            -> cmd_handle()                                                     controller/hci_driver.c
+            ---------------

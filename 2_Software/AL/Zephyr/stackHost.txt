@@ -1,0 +1,175 @@
+--------------------------------------------------------------------------------
+--                             APPLICATION                                    --
+--------------------------------------------------------------------------------
+
+Notify:
+--------------------------------------------------------------------------------
+
+-> bt_gatt_notify()                                                             host/gatt.c
+
+  | IF conn == NULL get the connection |
+  --------------------------------------
+  -> bt_gatt_foreach_attr()                                                     host/gatt.c
+    -> notify_cb()                                                              host/gatt.c
+  --------------------------------------
+
+  -> gatt_notify()                                                              host/gatt.c
+    -> bt_att_create_pdu()                                                      host/att.c
+    -> bt_l2cap_send()                                                          host/l2cap_internal.h
+      -> bt_l2cap_send_cb()                                                     host/l2cap.c            The function want a parameter cb that is null because notify (bt_conn_tx_cb_t = NULL)
+        -> bt_conn_send_cb()                                                    host/conn.c             The function want a parameter cb that is null because notify (bt_conn_tx_cb_t = NULL)
+          -> net_buf_put(&conn->tx_queue, buf)                                  subsys/net/buf.c
+
+Indicate:
+--------------------------------------------------------------------------------
+
+-> bt_gatt_indicate()                                                           host/gatt.c
+
+  | IF conn == NULL get the connection |
+  --------------------------------------
+  -> bt_gatt_foreach_attr()                                                     host/gatt.c
+    -> notify_cb()                                                              host/gatt.c
+  --------------------------------------
+
+  -> gatt_indicate()                                                            host/gatt.c
+    -> bt_att_create_pdu()                                                      host/att.c
+    -> gatt_send()                                                              host/gatt.c            take parameter bt_att_func_t gatt_indicate_rsp defined in host/gatt.c
+
+    | IF params != NULL |
+    ---------------------
+    -> bt_att_req_send()                                                        host/att.c
+      -> att_send_req()                                                         host/att.c
+    --------
+    | ELSE |
+    --------
+    -> bt_att_send()                                                            host/att.c
+    --------------------
+
+    -> att_cb()                                                                 host/att.c              return the callback function depending data type. this case attr_req_sent
+    -> bt_l2cap_send_cb()                                                       host/l2cap.c
+      -> bt_conn_send_cb()                                                      host/conn.c
+        -> net_buf_put(&conn->tx_queue, buf)                                    subsys/net/buf.c
+
+--------------------------------------------------------------------------------
+--                                  SEND                                      --  How data are sent to the HCI ??? bt_conn_process_tx -> send_buf -> send_frag() -> bt_send
+--------------------------------------------------------------------------------
+
+-> hci_tx_thread()                                                              host/hci_core.c
+  -> process_events()                                                           host/hci_core.c
+
+    | IF BT_EVENT_CONN_TX_NOTIFY |
+    -> bt_conn_process_tx
+
+
+    | IF BT_EVENT_CMD_TX |
+    -> send_cmd()                                                               host/hci_core.c
+      -> net_buf_get(&bt_dev.cmd_tx_queue)                                      subsys/net/buf.c
+      -> bt_send()                                                              host/hci_core.c
+        -> bt_dev.drv->send()                                                   host/hci_core.h
+          -> (CONTROLLER) hci_driver_send()                                     controller/hci_driver.c
+
+        /!\ IMPORTANT /!\
+        -----------------
+        1. bt_dev           struct bt_dev           host/hci_core.h
+        2. drv              struct bt_hci_driver    controller/hci_driver.c
+        -> bt_hci_driver_register(drv)              host/hci_raw.c
+            { bt_dev.drv = drv }
+
+--------------------------------------------------------------------------------
+--                               RECEIVE                                      --  How data are sent to the Application ???
+--------------------------------------------------------------------------------
+
+-> (CONTROLLER) recv_thread()                                                   Controller/hci/hci_driver.c
+  -> bt_recv()                                                                  host/hci_core.c
+
+    | IF CONFIG_BLUETOOTH_RECV_IS_RX_THREAD |
+    -----------------------------------------
+    -> hci_event()                                                              host/hci_core.c
+    --------
+    | ELSE |
+    --------
+    -> net_buf_put(bt_dev.rx_queue)                                             subsys/net/buf.c      the event will be handled in hci_rx_thread()
+    -----------------------------------------
+
+| IF NOT CONFIG_BLUETOOTH_RECV_IS_RX_THREAD |
+---------------------------------------------
+-> hci_rx_thread()                                                              host/hci_core.c
+  -> net_buf_get(bt_dev.rx_queue)                                               subsys/net/buf.c
+  -> hci_event()                                                                host/hci_core.c
+
+
+/!\ IMPORTANT /!\
+-----------------
+hci_event() dispatches depend of the kind of event. Very, very important
+
+	case BT_HCI_EVT_CONN_REQUEST:
+		conn_req(buf);
+
+	case BT_HCI_EVT_CONN_COMPLETE:
+		conn_complete(buf);
+
+	case BT_HCI_EVT_PIN_CODE_REQ:
+		pin_code_req(buf);
+
+	case BT_HCI_EVT_LINK_KEY_NOTIFY:
+		link_key_notify(buf);
+
+	case BT_HCI_EVT_LINK_KEY_REQ:
+		link_key_req(buf);
+
+	case BT_HCI_EVT_IO_CAPA_RESP:
+		io_capa_resp(buf);
+
+	case BT_HCI_EVT_IO_CAPA_REQ:
+		io_capa_req(buf);
+
+	case BT_HCI_EVT_SSP_COMPLETE:
+		ssp_complete(buf);
+
+	case BT_HCI_EVT_USER_CONFIRM_REQ:
+		user_confirm_req(buf);
+
+	case BT_HCI_EVT_USER_PASSKEY_NOTIFY:
+		user_passkey_notify(buf);
+
+	case BT_HCI_EVT_USER_PASSKEY_REQ:
+		user_passkey_req(buf);
+
+	case BT_HCI_EVT_INQUIRY_COMPLETE:
+		inquiry_complete(buf);
+
+	case BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI:
+		inquiry_result_with_rssi(buf);
+
+	case BT_HCI_EVT_EXTENDED_INQUIRY_RESULT:
+		extended_inquiry_result(buf);
+
+	case BT_HCI_EVT_REMOTE_NAME_REQ_COMPLETE:
+		remote_name_request_complete(buf);
+
+	case BT_HCI_EVT_AUTH_COMPLETE:
+		auth_complete(buf);
+
+	case BT_HCI_EVT_REMOTE_FEATURES:
+		read_remote_features_complete(buf);
+
+	case BT_HCI_EVT_REMOTE_EXT_FEATURES:
+		read_remote_ext_features_complete(buf);
+
+	case BT_HCI_EVT_ROLE_CHANGE:
+		role_change(buf);
+
+	case BT_HCI_EVT_SYNC_CONN_COMPLETE:
+		synchronous_conn_complete(buf);
+
+	case BT_HCI_EVT_DISCONN_COMPLETE:
+		hci_disconn_complete(buf);
+
+	case BT_HCI_EVT_ENCRYPT_CHANGE:
+		hci_encrypt_change(buf);
+
+	case BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE:
+		hci_encrypt_key_refresh_complete(buf);
+
+	case BT_HCI_EVT_LE_META_EVENT:
+		hci_le_meta_event(buf);

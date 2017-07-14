@@ -71,7 +71,7 @@
 														((ADC_DATA_RATE == ADC_DATA_RATE_7) && (ADC_CONVERSION_MODE == ADC_CONVERSION_SINGLE_CYCLE)) ?   17: \
 														((ADC_DATA_RATE == ADC_DATA_RATE_8) && (ADC_CONVERSION_MODE == ADC_CONVERSION_SINGLE_CYCLE)) ?    9: 0)
 
-extern iSpi_id_t spi;
+static iSpi_id_t spi = ADC_SPI;
 
 typedef struct {
     uint8_t system_gain_overrange		: 1;

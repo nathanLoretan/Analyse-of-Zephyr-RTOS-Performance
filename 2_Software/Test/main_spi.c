@@ -1,7 +1,7 @@
 #include "../configuration.h"
-#include "../Board/acc.h"
-#include "../Board/adc.h"
-#include "../Board/swg.h"
+#include "../Drivers/acc.h"
+#include "../Drivers/adc.h"
+#include "../Drivers/swg.h"
 
 iSpi_id_t spi = SPI1;
 

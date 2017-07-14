@@ -1,7 +1,7 @@
 #include "../configuration.h"
-#include "../Board/acc.h"
-#include "../Board/adc.h"
-#include "../Board/swg.h"
+#include "../Drivers/acc.h"
+#include "../Drivers/adc.h"
+#include "../Drivers/swg.h"
 
 iEventQueue_t eventTh1;
 iEventQueue_t eventTh2;

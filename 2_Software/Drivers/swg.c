@@ -42,7 +42,7 @@
 	#define	WAVE_SQUARE_DIV2		0x20
 	#define	WAVE_SQUARE					0x28
 
-extern iSpi_id_t spi;
+static iSpi_id_t spi = SWG_SPI;
 
 void swg_init(float frequency)
 {

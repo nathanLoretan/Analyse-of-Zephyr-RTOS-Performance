@@ -78,22 +78,19 @@ interruption 2: click, threshold
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+Scenario Case 0 (WORST CASE):
+--------------------------------------------------------------------------------
+BLE slave latency             0
+BLE connection timeout        3000ms
+BLE connection interval min   7.5ms
+BLE connection interval max   15ms
 
 Scenario Case 1 (SDK mouse):
 --------------------------------------------------------------------------------
 BLE slave latency             20
-BLE connection timeout        3000mss
+BLE connection timeout        3000ms
 BLE connection interval min   7.5ms
 BLE connection interval max   15ms
-
-ACC data Rate = 5.95ms
-ACC FIFO = 8      \_ 1ms Time data frame transmition
-ACC DATA = X Y Z  /
-
-ADC data Rate = 120sps -> 8.3ms(1/120)
-
-External interrupt  7.5ms (120000)
-Software interrput  >= 1ms
 
 Scenario Case 2 (SDK keyboard):
 --------------------------------------------------------------------------------
@@ -107,17 +104,42 @@ Scenario Case 3 (SDK Heart Rate Service):
 BLE slave latency             0
 BLE connection timeout        4000ms
 BLE connection interval min   400ms
-BLE connection interval max   550ms
+BLE connection interval max   650ms
+
+Scenario Case 4:
+--------------------------------------------------------------------------------
+BLE slave latency             0
+BLE connection timeout        3000ms
+BLE connection interval min   7.5ms
+BLE connection interval max   15ms
+
+1 Packet per connection interval
+
+Scenario Case 5:
+--------------------------------------------------------------------------------
+BLE slave latency             0
+BLE connection timeout        3000ms
+BLE connection interval min   7.5ms
+BLE connection interval max   15ms
+
+6 Packets per connection interval
 
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 --------------------------------------------------------------------------------
+Zephyr BLE Stack: Zephyr/subsys/bluetooth
 
 measurements:
 --------------------------------------------------------------------------------
-Max data length that can be transmit
-- interrupt latency
 - power consumption
-- Latency between the Application Layer and Physical layer
-- Connection interval
--It is interesting to try to send always 6 packets per connection interval and send always 1 packet per connection interval and see the difference
+
+BLE Connection:
+---------------
+- Response to simple connection event
+
+BLE Stack propagation:
+----------------------
+- Application Notify   -> Host	-> Controller -> ble packet sent
+- Application Indicate -> Host 	-> Controller -> ble packet sent -> response
+- ble packet write request -> Controller -> Host -> Application Write
+- ble packet read request  -> Controller -> Host -> Application Read -> response

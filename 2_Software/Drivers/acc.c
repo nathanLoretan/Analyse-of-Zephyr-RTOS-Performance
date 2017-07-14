@@ -217,7 +217,7 @@
 #define MODE_HIGH_RESOLUTION_ENABLE   0
 #endif
 
-extern iI2c_id_t i2c;
+static iI2c_id_t i2c = ACC_I2C;
 
 typedef struct {
   uint8_t axis_overrun_123				: 1;

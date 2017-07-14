@@ -1,3 +1,3 @@
-GNU_INSTALL_ROOT := /home/nathan/gcc-arm-Toolchain
+GNU_INSTALL_ROOT := /home/nathanloretan/gcc-arm-Toolchain
 GNU_VERSION := 4.9.3
 GNU_PREFIX := arm-none-eabi

@@ -1,7 +1,7 @@
 #include "iBle.h"
 
 volatile static bool isConnected = false;
-static struct bt_conn* 									connection;
+static struct bt_conn* 									default_conn;
 static struct k_mutex 									indicate_mutex;
 static struct bt_gatt_indicate_params 	ind_params;
 
@@ -20,7 +20,7 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
 	}
 	else
   {
-		connection = bt_conn_ref(conn);
+		default_conn = bt_conn_ref(conn);
 
     struct bt_conn_info info;
     error = bt_conn_get_info(conn, &info);
@@ -40,9 +40,10 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
 
 static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
 {
-  if(connection) {
-  bt_conn_unref(connection);
-  connection = NULL;
+  if(default_conn)
+  {
+    bt_conn_unref(default_conn);
+    default_conn = NULL;
   }
 
 	isConnected = false;

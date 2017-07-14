@@ -20,16 +20,19 @@
 #define INTERRUPT_PIN		   13
 
 // Serial Configuration---------------------------------------------------------
+#define ADC_SPI                 SPI1
 #define ADC_SPI_CS              CS0
 #define ADC_SPI_FREQUENCY       ISPI_FREQ_1M
 #define ADC_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define ADC_SPI_MODE            ISPI_MODE_SCK_HIGH_CAPTURE_LEADING
 
+#define SWG_SPI                 SPI1
 #define SWG_SPI_CS              CS1
 #define SWG_SPI_FREQUENCY       ISPI_FREQ_1M
 #define SWG_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING
 
+#define ACC_I2C                 I2C0
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
 // BLE Configuration------------------------------------------------------------
