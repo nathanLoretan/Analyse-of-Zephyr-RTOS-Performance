@@ -51,17 +51,34 @@ Indicate:
         -> net_buf_put(&conn->tx_queue, buf)                                    subsys/net/buf.c
 
 --------------------------------------------------------------------------------
---                                  SEND                                      --  How data are sent to the HCI ??? bt_conn_process_tx -> send_buf -> send_frag() -> bt_send
+--                                  SEND                                      --
 --------------------------------------------------------------------------------
 
 -> hci_tx_thread()                                                              host/hci_core.c
+  -> bt_conn_prepare_events()                                                   host/conn.c
+  -> k_poll()                                                                   kernel/poll.c
+    -> is_condition_met() check if the queue is empty, if not ev->state != null kernel/poll.c
   -> process_events()                                                           host/hci_core.c
 
-    | IF BT_EVENT_CONN_TX_NOTIFY |
-    -> bt_conn_process_tx
+    | IF ev->state = BT_EVENT_CONN_TX_NOTIFY | (conn->tx_notify is not empty)   bt_recv_prio -> hci_num_completed_packets(buf) -> k_fifo_put(&conn->tx_notify, node);
+    ------------------------------------------
+    -> bt_conn_notify_tx()                                                      host/conn.c
+      -> cb ????????????????''??? find out what is the callback function
+      -> tx_free()
 
+    | IF ev->state = BT_EVENT_CONN_TX_QUEUE | (conn->tx_queue is not empty)
+    -----------------------------------------
+    -> bt_conn_process_tx()                                                     host/conn.c
+      -> net_buf_get(&conn->tx_queue, K_NO_WAIT)
+      -> send_buf(conn, buf)                                                    host/conn.c
+        -> send_frag()                                                          host/conn.c
+          -> bt_conn_notify_tx()    SEE ABOVE                                   host/conn.c
+            -> bt_send()                                                        host/hci_core.c
+              -> bt_dev.drv->send()                                             host/hci_core.h
+                -> (CONTROLLER) hci_driver_send()                               controller/hci_driver.c
 
-    | IF BT_EVENT_CMD_TX |
+    | IF ev->state = BT_EVENT_CMD_TX | (bt_dev.cmd_tx_queue is not empty)
+    ----------------------------------
     -> send_cmd()                                                               host/hci_core.c
       -> net_buf_get(&bt_dev.cmd_tx_queue)                                      subsys/net/buf.c
       -> bt_send()                                                              host/hci_core.c

@@ -28,15 +28,24 @@ typedef gpio_callback_handler_t iGpio_handler_t;
 #define IGPIO_HANDLER(fn, pin) 	static struct gpio_callback gpio_cb_##fn; \
  																void fn(struct device *port, struct gpio_callback *cb, u32_t pin)
 
+#define NRF_P0_PIN_NUM 32
+#define NRF_P1_PIN_NUM 16
+
 typedef struct {
 	iGpio_pin_t						pin;
 	iGpio_device_t 				device;
 } iGpio_t;
 
-#define iGpio_interrupt_init(_gpio, _pin, _edge, _pull, _handler)				(_gpio)->pin    = _pin;																																\
-																																				(_gpio)->device = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);										\
-																																				gpio_pin_configure((_gpio)->device, _pin, GPIO_DIR_IN | GPIO_INT |  _pull | _edge);		\
-																																				gpio_init_callback(&gpio_cb_##_handler, _handler, BIT(_pin));													\
+#define iGpio_interrupt_init(_gpio, _pin, _edge, _pull, _handler)				if(_pin < NRF_P0_PIN_NUM) {                                                                    \
+                                                                      		(_gpio)->device = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);                           \
+                                                                      		(_gpio)->pin = _pin;                                                                          \
+                                                                      	}                                                                                               \
+                                                                      	else {                                                                                          \
+                                                                      		(_gpio)->device = device_get_binding(CONFIG_GPIO_NRF5_P1_DEV_NAME);                           \
+                                                                      		(_gpio)->pin = _pin - NRF_P0_PIN_NUM;                                                         \
+                                                                      	}                                                                                               \
+																																				gpio_pin_configure((_gpio)->device, (_gpio)->pin, GPIO_DIR_IN | GPIO_INT |  _pull | _edge);		  \
+																																				gpio_init_callback(&gpio_cb_##_handler, _handler, BIT((_gpio)->pin));												 	  \
 																																				gpio_add_callback((_gpio)->device, &gpio_cb_##_handler);
 
 #define iGpio_enable_interrupt(_gpio)			gpio_pin_enable_callback((_gpio)->device, (_gpio)->pin)

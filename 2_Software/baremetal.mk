@@ -70,8 +70,8 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Drivers/acc.c \
 	$(PROJECT_BASE)/Drivers/adc.c \
 	$(PROJECT_BASE)/Drivers/swg.c \
-	$(PROJECT_BASE)/Sensors/main.c
-	# $(PROJECT_BASE)/Test/main.c
+	$(PROJECT_BASE)/Test/main.c
+	# $(PROJECT_BASE)/Sensors/main.c
 
 
 # Include folders common to all targets

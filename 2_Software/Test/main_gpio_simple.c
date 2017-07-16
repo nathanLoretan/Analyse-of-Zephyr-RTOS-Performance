@@ -10,7 +10,7 @@ int main()
   iPrint("Programme started\n");
   iPrint("-----------------\n");
 
-  iGpio_init(&gpio1, 34, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+  iGpio_init(&gpio1, 37, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
 
   while(1)
   {

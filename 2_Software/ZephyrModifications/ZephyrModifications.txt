@@ -12,3 +12,16 @@ Zephyr/drivers/spi/spim_nrf52.c :
     - lines 161 -166
     - Error because config only equal 0 or 1, bit 1 and 2 never set
     - bit2 = CPOL, bit1 = CPHA, bit0 = MSB or LSB first
+
+------------------------------------------------------------------------------
+zephyr/drivers/gpio/gpio_nrf5.c :
+	- (l405 - l433)
+	- Each port has a gpiote_chan_mask but it must be the same for both port
+	- gpio_nrf5_port_isr is called but not the callback error gpio_nrf5_manage_callback()
+	
+
+zephyr/drivers/gpio/Kconfig.nrf5 :
+	
+
+Zephyr/ext/hal/nordic/mdk/nrf51_tonrf52840. :
+	- l85 #define NRF_GPIO_P1_BASE        NRF_P1_BASE
