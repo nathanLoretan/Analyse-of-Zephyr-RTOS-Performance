@@ -17,7 +17,7 @@
 #define ACC_INT2           30
 #define ACC_INT1           31
 
-#define INTERRUPT_PIN		   13
+#define INTERRUPT_PIN		   39
 
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI                 SPI1

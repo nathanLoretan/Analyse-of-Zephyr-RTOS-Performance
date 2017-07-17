@@ -14,14 +14,26 @@ Zephyr/drivers/spi/spim_nrf52.c :
     - bit2 = CPOL, bit1 = CPHA, bit0 = MSB or LSB first
 
 ------------------------------------------------------------------------------
-zephyr/drivers/gpio/gpio_nrf5.c :
-	- (l405 - l433)
-	- Each port has a gpiote_chan_mask but it must be the same for both port
-	- gpio_nrf5_port_isr is called but not the callback error gpio_nrf5_manage_callback()
-	
+zephyr/drivers/gpio/gpio_nrf5.c 
+zephyr/drivers/gpio/Kconfig.nrf5 
+	CONFIG_GPIO_NRF5_P1
 
-zephyr/drivers/gpio/Kconfig.nrf5 :
+zephyr/drivers/spi/Kconfig.nrf5
+	SPIM0_NRF52_GPIO_PORT
+	SPIS0_NRF52_GPIO_PORT
+	SPIM1_NRF52_GPIO_PORT
+	SPIS1_NRF52_GPIO_PORT
+
+zephyr/drivers/i2c/Kconfig
+ 	I2C_NRF5_GPIO_PORT
+
+Zephyr/drivers/spi/spim_nrf52.c :
+	- l320
 	
+Zephyr/drivers/spi/spis_nrf52.c :
+	- l368
+
+Zephyr/drivers/i2c/i2c_nrf52.c :
 
 Zephyr/ext/hal/nordic/mdk/nrf51_tonrf52840. :
 	- l85 #define NRF_GPIO_P1_BASE        NRF_P1_BASE
