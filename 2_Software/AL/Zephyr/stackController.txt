@@ -1,9 +1,177 @@
 
-Controller:
-          -> hci_driver_send()                                                  controller/hci_driver.c
+--------------------------------------------------------------------------------
+--                                  SEND                                      --
+--------------------------------------------------------------------------------
+-> hci_driver_send()                                                            controller/hci_driver.c
 
-            -> hci_acl_handle()                                                 controller/hci.c              acl = Asynchronous Connection-Less
-              -----------------
+  | IF BT_BUF_ACL_OUT | Send indication or notification
+  ---------------------
+  -> hci_acl_handle()                                                           controller/hci.c
+  -> radio_tx_mem_acquire()
+  -> radio_tx_mem_enqueue()
+  -> radio_tx_mem_release()
 
-            -> cmd_handle()                                                     controller/hci_driver.c
-            ---------------
+  | IF BT_BUF_CMD | other command
+  -----------------
+  -> cmd_handle()                                                               controller/hci_driver.c
+    -> hci_cmd_handle()                                                         controller/hci.c
+    -> (HOST) bt_recv_prio()                                                    host/hci_core.c
+
+--------------------------------------------------------------------------------
+--                               RECEIVE                                      --
+--------------------------------------------------------------------------------
+
+-> prio_recv_thread() THREAD                                                    Controller/hci/hci_driver.c
+  -> radio_rx_get(&node_rx)                                                     Controller/ll_sw/ctrl.c
+  -> (HOST) bt_buf_get_rx(BT_BUF_EVT)                                           host/hci/hci_core.c
+  -> hci_num_cmplt_encode()                                                     Controller/hci/hci.c
+  -> (HOST) bt_recv_prio()                                                      host/hci_core.c
+
+  -> radio_rx_dequeue()
+  -> k_fifo_put(&recv_fifo, node_rx);
+
+--------------------------------------------------------------------------------
+
+-> recv_thread() THREAD                                                         Controller/hci/hci_driver.c
+
+  | IF CONFIG_BLEUTOOTH_HCI_ACL_FLOW_CONTROL |
+  --------------------------------------------
+  -> k_poll()                                                                   kernel/poll.c
+    -> is_condition_met() check if the queue is empty, if not ev->state != null kernel/poll.c
+  -> process_hbuf()                                                             Controller/hci/hci_driver.c
+  --------
+  | ELSE |
+  --------
+  -> k_fifo_get(&recv_fifo);
+  --------------------------------------------
+
+  -> process_node()                                                             Controller/hci/hci_driver.c
+    -> encode_node()                                                            Controller/hci/hci_driver.c
+
+      | IF HCI_CLASS_EVT_DISCARDABLE ||  HCI_CLASS_EVT_REQUIRED || HCI_CLASS_EVT_CONNECTION | connection parameter, disconnection, get service
+      -----------------------------
+      -> (HOST) bt_buf_get_rx(BT_BUF_EVT, K_FOREVER);                           host/hci/hci_core.c
+			-> hci_evt_encode(node_rx, buf);                                          Controller/hci/hci.c
+
+      | IF HCI_CLASS_ACL_DATA | data (write ,read, active indication, indication response, notification, service discovery)
+      -------------------------
+      -> (HOST) bt_buf_get_rx(BT_BUF_ACL_IN, K_FOREVER);                        host/hci/hci_core.c
+  		-> hci_acl_encode(node_rx, buf);                                          Controller/hci/hci.c
+
+  -> (HOST) bt_recv(buf)                                                        host/hci_core.c
+
+--------------------------------------------------------------------------------
+--                               ISR                                          --
+--------------------------------------------------------------------------------
+
+-> isr()
+
+  | IF STATE_TX |
+  ---------------
+  -> isr_radio_state_tx()                                                       Controller/ll_sw/ctrl.c
+
+    | IF ROLE_ADV |
+    ---------------
+
+    | IF ROLE_SCAN |
+    ----------------
+
+    | IF ROLE_SLAVE |
+    -----------------
+
+    | ROLE_SLAVE |
+    --------------
+
+  -----------------------------------------------------
+
+  | IF STATE_RX |
+  ---------------
+  -> isr_radio_state_rx()                                                       Controller/ll_sw/ctrl.c
+
+    | IF ROLE_ADV |
+    ---------------
+    -> isr_rx_adv()                                                             Controller/ll_sw/ctrl.c
+
+    | IF ROLE_SCAN |
+    ----------------
+    -> isr_rx_scan()                                                            Controller/ll_sw/ctrl.c
+
+    | IF ROLE_SLAVE || ROLE_SLAVE |
+    -------------------------------
+    -> isr_rx_conn()                                                             Controller/ll_sw/ctrl.c
+
+  -----------------------------------------------------
+
+  | IF STATE_CLOSE | STATE_STOP | STATE_ABORT |
+  ---------------------------------------------
+  -> isr_radio_state_close()                                                      Controller/ll_sw/ctrl.c
+
+    | IF ROLE_ADV |
+    ---------------
+    -> isr_close_adv()                                                            Controller/ll_sw/ctrl.c
+
+    | IF ROLE_SCAN |
+    ----------------
+    -> isr_close_scan()                                                           Controller/ll_sw/ctrl.c
+
+    | IF ROLE_SLAVE || ROLE_SLAVE |
+    -------------------------------
+    -> isr_close_conn()                                                           Controller/ll_sw/ctrl.c
+
+--------------------------------------------------------------------------------
+--                               CONFIGURATION                                --
+--------------------------------------------------------------------------------
+Configure the isr to handle bluetooth event
+
+-> adv_scan_conn_configure()                                                    Controller/ll_sw/ctrl.c
+	-> radio_reset()
+	-> radio_tx_power_set(0)
+	-> radio_isr_set(isr)                                                         controller/hal/nrf5/radio.c
+
+--------------------------------------------------------------------------------
+
+-> radio_init()
+  -> _radio.packet_rx = (void *)mem_radio;              /* initialise rx queue memory */
+  -> mem_radio += (sizeof(struct radio_pdu_node_rx *)*_radio.packet_rx_count);
+
+  -> _radio.pkt_tx = (void *)mem_radio;                 /* initialise tx queue memory */
+  -> mem_radio += (sizeof(struct pdu_data_q_tx) * _radio.packet_tx_count);
+
+  -> _radio.pkt_release = (void *)mem_radio;            /* initialise tx release queue memory */
+  -> mem_radio += (sizeof(struct pdu_data_q_tx) * _radio.packet_tx_count);
+
+--------------------------------------------------------------------------------
+
+-> event_master() or isr_radio_state_tx()
+  -> rx_packet_set()
+    -> radio_pkt_rx_set()     get a packet             controller/hal/nrf5/radio.c
+
+-> event_master() or isr_rx_conn()
+  -> tx_packet_set()
+    -> radio_pkt_tx_set()     send a packet            controller/hal/nrf5/radio.c
+
+--------------------------------------------------------------------------------
+
+packet_tx_enqueue()    push a packet in the  _radio.pkt_tx      queue     Controller/ll_sw/ctrl.c
+packet_rx_enqueue()    push a packet in the  _radio.packet_rx   queue     Controller/ll_sw/ctrl.c
+
+--------------------------------------------------------------------------------
+
+radio_rx_get()
+radio_rx_dequeue()
+radio_tx_mem_enqueue()
+
+
+packet_tx_enqueue() called by
+-----------------------------
+event_common_prepare()
+event_slave()
+event_master()
+
+packet_rx_enqueue() called by
+-----------------------------
+event_adv_stop()
+event_conn_update_prep()
+event_vex_prep()
+event_len_prep()
+event_phy_upd_ind_prep()

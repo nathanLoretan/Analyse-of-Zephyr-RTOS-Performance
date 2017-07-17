@@ -54,24 +54,24 @@ Indicate:
 --                                  SEND                                      --
 --------------------------------------------------------------------------------
 
--> hci_tx_thread()                                                              host/hci_core.c
+-> hci_tx_thread() THREAD                                                       host/hci_core.c
   -> bt_conn_prepare_events()                                                   host/conn.c
   -> k_poll()                                                                   kernel/poll.c
     -> is_condition_met() check if the queue is empty, if not ev->state != null kernel/poll.c
   -> process_events()                                                           host/hci_core.c
 
-    | IF ev->state = BT_EVENT_CONN_TX_NOTIFY | (conn->tx_notify is not empty)   bt_recv_prio -> hci_num_completed_packets(buf) -> k_fifo_put(&conn->tx_notify, node);
+    | IF ev->state = BT_EVENT_CONN_TX_NOTIFY | (conn->tx_notify is not empty)
     ------------------------------------------
     -> bt_conn_notify_tx()                                                      host/conn.c
-      -> cb ????????????????''??? find out what is the callback function
+      -> cb ????????????????????? find out what is the callback function
       -> tx_free()
 
-    | IF ev->state = BT_EVENT_CONN_TX_QUEUE | (conn->tx_queue is not empty)
+    | IF ev->state = BT_EVENT_CONN_TX_QUEUE | (conn->tx_queue is not empty) for notification and indication
     -----------------------------------------
     -> bt_conn_process_tx()                                                     host/conn.c
       -> net_buf_get(&conn->tx_queue, K_NO_WAIT)
       -> send_buf(conn, buf)                                                    host/conn.c
-        -> send_frag()                                                          host/conn.c
+        -> send_frag()                                                          host/conn.c           Slipt the data in several packet
           -> bt_conn_notify_tx()    SEE ABOVE                                   host/conn.c
             -> bt_send()                                                        host/hci_core.c
               -> bt_dev.drv->send()                                             host/hci_core.h
@@ -93,100 +93,71 @@ Indicate:
             { bt_dev.drv = drv }
 
 --------------------------------------------------------------------------------
---                               RECEIVE                                      --  How data are sent to the Application ???
+--                               RECEIVE                                      --
 --------------------------------------------------------------------------------
 
--> (CONTROLLER) recv_thread()                                                   Controller/hci/hci_driver.c
+-> (CONTROLLER) prio_recv_thread() THREAD                                       Controller/hci/hci_driver.c
+  -> bt_recv_prio()                                                             host/hci_core.c
+
+    | IF BT_HCI_EVT_NUM_COMPLETED_PACKETS |
+    ---------------------------------------
+    -> hci_num_completed_packets()                                              host/hci_core.c
+      ->k_fifo_put(&conn->tx_notify, node);                                     the event will be handled in hci_TX_thread()
+
+    ----------------------------
+    | IF BT_HCI_EVT_CMD_STATUS |
+    ----------------------------
+    -> hci_cmd_status()                                                         host/hci_core.c
+      -> hci_cmd_done()                                                         host/hci_core.c
+
+    | IF BT_HCI_EVT_CMD_COMPLETED |
+    -------------------------------
+    -> hci_cmd_complete()                                                       host/hci_core.c
+      -> hci_cmd_done()                                                         host/hci_core.c
+
+--------------------------------------------------------------------------------
+
+-> (CONTROLLER) recv_thread() THREAD                                            Controller/hci/hci_driver.c
   -> bt_recv()                                                                  host/hci_core.c
 
     | IF CONFIG_BLUETOOTH_RECV_IS_RX_THREAD |
     -----------------------------------------
-    -> hci_event()                                                              host/hci_core.c
+      | IF BT_BUF_EVT | connection and disconnection from central and when the connection parameter changed
+      -----------------
+      -> hci_event()                                                            host/hci_core.c
+
+      | IF BT_BUF_ACL_IN |  read, write, activate notify, activate indication, indication response
+      --------------------
+      -> hci_acl()                                                              host/hci_core.c
+
     --------
     | ELSE |
     --------
-    -> net_buf_put(bt_dev.rx_queue)                                             subsys/net/buf.c      the event will be handled in hci_rx_thread()
+    -> net_buf_put(bt_dev.rx_queue)                                             subsys/net/buf.c      the event will be handled in hci_RX_thread()
     -----------------------------------------
+
+--------------------------------------------------------------------------------
 
 | IF NOT CONFIG_BLUETOOTH_RECV_IS_RX_THREAD |
 ---------------------------------------------
--> hci_rx_thread()                                                              host/hci_core.c
+-> hci_rx_thread()   THREAD                                                     host/hci_core.c
   -> net_buf_get(bt_dev.rx_queue)                                               subsys/net/buf.c
+
+  | IF BT_BUF_EVT | connection and disconnection from central and when the connection parameter changed
+  -----------------
   -> hci_event()                                                                host/hci_core.c
 
+  | IF BT_BUF_ACL_IN |  data (read, write, activate notify, activate indication, indication response, service discovery)
+  --------------------
+  -> hci_acl()                                                                  host/hci_core.c
 
-/!\ IMPORTANT /!\
------------------
-hci_event() dispatches depend of the kind of event. Very, very important
+--------------------------------------------------------------------------------
+-> hci_event()
 
-	case BT_HCI_EVT_CONN_REQUEST:
-		conn_req(buf);
+	  | IF BT_HCI_EVT_DISCONN_COMPLETE |   When the central want to disconnect
+    ----------------------------------
+		-> hci_disconn_complete(buf)
 
-	case BT_HCI_EVT_CONN_COMPLETE:
-		conn_complete(buf);
-
-	case BT_HCI_EVT_PIN_CODE_REQ:
-		pin_code_req(buf);
-
-	case BT_HCI_EVT_LINK_KEY_NOTIFY:
-		link_key_notify(buf);
-
-	case BT_HCI_EVT_LINK_KEY_REQ:
-		link_key_req(buf);
-
-	case BT_HCI_EVT_IO_CAPA_RESP:
-		io_capa_resp(buf);
-
-	case BT_HCI_EVT_IO_CAPA_REQ:
-		io_capa_req(buf);
-
-	case BT_HCI_EVT_SSP_COMPLETE:
-		ssp_complete(buf);
-
-	case BT_HCI_EVT_USER_CONFIRM_REQ:
-		user_confirm_req(buf);
-
-	case BT_HCI_EVT_USER_PASSKEY_NOTIFY:
-		user_passkey_notify(buf);
-
-	case BT_HCI_EVT_USER_PASSKEY_REQ:
-		user_passkey_req(buf);
-
-	case BT_HCI_EVT_INQUIRY_COMPLETE:
-		inquiry_complete(buf);
-
-	case BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI:
-		inquiry_result_with_rssi(buf);
-
-	case BT_HCI_EVT_EXTENDED_INQUIRY_RESULT:
-		extended_inquiry_result(buf);
-
-	case BT_HCI_EVT_REMOTE_NAME_REQ_COMPLETE:
-		remote_name_request_complete(buf);
-
-	case BT_HCI_EVT_AUTH_COMPLETE:
-		auth_complete(buf);
-
-	case BT_HCI_EVT_REMOTE_FEATURES:
-		read_remote_features_complete(buf);
-
-	case BT_HCI_EVT_REMOTE_EXT_FEATURES:
-		read_remote_ext_features_complete(buf);
-
-	case BT_HCI_EVT_ROLE_CHANGE:
-		role_change(buf);
-
-	case BT_HCI_EVT_SYNC_CONN_COMPLETE:
-		synchronous_conn_complete(buf);
-
-	case BT_HCI_EVT_DISCONN_COMPLETE:
-		hci_disconn_complete(buf);
-
-	case BT_HCI_EVT_ENCRYPT_CHANGE:
-		hci_encrypt_change(buf);
-
-	case BT_HCI_EVT_ENCRYPT_KEY_REFRESH_COMPLETE:
-		hci_encrypt_key_refresh_complete(buf);
-
-	case BT_HCI_EVT_LE_META_EVENT:
-		hci_le_meta_event(buf);
+	  | IF BT_HCI_EVT_LE_META_EVENT |  When the central update the connection parameter
+    -------------------------------
+		-> hci_le_meta_event(buf)
