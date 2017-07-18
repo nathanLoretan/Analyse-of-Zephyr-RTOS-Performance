@@ -7,14 +7,30 @@
   | IF BT_BUF_ACL_OUT | Send indication or notification
   ---------------------
   -> hci_acl_handle()                                                           controller/hci.c
-  -> radio_tx_mem_acquire()
-  -> radio_tx_mem_enqueue()
-  -> radio_tx_mem_release()
+  -> radio_tx_mem_acquire()       \_ push data within tx queue _radio.pkt_tx    Controller/ll_sw/ctrl.c
+  -> radio_tx_mem_enqueue()       /                                             Controller/ll_sw/ctrl.c
 
   | IF BT_BUF_CMD | other command
   -----------------
   -> cmd_handle()                                                               controller/hci_driver.c
     -> hci_cmd_handle()                                                         controller/hci.c
+
+    	  | IF BT_OGF_LINK_CTRL |
+        -----------------------
+    		  -> link_control_cmd_handle(ocf, cmd, &evt)
+
+    	  | IF BT_OGF_BASEBAND |
+        ----------------------
+    		  -> ctrl_bb_cmd_handle(ocf, cmd, &evt)
+
+    	  | IF BT_OGF_INFO |
+        ------------------
+    		  -> info_cmd_handle(ocf, cmd, &evt)
+
+    	  | IF BT_OGF_LE |
+        ----------------
+    		  -> controller_cmd_handle(ocf, cmd, &evt)
+
     -> (HOST) bt_recv_prio()                                                    host/hci_core.c
 
 --------------------------------------------------------------------------------
@@ -27,7 +43,7 @@
   -> hci_num_cmplt_encode()                                                     Controller/hci/hci.c
   -> (HOST) bt_recv_prio()                                                      host/hci_core.c
 
-  -> radio_rx_dequeue()
+  -> radio_rx_dequeue()                                                         Controller/ll_sw/ctrl.c
   -> k_fifo_put(&recv_fifo, node_rx);
 
 --------------------------------------------------------------------------------
@@ -98,7 +114,45 @@
 
     | IF ROLE_SLAVE || ROLE_SLAVE |
     -------------------------------
-    -> isr_rx_conn()                                                             Controller/ll_sw/ctrl.c
+/!\ -> isr_rx_conn()                                                            Controller/ll_sw/ctrl.c
+      -> isr_rx_conn_pkt()
+
+        PDU_DATA_LLID_CTRL
+        ------------------
+        -> ist_rx_conn_pkt_ctrl()
+          PDU_DATA_LLCTRL_TYPE_CONN_UPDATE_IND
+          PDU_DATA_LLCTRL_TYPE_CHAN_MAP_IND
+          PDU_DATA_LLCTRL_TYPE_TERMINATE_IND
+          PDU_DATA_LLCTRL_TYPE_ENC_REQ
+          PDU_DATA_LLCTRL_TYPE_ENC_RSP
+          PDU_DATA_LLCTRL_TYPE_START_ENC_REQ
+          PDU_DATA_LLCTRL_TYPE_START_ENC_RSP
+          PDU_DATA_LLCTRL_TYPE_FEATURE_REQ
+          PDU_DATA_LLCTRL_TYPE_SLAVE_FEATURE_REQ
+          PDU_DATA_LLCTRL_TYPE_FEATURE_RSP
+          PDU_DATA_LLCTRL_TYPE_PAUSE_ENC_REQ
+          PDU_DATA_LLCTRL_TYPE_PAUSE_ENC_RSP
+          PDU_DATA_LLCTRL_TYPE_VERSION_IND
+          PDU_DATA_LLCTRL_TYPE_REJECT_IND
+          PDU_DATA_LLCTRL_TYPE_CONN_PARAM_REQ
+          PDU_DATA_LLCTRL_TYPE_CONN_PARAM_RSP
+          PDU_DATA_LLCTRL_TYPE_REJECT_EXT_IND
+          PDU_DATA_LLCTRL_TYPE_PING_RSP
+          PDU_DATA_LLCTRL_TYPE_UNKNOWN_RSP
+          PDU_DATA_LLCTRL_TYPE_PING_REQ
+          PDU_DATA_LLCTRL_TYPE_LENGTH_RSP
+          PDU_DATA_LLCTRL_TYPE_LENGTH_REQ
+          PDU_DATA_LLCTRL_TYPE_PHY_REQ
+          PDU_DATA_LLCTRL_TYPE_PHY_REQ
+          LLCP_PHY_STATE_UPD
+          PDU_DATA_LLCTRL_TYPE_PHY_RSP
+          PDU_DATA_LLCTRL_TYPE_PHY_UPD_IND
+
+      PDU_DATA_LLID_DATA_CONTINUE
+      PDU_DATA_LLID_DATA_START
+
+        -> isr_rx_conn_pkt_ack()
+        -> isr_rx_conn_pkt_release()
 
   -----------------------------------------------------
 
@@ -119,7 +173,29 @@
     -> isr_close_conn()                                                           Controller/ll_sw/ctrl.c
 
 --------------------------------------------------------------------------------
---                               CONFIGURATION                                --
+--                               GET RX PACKET                                --
+--------------------------------------------------------------------------------
+
+-> event_master() / event_slave() / isr_radio_state_tx()
+  -> rx_packet_set( _radio.packet_rx[_radio.packet_rx_last]->pdu_data )         Controller/ll_sw/ctrl.c
+    -> radio_phy_set()
+    -> radio_pkt_configure()
+    -> radio_pkt_rx_set()                                                       controller/hal/nrf5/radio.c
+      ->  NRF_RADIO->PACKETPTR = rx_packet
+
+--------------------------------------------------------------------------------
+--                               SEND TX PACKET                               --
+--------------------------------------------------------------------------------
+
+-> event_master() / isr_rx_conn()
+  -> tx_packet_set()                                                            Controller/ll_sw/ctrl.c
+    -> radio_phy_set()
+    -> radio_pkt_configure()
+    -> radio_pkt_tx_set()                                                       controller/hal/nrf5/radio.c
+      -> NRF_RADIO->PACKETPTR = tx_packet
+
+--------------------------------------------------------------------------------
+--                             ISR  CONFIGURATION                             --
 --------------------------------------------------------------------------------
 Configure the isr to handle bluetooth event
 
@@ -128,6 +204,8 @@ Configure the isr to handle bluetooth event
 	-> radio_tx_power_set(0)
 	-> radio_isr_set(isr)                                                         controller/hal/nrf5/radio.c
 
+--------------------------------------------------------------------------------
+--                             QUEUE  CONFIGURATION                           --
 --------------------------------------------------------------------------------
 
 -> radio_init()
@@ -142,36 +220,18 @@ Configure the isr to handle bluetooth event
 
 --------------------------------------------------------------------------------
 
--> event_master() or isr_radio_state_tx()
-  -> rx_packet_set()
-    -> radio_pkt_rx_set()     get a packet             controller/hal/nrf5/radio.c
+packet_tx_enqueue() push n packets from _radio.pkt_tx to conn->pkt_tx_data of the current connection
+packet_rx_enqueue()
 
--> event_master() or isr_rx_conn()
-  -> tx_packet_set()
-    -> radio_pkt_tx_set()     send a packet            controller/hal/nrf5/radio.c
+radio_rx_dequeue()  dequeue packets received
+radio_rx_get()      get packets received
 
---------------------------------------------------------------------------------
-
-packet_tx_enqueue()    push a packet in the  _radio.pkt_tx      queue     Controller/ll_sw/ctrl.c
-packet_rx_enqueue()    push a packet in the  _radio.packet_rx   queue     Controller/ll_sw/ctrl.c
-
---------------------------------------------------------------------------------
-
-radio_rx_get()
-radio_rx_dequeue()
-radio_tx_mem_enqueue()
-
-
-packet_tx_enqueue() called by
------------------------------
-event_common_prepare()
-event_slave()
-event_master()
-
-packet_rx_enqueue() called by
------------------------------
-event_adv_stop()
-event_conn_update_prep()
-event_vex_prep()
-event_len_prep()
-event_phy_upd_ind_prep()
+isr_rx_conn_pkt_ack()
+isr_rx_conn_pkt_release()
+isr_rx_conn_pkt_ctrl_rej_conn_upd()
+isr_rx_conn_pkt_ctrl_rej_dle()
+isr_rx_conn_pkt_ctrl_rej_phy_upd()
+isr_rx_conn_pkt_ctrl_rej()
+isr_rx_conn_pkt_ctrl_dle()
+isr_rx_conn_pkt_ctrl()
+isr_rx_conn_pkt()
