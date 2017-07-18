@@ -91,8 +91,8 @@ DEFINE_ITHREAD(th4, 4096, 0);
 
 int main()
 {
-  iPrint("Programme started\n");
-  iPrint("-----------------\n");
+  iPrint("Thread test started\n");
+  iPrint("-------------------\n");
 
   iThread_run(&th1, thread1);
   iThread_run(&th2, thread2);

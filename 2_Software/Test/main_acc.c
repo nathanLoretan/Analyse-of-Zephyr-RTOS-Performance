@@ -3,16 +3,14 @@
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
 
-iI2c_id_t i2c = I2C0;
-
 volatile bool wakeUp;
 
 int main()
 {
-  iPrint("Programme started\n");
-  iPrint("-----------------\n");
+  iPrint("ACC test started\n");
+  iPrint("----------------\n");
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
+  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
 
   acc_init();
 
