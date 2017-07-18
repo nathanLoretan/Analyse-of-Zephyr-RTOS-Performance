@@ -6,7 +6,6 @@ TODO:
 
 3. Code Improvement
 - BM, thread priority
-- Zephyr port1 for nrf52840
 
 - BLE See if 1MBit/s or 2MBit/s
 

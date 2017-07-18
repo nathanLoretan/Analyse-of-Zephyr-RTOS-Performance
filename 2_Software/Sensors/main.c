@@ -3,10 +3,6 @@
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
 
-// Serial Communication---------------------------------------------------------
-iSpi_id_t spi = SPI1;
-iI2c_id_t i2c = I2C0;
-
 // BLE--------------------------------------------------------------------------
 #define ACC_UUID_SVC     0x0ACC
 #define ACC_UUID_CHRC1   0x1ACC
@@ -196,7 +192,7 @@ int main()
 void bluetooth_init()
 {
   iPrint("\nInitialize Bluetooth\n");
-  iPrint("--------------------\n");
+  iPrint("----------------------\n");
 
   iBle_init();
   iBle_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
@@ -207,14 +203,14 @@ void bluetooth_init()
 void extBoad_init()
 {
   iPrint("\nInitialize extBoard\n");
-  iPrint("-------------------\n");
+  iPrint("---------------------\n");
 
-  iSpi_init(spi, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
+  iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
   swg_init(EXT_INT_FREQ);
 
-  iSpi_init(spi, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
+  iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
   adc_init();
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
+  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
   acc_init();
 }

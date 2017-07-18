@@ -4,13 +4,20 @@
 //==========================================================
 // <h> GENERAL INFORMATION
 //==========================================================
+#define NRF5_GPIO_P0	0
+#define NRF5_GPIO_P1	32
 
-#define SPI1_SCK		       27
-#define SPI1_MISO		       26
-#define SPI1_MOSI		       2
-#define SPI1_CS0			     11
-#define SPI1_CS1			     12
+#define SPI1_SCK		       (15 + NRF5_GPIO_P1)
+#define SPI1_MISO		       (14 + NRF5_GPIO_P1)
+#define SPI1_MOSI		       (13 + NRF5_GPIO_P1)
+#define SPI1_CS0			     (12 + NRF5_GPIO_P1)
 #define SPI1_IRQ_PRIORITY  SPI_DEFAULT_CONFIG_IRQ_PRIORITY
+
+#define SPI2_SCK		       (6 + NRF5_GPIO_P1)
+#define SPI2_MISO		       (5 + NRF5_GPIO_P1)
+#define SPI2_MOSI		       (4 + NRF5_GPIO_P1)
+#define SPI2_CS0			     (3 + NRF5_GPIO_P1)
+#define SPI2_IRQ_PRIORITY  SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define I2C0_SCL           3
 #define I2C0_SDA           4
@@ -158,7 +165,7 @@
 	// <e> SPI2_ENABLED - Enable SPI2 instance
 	//==========================================================
 	#ifndef SPI2_ENABLED
-		#define SPI2_ENABLED 0
+		#define SPI2_ENABLED 2
 	#endif
 
 	#if  SPI2_ENABLED

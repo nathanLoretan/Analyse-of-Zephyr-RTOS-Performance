@@ -9,8 +9,8 @@ int main()
 {
   uint8_t tx_buf[1];
 
-  iPrint("Programme started\n");
-  iPrint("-----------------\n");
+  iPrint("Spi test started\n");
+  iPrint("----------------\n");
 
   // iSpi_init(spi, ISPI_FREQ_1M, ISPI_MODE_SCK_HIGH_CAPTURE_LEADING ISPI_BIT_ORDER_MSB_FIRST);
   // iSpi_init(spi, ISPI_FREQ_1M, ISPI_MODE_SCK_HIGH_CAPTURE_TRAILING, ISPI_BIT_ORDER_MSB_FIRST);

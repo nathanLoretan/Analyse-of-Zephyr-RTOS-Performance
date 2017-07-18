@@ -26,8 +26,8 @@
 #define ADC_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define ADC_SPI_MODE            ISPI_MODE_SCK_HIGH_CAPTURE_LEADING
 
-#define SWG_SPI                 SPI1
-#define SWG_SPI_CS              CS1
+#define SWG_SPI                 SPI2
+#define SWG_SPI_CS              CS0
 #define SWG_SPI_FREQUENCY       ISPI_FREQ_1M
 #define SWG_SPI_BIT_ORDER       ISPI_BIT_ORDER_MSB_FIRST
 #define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING

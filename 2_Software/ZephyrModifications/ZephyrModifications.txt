@@ -24,16 +24,16 @@ zephyr/drivers/spi/Kconfig.nrf5
 	SPIM1_NRF52_GPIO_PORT
 	SPIS1_NRF52_GPIO_PORT
 
+	- Driver SPI2
+
 zephyr/drivers/i2c/Kconfig
  	I2C_NRF5_GPIO_PORT
 
 Zephyr/drivers/spi/spim_nrf52.c :
-	- l320
 	
 Zephyr/drivers/spi/spis_nrf52.c :
-	- l368
 
 Zephyr/drivers/i2c/i2c_nrf52.c :
 
-Zephyr/ext/hal/nordic/mdk/nrf51_tonrf52840. :
+Zephyr/ext/hal/nordic/mdk/nrf51_to_nrf52840. :
 	- l85 #define NRF_GPIO_P1_BASE        NRF_P1_BASE

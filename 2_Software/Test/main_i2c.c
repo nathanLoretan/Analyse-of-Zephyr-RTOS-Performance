@@ -7,8 +7,8 @@ iI2c_id_t i2c = I2C0;
 
 int main()
 {
-  iPrint("Programme started\n");
-  iPrint("-----------------\n");
+  iPrint("I2c test started\n");
+  iPrint("----------------\n");
 
   iI2c_init(i2c, ACC_I2C_FREQEUNCY);
 
