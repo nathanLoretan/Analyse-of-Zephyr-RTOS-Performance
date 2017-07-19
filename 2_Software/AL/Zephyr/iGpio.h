@@ -54,6 +54,15 @@ typedef struct {
 // 																																				gpio_init_callback(&gpio_cb_##_handler, _handler, BIT((_gpio)->pin));
 // 																																				gpio_add_callback((_gpio)->device, &gpio_cb_##_handler);
 
+<<<<<<< HEAD
+=======
+#define iGpio_interrupt_init(_gpio, _pin, _edge, _pull, _handler)				(_gpio)->device = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);\
+                                                                      	(_gpio)->pin = _pin;\
+																																				gpio_pin_configure((_gpio)->device, (_gpio)->pin, GPIO_DIR_IN | GPIO_INT |  _pull | _edge);\
+																																				gpio_init_callback(&gpio_cb_##_handler, _handler, BIT((_gpio)->pin));\
+																																				gpio_add_callback((_gpio)->device, &gpio_cb_##_handler);
+
+>>>>>>> 68fa9a349b0178878c1d69e02babdb922fbf30bd
 
 #define iGpio_enable_interrupt(_gpio)			gpio_pin_enable_callback((_gpio)->device, (_gpio)->pin)
 #define iGpio_disable_interrupt(_gpio)		gpio_pin_disable_callback((_gpio)->device, (_gpio)->pin)
