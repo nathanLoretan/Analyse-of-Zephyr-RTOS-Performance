@@ -1,11 +1,7 @@
 #ifndef __DEBUG_NRF52840__
 #define __DEBUG_NRF52840__
 
-// TODO: Question
-//
-// *(volatile uint32_t* xxx) = *(volatile uint32_t* yyy); does xxx changed if yyy changes ?  GLOBAL
-//
-// uint32_t x = y | x; is it possible to declare ?  GLOBAL
+#include "../configuration.h"
 
 // /**
 //   * @brief 2.4 GHz Radio (RADIO)
@@ -100,9 +96,12 @@
 //   uint32_t  POWER;                             // Peripheral power control
 // } NRF_RADIO_Type;
 
-// #define NRF_RADIO                       ((NRF_RADIO_Type          *) NRF_RADIO_BASE)
+// #define NRF_RADIO                       ((NRF_RADIO_Type          *) DEBUG_NRF_RADIO)
 
-#define NRF_RADIO_BASE                           0x40001000
+#define DEBUG_NRF_RADIO                           0x40001000
+
+// nrf_radio.h nrf_radio_task_t  -> nrf_radio_task_trigger()
+//                               -> nrf_radio_event_clear()
 
 #define NRF_RADIO_OFFSET_TASKS_TXEN              0x000
 #define NRF_RADIO_OFFSET_TASKS_RXEN              0x004
@@ -177,40 +176,52 @@
 #define NRF_RADIO_OFFSET_CCACTRL                 0x66C
 #define NRF_RADIO_OFFSET_POWER                   0xFFC
 
-#define TASKS_TXEN              *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_TXEN))
-#define TASKS_RXEN              *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_RXEN))
-#define TASKS_START             *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_START))
-#define TASKS_STOP              *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_STOP))
-#define TASKS_DISABLE           *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_DISABLE))
-#define TASKS_RSSISTART         *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_RSSISTART))
-#define TASKS_RSSISTOP          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_RSSISTOP))
-#define TASKS_BCSTART           *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_BCSTART))
-#define TASKS_BCSTOP            *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_BCSTOP))
-#define TASKS_EDSTART           *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_EDSTART))
-#define TASKS_EDSTOP            *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_EDSTOP))
-#define TASKS_CCASTART          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_CCASTART))
-#define TASKS_CCASTOP           *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_TASKS_CCASTOP))
-#define EVENTS_READY            *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_READY))
-#define EVENTS_ADDRESS          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_ADDRESS))
-#define EVENTS_PAYLOAD          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_PAYLOAD))
-#define EVENTS_END              *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_END))
-#define EVENTS_DISABLED         *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_DISABLED))
-#define EVENTS_DEVMATCH         *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_DEVMATCH))
-#define EVENTS_DEVMISS          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_DEVMISS))
-#define EVENTS_RSSIEND          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_RSSIEND))
-#define EVENTS_BCMATCH          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_BCMATCH))
-#define EVENTS_CRCOK            *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_CRCOK))
-#define EVENTS_CRCERROR         *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_CRCERROR))
-#define EVENTS_FRAMESTART       *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_FRAMESTART))
-#define EVENTS_EDEND            *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_EDEND))
-#define EVENTS_EDSTOPPED        *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_EDSTOPPED))
-#define EVENTS_CCAIDLE          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_CCAIDLE))
-#define EVENTS_CCABUSY          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_CCABUSY))
-#define EVENTS_CCASTOPPED       *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_CCASTOPPED))
-#define EVENTS_RATEBOOST        *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_RATEBOOST))
-#define EVENTS_TXREADY          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_TXREADY))
-#define EVENTS_RXREADY          *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_RXREADY))
-#define EVENTS_MHRMATCH         *((volatile uint32_t*) (NRF_RADIO_BASE + NRF_RADIO_OFFSET_EVENTS_MHRMATCH))
+#define DEBUG_TSK_TXEN             *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_TXEN))
+#define DEBUG_TSK_RXEN             *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_RXEN))
+#define DEBUG_TSK_START            *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_START))
+#define DEBUG_TSK_STOP             *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_STOP))
+#define DEBUG_TSK_DISABLE          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_DISABLE))
+#define DEBUG_TSK_RSSISTART        *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_RSSISTART))
+#define DEBUG_TSK_RSSISTOP         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_RSSISTOP))
+#define DEBUG_TSK_BCSTART          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_BCSTART))
+#define DEBUG_TSK_BCSTOP           *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_BCSTOP))
+#define DEBUG_TSK_EDSTART          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_EDSTART))
+#define DEBUG_TSK_EDSTOP           *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_EDSTOP))
+#define DEBUG_TSK_CCASTART         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_CCASTART))
+#define DEBUG_TSK_CCASTOP          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_TASKS_CCASTOP))
+#define DEBUG_EVT_READY            *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_READY))
+#define DEBUG_EVT_ADDRESS          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_ADDRESS))
+#define DEBUG_EVT_PAYLOAD          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_PAYLOAD))
+#define DEBUG_EVT_END              *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_END))
+#define DEBUG_EVT_DISABLED         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_DISABLED))
+#define DEBUG_EVT_DEVMATCH         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_DEVMATCH))
+#define DEBUG_EVT_DEVMISS          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_DEVMISS))
+#define DEBUG_EVT_RSSIEND          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_RSSIEND))
+#define DEBUG_EVT_BCMATCH          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_BCMATCH))
+#define DEBUG_EVT_CRCOK            *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_CRCOK))
+#define DEBUG_EVT_CRCERROR         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_CRCERROR))
+#define DEBUG_EVT_FRAMESTART       *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_FRAMESTART))
+#define DEBUG_EVT_EDEND            *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_EDEND))
+#define DEBUG_EVT_EDSTOPPED        *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_EDSTOPPED))
+#define DEBUG_EVT_CCAIDLE          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_CCAIDLE))
+#define DEBUG_EVT_CCABUSY          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_CCABUSY))
+#define DEBUG_EVT_CCASTOPPED       *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_CCASTOPPED))
+#define DEBUG_EVT_RATEBOOST        *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_RATEBOOST))
+#define DEBUG_EVT_TXREADY          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_TXREADY))
+#define DEBUG_EVT_RXREADY          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_RXREADY))
+#define DEBUG_EVT_MHRMATCH         *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_EVENTS_MHRMATCH))
+
+#define DEBUG_RADIO_STATE          *((volatile uint32_t*) (DEBUG_NRF_RADIO + NRF_RADIO_OFFSET_STATE))
+
+#define RADIO_STATE_DISABLED    0
+#define RADIO_STATE_RXRU        1
+#define RADIO_STATE_RX          2
+#define RADIO_STATE_RXIDLE      3
+#define RADIO_STATE_RXDISABLE   4
+#define RADIO_STATE_TXRU        9
+#define RADIO_STATE_TXIDLE      10
+#define RADIO_STATE_TX          11
+#define RADIO_STATE_TXDISABLE   12
 
 //------------------------------------------------------------------------------
 
@@ -229,11 +240,11 @@
 //   uint32_t  PIN_CNF[32];                       // Description collection[0]: Configuration of GPIO pins
 // } NRF_GPIO_Type;
 //
-// #define NRF_P0                          ((NRF_GPIO_Type*) NRF_P0_BASE)
-// #define NRF_P1                          ((NRF_GPIO_Type*) NRF_P1_BASE)
+// #define NRF_P0                          ((NRF_GPIO_Type*) DEBUG_NRF_P0)
+// #define NRF_P1                          ((NRF_GPIO_Type*) DEBUG_NRF_P1)
 
-#define NRF_P0_BASE                       0x50000000
-#define NRF_P1_BASE                       0x50000300
+#define DEBUG_NRF_P0                       0x50000000
+#define DEBUG_NRF_P1                       0x50000300
 
 #define NRF_GPIO_OFFSET_OUT               0x504
 #define NRF_GPIO_OFFSET_OUTSET            0x508
@@ -246,64 +257,123 @@
 #define NRF_GPIO_OFFSET_DETECTMODE        0x524
 #define NRF_GPIO_OFFSET_PIN_CNF(_offset)  (0x700 + 0x04 * _offset)
 
-#define OUTSET_P0            *((volatile uint32_t*) (NRF_P0_BASE + NRF_GPIO_OFFSET_OUTSET))
-#define OUTCLR_P0            *((volatile uint32_t*) (NRF_P0_BASE + NRF_GPIO_OFFSET_OUTCLR))
-#define DIRSET_P0            *((volatile uint32_t*) (NRF_P0_BASE + NRF_GPIO_OFFSET_DIRSET))
+#define OUT_P0               *((volatile uint32_t*) (DEBUG_NRF_P0 + NRF_GPIO_OFFSET_OUT))
+#define OUTSET_P0            *((volatile uint32_t*) (DEBUG_NRF_P0 + NRF_GPIO_OFFSET_OUTSET))
+#define OUTCLR_P0            *((volatile uint32_t*) (DEBUG_NRF_P0 + NRF_GPIO_OFFSET_OUTCLR))
+#define DIRSET_P0            *((volatile uint32_t*) (DEBUG_NRF_P0 + NRF_GPIO_OFFSET_DIRSET))
 
-#define OUTSET_P1            *((volatile uint32_t*) (NRF_P1_BASE + NRF_GPIO_OFFSET_OUTSET))
-#define OUTCLR_P1            *((volatile uint32_t*) (NRF_P1_BASE + NRF_GPIO_OFFSET_OUTCLR))
-#define DIRSET_P2            *((volatile uint32_t*) (NRF_P1_BASE + NRF_GPIO_OFFSET_DIRSET))
+#define OUT_P1               *((volatile uint32_t*) (DEBUG_NRF_P1 + NRF_GPIO_OFFSET_OUT))
+#define OUTSET_P1            *((volatile uint32_t*) (DEBUG_NRF_P1 + NRF_GPIO_OFFSET_OUTSET))
+#define OUTCLR_P1            *((volatile uint32_t*) (DEBUG_NRF_P1 + NRF_GPIO_OFFSET_OUTCLR))
+#define DIRSET_P1            *((volatile uint32_t*) (DEBUG_NRF_P1 + NRF_GPIO_OFFSET_DIRSET))
 
-#define DEBUG_EXT_INT_LATENCY_PIN         0
+
+#define DEBUG_PIN_SET(_pin, _port, _flag)       \
+do {                                            \
+  if(_flag) {                                   \
+    (_port) ? (OUT_P1 |= (0x01 << _pin)) :      \
+              (OUT_P0 |= (0x01 << _pin)); }     \
+  else {                                        \
+    (_port) ? (OUT_P1 &= ~(0x01 << _pin)) :     \
+              (OUT_P0 &= ~(0x01 << _pin));  }   \
+} while(0)
+
+#define DEBUG_PIN_TOGGLE(_pin, _port)                           \
+do {                                                            \
+  if(_port) {                                                   \
+    (OUT_P1 & (0x01 << _pin)) ? (OUT_P1 &= ~(0x01 << _pin)) :   \
+                                (OUT_P1 |= (0x01 << _pin)); }   \
+  else {                                                        \
+    (OUT_P0 & (0x01 << _pin)) ? (OUT_P0 &= ~(0x01 << _pin)) :   \
+                                (OUT_P0 |= (0x01 << _pin)); }   \
+} while(0)
+
+#define DEBUG_PIN_INIT(_pin, _port)   (_port) ? (DIRSET_P1 |= 1 << _pin) : \
+                                                (DIRSET_P0 |= 1 << _pin);  \
+
+#define DEBUG_PIN         13
+#define DEBUG_PORT        1
+#define DEBUG(_flag)      DEBUG_PIN_SET(DEBUG_PIN, DEBUG_PORT, _flag)
+
+#define DEBUG_EXT_INT_LATENCY_PIN         31
 #define DEBUG_EXT_INT_LATENCY_PORT        0
-#define DEBUG_EXT_INT_LATENCY_STATE
+#define DEBUG_EXT_INT_LATENCY()           DEBUG_PIN_TOGGLE(DEBUG_EXT_INT_LATENCY_PIN, DEBUG_EXT_INT_LATENCY_PORT)
 
-#define DEBUG_SOFT_INT_LATENCY_PIN        0
+#define DEBUG_SOFT_INT_LATENCY_PIN        30
 #define DEBUG_SOFT_INT_LATENCY_PORT       0
-#define DEBUG_SOFT_INT_LATENCY_STATE
+#define DEBUG_SOFT_INT_LATENCY()          DEBUG_PIN_TOGGLE(DEBUG_SOFT_INT_LATENCY_PIN, DEBUG_SOFT_INT_LATENCY_PORT)
 
-#define DEBUG_CONN_EVT_PIN                0
-#define DEBUG_CONN_EVT_PORT               0
-#define DEBUG_CONN_EVT_STATE
+// Zephyr:
+//    -> isr_rx_conn()     Zephyr/subsys/bluetooth/controller/ll_sw/ctrl.c
+#define DEBUG_CONN_EVT_PIN                12
+#define DEBUG_CONN_EVT_PORT               1
+#define DEBUG_CONN_EVT(_flag)             DEBUG_PIN_SET(DEBUG_CONN_EVT_PIN, DEBUG_CONN_EVT_PORT, _flag)
 
-#define DEBUG_RX_START_PIN                0
-#define DEBUG_RX_START_PORT               0
-#define DEBUG_RX_START_STATE
+// Inspired by the State Machine from nrf52840 Datasheet p.252 Figure.35
+#define RADIO_SM_DISABLED_PIN           2
+#define RADIO_SM_DISABLED_PORT          1
+// #define RADIO_SM_DISABLED(_flag)        DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, _flag)
+#define RADIO_SM_DISABLED()         DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, DEBUG_RADIO_STATE & RADIO_STATE_DISABLED)
 
-#define DEBUG_RX_STOP_PIN                 0
-#define DEBUG_RX_STOP_PORT                0
-#define DEBUG_RX_STOP_STATE
+#define RADIO_SM_TXRU_PIN               3
+#define RADIO_SM_TXRU_PORT              1
+// #define RADIO_SM_TXRU(_flag)            DEBUG_PIN_SET(RADIO_SM_TXRU_PIN, RADIO_SM_TXRU_PORT, _flag)
+#define RADIO_SM_TXRU()            DEBUG_PIN_SET(RADIO_SM_TXRU_PIN, RADIO_SM_TXRU_PORT, DEBUG_RADIO_STATE & RADIO_STATE_TXRU)
 
-#define DEBUG_TX_START_PIN                0
-#define DEBUG_TX_START_PORT               0
-#define DEBUG_TX_START_STATE
+#define RADIO_SM_TXIDLE_PIN             4
+#define RADIO_SM_TXIDLE_PORT            1
+// #define RADIO_SM_TXIDLE(_flag)          DEBUG_PIN_SET(RADIO_SM_TXIDLE_PIN, RADIO_SM_TXIDLE_PORT, _flag)
+#define RADIO_SM_TXIDLE()          DEBUG_PIN_SET(RADIO_SM_TXIDLE_PIN, RADIO_SM_TXIDLE_PORT, DEBUG_RADIO_STATE & RADIO_STATE_TXIDLE)
 
-#define DEBUG_TX_STOP_PIN                 0
-#define DEBUG_TX_STOP_PORT                0
-#define DEBUG_TX_STOP_STATE
+#define RADIO_SM_TX_PIN                 5
+#define RADIO_SM_TX_PORT                1
+// #define RADIO_SM_TX(_flag)              DEBUG_PIN_SET(RADIO_SM_RX_PIN, RADIO_SM_RX_PORT, _flag)
+#define RADIO_SM_TX()              DEBUG_PIN_SET(RADIO_SM_RX_PIN, RADIO_SM_RX_PORT, DEBUG_RADIO_STATE & RADIO_STATE_TX)
 
-#define DEBUG_STATE_TX_PIN                0
-#define DEBUG_STATE_TX_PORT               0
-#define DEBUG_STATE_TX_STATE
+#define RADIO_SM_TXDISABLE_PIN          6
+#define RADIO_SM_TXDISABLE_PORT         1
+// #define RADIO_SM_TXDISABLE(_flag)       DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, _flag)
+#define RADIO_SM_TXDISABLE()       DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, DEBUG_RADIO_STATE & RADIO_STATE_TXDISABLE)
 
-#define DEBUG_STATE_RX_PIN                0
-#define DEBUG_STATE_RX_PORT               0
-#define DEBUG_STATE_RX_STATE
+#define RADIO_SM_RXRU_PIN               7
+#define RADIO_SM_RXRU_PORT              1
+// #define RADIO_SM_RXRU(_flag)            DEBUG_PIN_SET(RADIO_SM_RXRU_PIN, RADIO_SM_RXRU_PORT, _flag)
+#define RADIO_SM_RXRU()            DEBUG_PIN_SET(RADIO_SM_RXRU_PIN, RADIO_SM_RXRU_PORT, DEBUG_RADIO_STATE & RADIO_STATE_RXRU)
 
-#define DEBUG_DISABLE_PIN                 0
-#define DEBUG_DISABLE_PORT                0
-#define DEBUG_DISABLE_STATE
+#define RADIO_SM_RXIDLE_PIN             8
+#define RADIO_SM_RXIDLE_PORT            1
+// #define RADIO_SM_RXIDLE(_flag)          DEBUG_PIN_SET(RADIO_SM_RXIDLE_PIN, RADIO_SM_RXIDLE_PORT, _flag)
+#define RADIO_SM_RXIDLE()          DEBUG_PIN_SET(RADIO_SM_RXIDLE_PIN, RADIO_SM_RXIDLE_PORT, DEBUG_RADIO_STATE & RADIO_STATE_RXIDLE)
 
-#define SET_DEBUG_PIN(_pin, _port)  (_port) ? (DIRSET_P1 |= 1 << _pin) : \
-                                              (DIRSET_P0 |= 1 << _pin);  \
-                                    (_port) ? (OUTCLR_P1 |= 1 << _pin) : \
-                                              (OUTCLR_P0 |= 1 << _pin)   \
+#define RADIO_SM_RX_PIN                 10
+#define RADIO_SM_RX_PORT                1
+// #define RADIO_SM_RX(_flag)              DEBUG_PIN_SET(RADIO_SM_RX_PIN, RADIO_SM_RX_PORT, _flag)
+#define RADIO_SM_RX()              DEBUG_PIN_SET(RADIO_SM_RX_PIN, RADIO_SM_RX_PORT, DEBUG_RADIO_STATE & RADIO_STATE_RX)
 
-#define DEBUG_INIT()  do {                              \
-        DIRSET_P0 = 0x0000000;                          \
-        DIRSET_P1 = 0x0000000;                          \
-        SET_DEBUG_PIN(DEBUG_CONN_EVT_PIN,               \
-                      DEBUG_CONN_EVT_PORT);             \
-        } while (0)
+#define RADIO_SM_RXDISABLE_PIN          11
+#define RADIO_SM_RXDISABLE_PORT         1
+// #define RADIO_SM_RXDISABLE(_flag)       DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, _flag)
+#define RADIO_SM_RXDISABLE()       DEBUG_PIN_SET(RADIO_SM_DISABLED_PIN, RADIO_SM_DISABLED_PORT, DEBUG_RADIO_STATE & RADIO_STATE_RXDISABLE)
+
+#define RADIO_STATE_DISABLED    0
+#define RADIO_STATE_RXRU        1
+#define RADIO_STATE_RXIDLE      2
+#define RADIO_STATE_RX          3
+#define RADIO_STATE_RXDISABLE   4
+#define RADIO_STATE_TXRU        9
+#define RADIO_STATE_TXIDLE      10
+#define RADIO_STATE_TX          11
+#define RADIO_STATE_TXDISABLE   12
+
+// Zephyr:
+//    -> radio_tx_enable()     Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c
+//    -> radio_rx_enable()     Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c
+//    -> radio_disable()       Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c
+#define DEBUG_RADIO_SM()
+do 
+
+
+// void iDebug_radio_sm();
+void iDebug_init();
 
 #endif // __DEBUG_NRF52840__
