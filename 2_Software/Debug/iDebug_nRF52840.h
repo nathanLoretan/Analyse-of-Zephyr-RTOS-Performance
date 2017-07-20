@@ -7,6 +7,8 @@
 
 // #include "/home/nathanloretan/Desktop/Bachelor/2_Software/Debug/iDebug_nRF52840.h"
 
+// CHECK IF INTERRUPT ENABLED INTENSET
+
 #define RADIO_STATE_DISABLED    0
 #define RADIO_STATE_RXRU        1
 #define RADIO_STATE_RXIDLE      2

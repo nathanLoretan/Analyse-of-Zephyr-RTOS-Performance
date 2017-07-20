@@ -105,10 +105,10 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t*
 	struct bt_le_adv_param* adv_params;
 
 	// default advertising parameters
-	adv_params = BT_LE_ADV_CONN;
+	// adv_params = BT_LE_ADV_CONN;
 
 	// Personalized advertising parameters
-	// adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, MSEC_TO_UNITS(ADV_INTERVAL_MIN, UNIT_0_625_MS), MSEC_TO_UNITS(ADV_INTERVAL_MAX, UNIT_0_625_MS));
+	adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, MSEC_TO_UNITS(ADV_INTERVAL_MIN, UNIT_0_625_MS), MSEC_TO_UNITS(ADV_INTERVAL_MAX, UNIT_0_625_MS));
 
 	// Start advertising fast
 	error = bt_le_adv_start(adv_params, advdata, advdata_size, scanrsp,  scanrsp_size);

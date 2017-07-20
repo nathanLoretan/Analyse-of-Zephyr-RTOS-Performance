@@ -1,15 +1,13 @@
 TODO:
 
-1. Change SWG frequency
+2. Central BLE interface
 
-2. Behaviour on BLE central
-- Central BLE interface
-- RTT
+3. RTT
 
-3. Code Improvement
+4. Code Improvement
 - BM, thread priority
 
-- BLE See if 1MBit/s or 2MBit/s
+5. BLE See if 1MBit/s or 2MBit/s
 
 git config --global -e
 git commit -a -s
