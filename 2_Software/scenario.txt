@@ -129,49 +129,66 @@ BLE connection interval max   15ms
 --------------------------------------------------------------------------------
 Zephyr BLE Stack: Zephyr/subsys/bluetooth
 
-DEBUG_INT_LATENCY		on_ext_irq()		don't use the gpio api, directly the register
-DEBUG_SOFT_LATENCY	on_soft_irq()		don't use the gpio api, directly the register
+Interrupt latency
+-----------------
+DEBUG_EXT_INT_LATENCY		on_ext_irq()
+
+Radio
+-----
+CONNECTION EVENT
 
 Datasheet p.252 Radio State
+DISABLED		EVENT_DISABLED
 
-controller
-----------
-								Zephyr												SD
-								-------												---
-DEBUG_CONN_EVT 	isr_rx_conn()
+TXRU				TASK_TXEN
 
-DEBUG_PACKET_SEND
-DEBUG_PACKET_RECEIVED
+TXIDLE			TASK_STOP
+						EVENTS_READY
+						EVENTS_END
+
+TX					TASK_START
+						EVENTS_ADDRESS
+						EVENTS_PAYLOAD
+
+TXDISABLE		TASKS_DISABLE
+
+RXRU				TASK_RXEN
+
+RXIDLE			EVENTS_READY
+						EVENTS_END
+
+RX					TASK_START
+						EVENTS_ADDRESS
+						EVENTS_PAYLOAD
+
+RXDISABLE		TASKS_DISABLE
+
+--------------------------------------------------------------------------------
+
+gpio:
+- EXTERNAL INTERRUPT LATENCY
+- CONNECTION EVENT
+- DISABLED RXDISABLE TXDISABLE
+- TX MODE
+- RX MODE
+- RX or TX IDLE
+- RX or TX TRANSMITION
+- CRC OK
+- CRC ERROR
+
+gpiote:
+
+NRF_RADIO
+
+1. EVENTS_CRCOK
+2. EVENTS_CRCERROR
+
+3. EVENTS_END				RX or TX IDLE
+3. EVENTS_READY			RX or TX IDLE
+4. EVENTS_ADDRESS		RX or TX TRANSMITION
+4. EVENTS_PAYLOAD		RX or TX TRANSMITION
 
 
-
-RADIO_STATE_TX
-RADIO_STATE_RX
-
-RADIO_ROLE_SCAN
-RADIO_ROLE_ADV
-RADIO_ROLE_SLAVE
-RADIO_ROLE_MASTER
-
-ZEPHYR BLUETOOTH_CONTROLLER_DEBUG_PINS
-----------------------------
-DEBUG_CPU_SLEEP(flag)
-DEBUG_TICKER_ISR(flag)
-DEBUG_TICKER_TASK(flag)
-DEBUG_TICKER_JOB(flag)
-DEBUG_RADIO_ISR(flag)						isr()
-DEBUG_RADIO_HCTO(flag)
-DEBUG_RADIO_XTAL(flag)
-DEBUG_RADIO_ACTIVE(flag)
-DEBUG_RADIO_CLOSE(flag)
-DEBUG_RADIO_PREPARE_A(flag)			radio_event_adv_prepare()
-DEBUG_RADIO_START_A(flag)				event_adv()
-DEBUG_RADIO_PREPARE_S(flag)			event_slave_prepare()
-DEBUG_RADIO_START_S(flag)				event_slave()
-DEBUG_RADIO_PREPARE_O(flag)			event_scan_prepare()
-DEBUG_RADIO_START_O(flag)				event_scan()
-DEBUG_RADIO_PREPARE_M(flag)			event_master_prepare()
-DEBUG_RADIO_START_M(flag)				event_master()
 
 measurements:
 --------------------------------------------------------------------------------

@@ -1,5 +1,7 @@
 TODO:
 
+1. Change SWG frequency
+
 2. Behaviour on BLE central
 - Central BLE interface
 - RTT

@@ -172,7 +172,7 @@ void extBoad_init();
 
 int main()
 {
-  DEBUG_INIT();
+  iDebug_init();
 
   // Thread must be declare before the driver to avoid full filling the event queues
   iThread_run(&acc_thread, acc);

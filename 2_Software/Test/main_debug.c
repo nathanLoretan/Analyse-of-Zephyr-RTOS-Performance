@@ -15,19 +15,17 @@ int main()
   iPrint("------------------\n");
 
   iDebug_init();
-  // iDebig_radio_sm();
 
   while(1)
-    {
-    // DEBUG_CONN_EVT(1);
-    // DEBUG_EXT_INT_LATENCY();
-    // iPrint("TOGGLE\n");
-    iDebug_radio_sm();
+  {
+    CONN_EVT(1);
+    DEBUG_START(0);
+    EXT_INT_LATENCY();
     iSleep_ms(1000);
-    // DEBUG_CONN_EVT(0);
-    // DEBUG_EXT_INT_LATENCY();
-    // iPrint("TOGGLE\n");
-    iDebug_radio_sm();
+
+    CONN_EVT(0);
+    DEBUG_START(1);
+    EXT_INT_LATENCY();
     iSleep_ms(1000);
   }
 
