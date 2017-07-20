@@ -74,6 +74,56 @@ void swg_init(float frequency)
 	iPrint("[INIT] SWG initialized\n");
 }
 
+void swg_set_frequency(float frequency)
+{
+	static uint8_t selectFreq = 1;
+	uint8_t tx_buf[2];
+
+	// f = fMCLK/2^28 × FREQREG, Convert the given frequency to the value used by the register
+	uint32_t freqReg = (frequency / (((float) MASTER_CLOCK) / (1 << 28)));
+
+	if(selectFreq)
+	{
+		// Configure the frequency 14LSBs
+		ISPI_CREATE_DATA(tx_buf, REGISTER_FREQ1 | ((freqReg & 0x3F00) >> 8), (freqReg & 0xFF));
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Configure the frequency 14MSBs
+		ISPI_CREATE_DATA(tx_buf, REGISTER_FREQ1 | ((freqReg & 0xFC00000) >> 22), ((freqReg & 0x3FC000) >> 14));
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Configure the phase
+		ISPI_CREATE_DATA(tx_buf, REGISTER_PHASE1, 0);
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Select wave square
+		ISPI_CREATE_DATA(tx_buf, REGISTER_CONTROL | SELECT_28BITS | SELECT_FREQ1 | SELECT_PHASE1, SLEEP_NO | WAVE_SQUARE);
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+	}
+	else
+	{
+		// Configure the frequency 14LSBs
+		ISPI_CREATE_DATA(tx_buf, REGISTER_FREQ0 | ((freqReg & 0x3F00) >> 8), (freqReg & 0xFF));
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Configure the frequency 14MSBs
+		ISPI_CREATE_DATA(tx_buf, REGISTER_FREQ0 | ((freqReg & 0xFC00000) >> 22), ((freqReg & 0x3FC000) >> 14));
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Configure the phase
+		ISPI_CREATE_DATA(tx_buf, REGISTER_PHASE0, 0);
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+		// Select wave square
+		ISPI_CREATE_DATA(tx_buf, REGISTER_CONTROL | SELECT_28BITS | SELECT_FREQ0 | SELECT_PHASE1, SLEEP_NO | WAVE_SQUARE);
+		iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+	}
+
+	// The frequency must be written in the not used register to avoid problem.
+	// And then the register with the new frequency can be set
+	selectFreq ^= 1;
+}
+
 void swg_sleep()
 {
 	uint8_t tx_buf[2];
