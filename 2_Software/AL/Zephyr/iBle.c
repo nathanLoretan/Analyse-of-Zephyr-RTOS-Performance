@@ -10,6 +10,7 @@ struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 
 ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset)
 {
+  BLE_READ();
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
@@ -194,16 +195,31 @@ struct bt_gatt_attr* iBle_get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr)
 
 int	iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
-  return bt_gatt_notify(NULL, iBle_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
+  int error;
+
+  BLE_ERROR(0);
+
+  BLE_NOTIFY(1);
+  error = bt_gatt_notify(NULL, iBle_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
+  BLE_NOTIFY(0);
+
+  if(error) {
+    BLE_ERROR(1);
+  }
+
+  return error;
 }
 
 static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
+  BLE_INDICATE_RSP();
 	k_mutex_unlock(&indicate_mutex);
 }
 
 int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
+  int error;
+
 	// Avoid to rewrite the indication parameters
 	k_mutex_lock(&indicate_mutex, K_FOREVER);
 
@@ -212,5 +228,15 @@ int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t 
 	ind_params.data = buf;
 	ind_params.len 	= buf_length;
 
-	return bt_gatt_indicate(NULL, &ind_params);
+  BLE_ERROR(0);
+
+  BLE_INDICATE(1);
+	error = bt_gatt_indicate(NULL, &ind_params);
+  BLE_INDICATE(0);
+
+  if(error) {
+    BLE_ERROR(1);
+  }
+
+  return error;
 }

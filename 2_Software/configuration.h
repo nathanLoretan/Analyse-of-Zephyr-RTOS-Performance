@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "/home/nathanloretan/Desktop/Bachelor/2_Software/Debug/iDebug_nRF52840.h"
+
 #ifdef 	ZEPHYR_USED
   #include "AL/Zephyr/zephyr_interface.h"
 #endif
@@ -55,7 +57,7 @@
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
-#define EXT_INT_FREQ          1
-#define SOFT_INT_FREQ         1000
+#define EXT_INT_FREQ          1     // [Hz]
+#define SOFT_INT_FREQ         1000  // [ms]
 
 #endif  // __CONFIGURATION_H__

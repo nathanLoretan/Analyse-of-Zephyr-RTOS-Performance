@@ -150,6 +150,16 @@ Indicate:
   | IF BT_BUF_ACL_IN |  data (read, write, activate notify, activate indication, indication response, service discovery)
   --------------------
   -> hci_acl()                                                                  host/hci_core.c
+    -> bt_conn_recv                                                             host/conn.c
+      -> bt_l2cap_recv                                                          host/l2cap.c
+          -> l2cap_chan_recv()                                                  host/l2cap.c
+            -> chan->ops->recv(chan, buf);                                      host/l2cap.c
+              -> bt_att_recv()                                                  host/att.c
+                -> att_read_req
+                -> att_write_req
+                -> att_indicate
+                -> att_notify
+                -> att_confirm     Response to the indication
 
 --------------------------------------------------------------------------------
 -> hci_event()

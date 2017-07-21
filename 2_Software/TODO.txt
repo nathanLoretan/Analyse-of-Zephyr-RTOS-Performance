@@ -1,5 +1,7 @@
 TODO:
 
+1. Request MTU
+
 2. Central BLE interface
 
 3. RTT

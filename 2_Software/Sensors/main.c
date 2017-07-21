@@ -86,15 +86,17 @@ static DEFINE_IBLE_ADV_DATA(scanrsp) =
 iGpio_t ext_irq;
 IGPIO_HANDLER(on_ext_irq, pin)
 {
-  DEBUG_EXT_INT_LATENCY()
-  iPrint("External Interrupt\n");
+  EXT_INT_LATENCY()
+  // iPrint("External Interrupt\n");
 }
 
 iTimer_t soft_timer;
+static float ext_int_freq = EXT_INT_FREQ;
 ITIMER_HANDLER(on_soft_timer)
 {
-  DEBUG_SOFT_INT_LATENCY()
-  iPrint("Software Interrupt\n");
+  ext_int_freq *= 2;
+  swg_set_frequency(ext_int_freq);
+  // iPrint("Software Interrupt\n");
 }
 
 // Threads----------------------------------------------------------------------
