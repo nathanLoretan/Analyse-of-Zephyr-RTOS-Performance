@@ -2,10 +2,7 @@
 #include "../Drivers/acc.h"
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
-<<<<<<< HEAD
-=======
 #include "../Debug/iDebug_nRF52840.h"
->>>>>>> 68fa9a349b0178878c1d69e02babdb922fbf30bd
 
 // BLE--------------------------------------------------------------------------
 #define ACC_UUID_SVC     0x0ACC
@@ -86,7 +83,7 @@ static DEFINE_IBLE_ADV_DATA(scanrsp) =
 iGpio_t ext_irq;
 IGPIO_HANDLER(on_ext_irq, pin)
 {
-  EXT_INT_LATENCY()
+  EXT_INT_LATENCY();
   // iPrint("External Interrupt\n");
 }
 
@@ -223,3 +220,5 @@ void extBoad_init()
   iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
   acc_init();
 }
+
+// NRF_BLE_GATT_MAX_MTU_SIZE

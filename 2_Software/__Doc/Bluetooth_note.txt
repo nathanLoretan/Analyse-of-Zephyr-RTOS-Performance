@@ -5,12 +5,17 @@ https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf
 https://learn.adafruit.com/introduction-to-bluetooth-low-energy/gatt
 https://docs.mbed.com/docs/ble-intros/en/latest/Introduction/ConnectionParameters/
 
-- Advertising
+Advertising:
+------------
 ADV_IND: General connectable and scannable advertisement packets' time period ranges from 20 ms to 10.24s in steps of 0.625ms.
 ADV_DIRECT_IND: Directed advertisement packets' time period is less than or equal to 3.75 ms. This kind of advertisement events can happen consecutively only for 1.28s. This is for a establishing a quick connection (if there is a device listening).
 ADV_NONCONN_IND: Non-connectable and non-scannable advertisement packets' time period ranges from 100 ms to 10.24s in steps of 0.625ms.
 ADV_SCAN_IND: Scannable advertisement packets' time period ranges from 100 ms to 10.24s in steps of 0.625ms.
 
+Packet = 31Bytes adv data and 31Bytes Scan response
+
+Connection:
+-----------
 Connection Interval:
   - when establishing a connection, the peripheral will suggest a 'Connection Interval' to the central device, and the central device will try to reconnect every connection interval to see if any new data is available,
   - to process information or respond to connection events (ex: synchronisation)
@@ -43,6 +48,9 @@ Packet Length:
     - 4 bytes for MIC (when encryption is enabled),
     - 4 bytes for L2CAP header (channel ID and packet length),
     - ATT protocol is left with 23 bytes, which is the default and minimal MTU for ATT protocol.
+
+Zephyr Max MTU = 1300Bytes RX, 2000Bytes TX
+Softdevice Max MTU = 142Bytes default softdevice config
 
 With an ATT write request (or notification), 3 bytes are used by command type and attribute ID, 20 bytes are left for the attribute data.
 

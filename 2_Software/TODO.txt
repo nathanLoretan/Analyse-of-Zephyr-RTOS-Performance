@@ -1,15 +1,13 @@
 TODO:
 
-1. Request MTU
-
-2. Central BLE interface
-
-3. RTT
-
-4. Code Improvement
+- nbr packets zephyr
+- Softdevice RAM
+- Time between different packet
+- Adv packet transmition
+- Central BLE interface
+- RTT
 - BM, thread priority
-
-5. BLE See if 1MBit/s or 2MBit/s
+- BLE See if 1MBit/s or 2MBit/s
 
 git config --global -e
 git commit -a -s

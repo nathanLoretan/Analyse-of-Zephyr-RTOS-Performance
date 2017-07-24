@@ -78,7 +78,8 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 		case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
 
-																		error = sd_ble_gap_conn_param_update(ble_evt->evt.gap_evt->conn_handle, &ble_evt->evt.gap_evt->params.conn_param_update_request.conn_params);
+																		error = sd_ble_gap_conn_param_update(ble_evt->evt.gap_evt.conn_handle,
+																																				&ble_evt->evt.gap_evt.params.conn_param_update_request.conn_params);
 																		if(error) {
 																			iPrint("/!\\ Connection parameters update failed: error %d\n", error);
 																			return;
@@ -97,10 +98,22 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 		case BLE_GATTS_EVT_TIMEOUT: 		// Disconnect on GATT Server timeout event.
 																		iPrint("-> GATT Server Timeout\n");
-																		error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle,
-																																	BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+																		error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
 																		if(error) {
 																			iPrint("/!\\ disconnect failed : error %d\n", error);
+																			return;
+																		}
+		break;
+
+		case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+
+																		iPrint("\n-> MTU Parameters Update\n");
+																		iPrint("------------------------\n");
+																		iPrint("Connection Client RX MTU: %u[Bytes]\n", ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu);
+
+																		error = sd_ble_gatts_exchange_mtu_reply(ble_evt->evt.gatts_evt.conn_handle, NRF_BLE_GATT_MAX_MTU_SIZE);
+																		if(error) {
+																			iPrint("/!\\ MTU exchange failed : error %d\n", error);
 																			return;
 																		}
 		break;
@@ -234,7 +247,7 @@ int iBle_init()
 	// Configure the maximum ATT MTU.
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                 	= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gatt_conn_cfg.att_mtu 	= NRF_BLE_GATT_MAX_MTU_SIZE;
+	ble_cfg.conn_cfg.params.gatt_conn_cfg.att_mtu 	= NRF_BLE_GATT_MAX_MTU_SIZE;	// Maximum size of the ATT packet the SoftDevice can send or receive
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATT, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the maximum ATT MTU: error %d\n", error);
@@ -556,6 +569,7 @@ static uint16_t iBle_get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr)
 
 int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
+	int error;
 	ble_gatts_hvx_params_t hvx_params = {0};
 
 	hvx_params.handle = iBle_get_chrc_handle(svc, chrc_nbr);
@@ -564,11 +578,22 @@ int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	return sd_ble_gatts_hvx(connection, &hvx_params);
+	BLE_ERROR(0);
+
+	BLE_NOTIFY(1);
+	error = sd_ble_gatts_hvx(connection, &hvx_params);
+	BLE_NOTIFY(0);
+
+	if(error) {
+		BLE_ERROR(1);
+	}
+
+	return error;
 }
 
 int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
+	int error;
 	ble_gatts_hvx_params_t hvx_params = {0};
 
 	hvx_params.handle = iBle_get_chrc_handle(svc, chrc_nbr);
@@ -577,5 +602,15 @@ int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t 
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	return sd_ble_gatts_hvx(connection, &hvx_params);
+	BLE_ERROR(0);
+
+	BLE_INDICATE(1);
+	error = sd_ble_gatts_hvx(connection, &hvx_params);
+	BLE_INDICATE(0);
+
+	if(error) {
+		BLE_ERROR(1);
+	}
+
+	return error;
 }

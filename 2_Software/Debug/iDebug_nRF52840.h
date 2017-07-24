@@ -39,6 +39,8 @@ do {                                                                            
 #define EXT_INT_LATENCY_PORT    NRF_P1
 #define EXT_INT_LATENCY()       DEBUG_PIN_TOGGLE(EXT_INT_LATENCY_PIN, EXT_INT_LATENCY_PORT)
 
+//  -> iBle_svc_indication()
+//  -> iBle_svc_notify()
 #define BLE_ERROR_PIN           10
 #define BLE_ERROR_PORT          NRF_P1
 #define BLE_ERROR(_flag)        DEBUG_PIN_SET(BLE_ERROR_PIN, BLE_ERROR_PORT, _flag)
@@ -50,8 +52,6 @@ do {                                                                            
 #define BLE_CONN_EVT(_flag)     DEBUG_PIN_SET(BLE_CONN_EVT_PIN, BLE_CONN_EVT_PORT, _flag)
 
 //  -> iBle_svc_indication()
-// Zephyr:
-//  -> hci_acl_handle()         Zephyr/subsys/bluetooth/controller/hci.c
 #define BLE_INDICATE_PIN        7
 #define BLE_INDICATE_PORT       NRF_P1
 #define BLE_INDICATE(_flag)     DEBUG_PIN_SET(BLE_INDICATE_PIN, BLE_INDICATE_PORT, _flag)
@@ -63,8 +63,6 @@ do {                                                                            
 #define BLE_INDICATE_RSP()      DEBUG_PIN_TOGGLE(BLE_INDICATE_RSP_PIN, BLE_INDICATE_RSP_PORT)
 
 //  -> iBle_svc_notify()
-// Zephyr:
-//  -> hci_acl_handle()         Zephyr/subsys/bluetooth/controller/hci.c
 #define BLE_NOTIFY_PIN          8
 #define BLE_NOTIFY_PORT         NRF_P1
 #define BLE_NOTIFY(_flag)       DEBUG_PIN_SET(BLE_NOTIFY_PIN, BLE_NOTIFY_PORT, _flag)
@@ -103,12 +101,12 @@ do {                                                                            
 #define RADIO_RTX_PORT           NRF_P1
 #define RADIO_RTX()              DEBUG_PIN_SET(RADIO_RTX_PIN, RADIO_RTX_PORT, (NRF_RADIO->STATE == RADIO_STATE_TX) |\
                                                                               (NRF_RADIO->STATE == RADIO_STATE_RX))
-// Zephyr:
-//  -> radio_crc_is_valid()     Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c
+
 #define RADIO_CRCOK_PIN         5
 #define RADIO_CRCOK_PORT        NRF_P1
 #define RADIO_CRCOK(_flag)      DEBUG_PIN_SET(RADIO_CRCOK_PIN, RADIO_CRCOK_PORT, _flag)
 
+// NOT USED
 // Zephyr:
 //  -> hci_driver_send()       Zephyr/subsys/bluetooth/controller/hci_driver.c
 //    -> hci_acl_handle()      Zephyr/subsys/bluetooth/controller/hci.c
@@ -118,6 +116,7 @@ do {                        \
   BLE_NOTIFY(0);            \
 } while(0)
 
+// NOT USED
 // Zephyr:
 //    -> radio_tx_enable()     Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c
 //    -> radio_rx_enable()     Zephyr/subsys/bluetooth/controller/hal/nrf5/radio.c

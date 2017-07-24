@@ -147,7 +147,7 @@ typedef struct bt_gatt_attr		 						iBle_cccd_config_t;
 
 #define IBLE_SVC_UUID(_uuid)  																			BT_GATT_PRIMARY_SERVICE(_uuid)
 #define IBLE_CHRC_CONFIG(_uuid, _perm) 															BT_GATT_CHARACTERISTIC(_uuid, _perm)
-#define IBLE_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)  	BT_GATT_DESCRIPTOR(_uuid, _perm, iBle_read_handler, _write_handler, _p_data)
+#define IBLE_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)  		BT_GATT_DESCRIPTOR(_uuid, _perm, iBle_read_handler, _write_handler, _p_data)
 
 int	iBle_init();
 volatile bool iBle_isConnected();

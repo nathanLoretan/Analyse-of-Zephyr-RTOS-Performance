@@ -14,6 +14,18 @@ ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr 
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
+
+static void iBle_mtu_request(struct bt_conn* conn, u8_t err, struct bt_gatt_exchange_params* params)
+{
+  iPrint("\n-> MTU Parameters Update\n");
+  iPrint("------------------------\n");
+  iPrint("Connection Client RX MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
+}
+
+static struct bt_gatt_exchange_params mtu_req = {
+  .func = iBle_mtu_request,
+};
+
 static void iBle_connected(struct bt_conn *conn, u8_t error)
 {
 	if (error) {
@@ -36,6 +48,13 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
     iPrint("Connection Interval: %u[us]\n", info.le.interval * UNIT_1_25_MS);
     iPrint("Connection Slave Latency: %u\n", info.le.latency);
     iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
+
+    // Set the MTU for futur transmition
+    error = bt_gatt_exchange_mtu(conn, &mtu_req);
+    if(error)
+    {
+      iPrint("/!\\ MTU exchange failed: error %d\n", error);
+    }
 	}
 }
 
@@ -64,7 +83,7 @@ static struct bt_conn_cb connection_callback =
 {
 	.connected 		    = iBle_connected,
 	.disconnected     = iBle_disconnected,
-  .le_param_updated = iBle_conn_parameters_update
+  .le_param_updated = iBle_conn_parameters_update,
 };
 
 int iBle_init()

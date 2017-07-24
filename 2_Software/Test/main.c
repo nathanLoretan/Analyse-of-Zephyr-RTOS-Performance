@@ -82,7 +82,7 @@ DEFINE_IBLE_SVC_CONFIG(hrs_config)
 iBle_svc_t my_svc;
 // size_t my_nbr_attrs = 2;
 size_t my_nbr_chrcs = 1;
-uint32_t array[100] = {0};
+uint8_t array[514] = {0};
 DEFINE_IBLE_SVC_CONFIG(my_config)
 {
   IBLE_SVC_UUID(DEFINE_IBLE_UUID128(MY_UUID_SVC, MY_UUID_BASE)),
@@ -100,14 +100,8 @@ int main()
   iPrint("BLE test started\n");
   iPrint("----------------\n");
 
-  iPrint("Initialization\n");
-  iPrint("--------------\n");
-
   iDebug_init();
   bluetooth_init();
-
-  iPrint("--------------\n");
-
   bluetooth_test();
 
   while(1)
@@ -137,16 +131,17 @@ void bluetooth_test()
   {
     if(iBle_isConnected())
     {
-      iSleep_ms(1000);
+      iSleep_ms(50);
       current_time++;
-      for(int i = 0; i < 10; i++) {
+      for(int i = 0; i < sizeof(array); i++) {
         array[i] += 1;
       }
 
       // iPrint("current time: %lu\n", current_time);
-      // iBle_svc_notify(&my_svc, 1, (uint8_t*) &array, sizeof(array));
-      iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
-      iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+
+      iBle_svc_notify(&my_svc, 1, (uint8_t*) &array, sizeof(array));
+      // iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      // iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
     }
   }
 }
