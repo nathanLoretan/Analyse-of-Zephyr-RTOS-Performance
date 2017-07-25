@@ -106,7 +106,7 @@ ITHREAD_HANDLER(swg)
     iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
     if(accEvent == SWG_EVENT_FREQ)  // FIFO full
     {
-      ext_int_freq = ((ext_int_freq * 2) <= FREQUENCY_MAX) ? (ext_int_freq * 2) : 0;
+      ext_int_freq = ((ext_int_freq * 2) <= FREQUENCY_MAX) ? (ext_int_freq * 2) : 1;
       swg_set_frequency(ext_int_freq);
       iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
     }

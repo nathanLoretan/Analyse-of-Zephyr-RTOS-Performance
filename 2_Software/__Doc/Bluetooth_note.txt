@@ -50,7 +50,7 @@ Packet Length:
     - ATT protocol is left with 23 bytes, which is the default and minimal MTU for ATT protocol.
 
 Zephyr Max MTU = 1300Bytes RX, 2000Bytes TX
-Softdevice Max MTU = 142Bytes default softdevice config
+Softdevice Max MTU = 512Bytes default softdevice config
 
 With an ATT write request (or notification), 3 bytes are used by command type and attribute ID, 20 bytes are left for the attribute data.
 

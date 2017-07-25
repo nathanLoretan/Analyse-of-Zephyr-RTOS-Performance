@@ -496,7 +496,7 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	ble_gatts_attr_t attr_chrc_value = {0};
 	attr_chrc_value.p_uuid      = &chrc->chrc_config.uuid.uuid16;
 	attr_chrc_value.p_attr_md   = &attr_md;
-	attr_chrc_value.max_len     = BLE_GATTS_VAR_ATTR_LEN_MAX;
+	attr_chrc_value.max_len     = BLE_GATTS_VAR_ATTR_LEN_MAX;	// 512Bytes
 	attr_chrc_value.init_len    = 1;
 	attr_chrc_value.p_value     = (uint8_t*) chrc->attr_config.data;
 

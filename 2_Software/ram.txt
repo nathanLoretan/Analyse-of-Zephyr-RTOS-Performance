@@ -1,0 +1,12 @@
+0x20000000 + size of RAM    Call stack
+                            HEAP
+                            Application
+0x20000000                  Softdevice
+
+nrF52840 RAM = 256kB RAM = 40000hex = 262144dec = 256*2^10
+
+SDK Softdevice S140 RAM = 26c0hex = 9920dec = 9.6kB
+SDK Application RAM = 3d940hex
+
+Moi S140 RAM = 20kB = 20480dec = 5000hex
+Application RAM = (40000-5000)hex = 35000hex
