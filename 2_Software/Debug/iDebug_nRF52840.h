@@ -46,6 +46,7 @@ do {                                                                            
 #define BLE_ERROR(_flag)        DEBUG_PIN_SET(BLE_ERROR_PIN, BLE_ERROR_PORT, _flag)
 
 // Zephyr:
+//  -> isr_radio_state_rx()     Zephyr/subsys/bluetooth/controller/ll_sw/ctrl.c
 //    -> isr_rx_conn()          Zephyr/subsys/bluetooth/controller/ll_sw/ctrl.c
 #define BLE_CONN_EVT_PIN        29
 #define BLE_CONN_EVT_PORT       NRF_P0
@@ -79,7 +80,8 @@ do {                                                                            
 #define BLE_WRITE()             DEBUG_PIN_TOGGLE(BLE_WRITE_PIN, BLE_WRITE_PORT)
 
 // Zephyr:
-//  -> recv_thread()            Zephyr/subsys/bluetooth/controller/hci_driver.c
+//  -> recv_thread()            Zephyr/subsys/bluetooth/controller/hci/hci_driver.c
+//    -> bt_recv(buf)           Zephyr/subsys/bluetooth/host/hci_core.c
 #define BLE_RECV_PIN            2
 #define BLE_RECV_PORT           NRF_P1
 #define BLE_RECV(_flag)         DEBUG_PIN_SET(BLE_RECV_PIN, BLE_RECV_PORT, _flag)

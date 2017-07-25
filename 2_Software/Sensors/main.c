@@ -135,7 +135,8 @@ ITHREAD_HANDLER(acc)
     }
     else if(accEvent == ACC_EVENT_INT2) // Click
     {
-      bool click = true;
+      static uint8_t click = 0;
+      click++;
 
       if(iBle_isConnected())
         iBle_svc_notify(&acc_svc, 4, (uint8_t*) &click, sizeof(click));
@@ -192,6 +193,7 @@ ITHREAD_HANDLER(adc)
 }
 
 // Interrupts-------------------------------------------------------------------
+#if ENABLE_SWG
 iGpio_t ext_irq;
 IGPIO_HANDLER(on_ext_irq, pin)
 {
@@ -203,7 +205,7 @@ ITIMER_HANDLER(on_soft_timer)
 {
   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 }
-
+#endif  // ENABLE_SWG
 // -----------------------------------------------------------------------------
 void bluetooth_init();
 void extBoad_init();

@@ -16,10 +16,10 @@
 #endif
 
 //------------------------------------------------------------------------------
-#define ENABLE_ACC        0
+#define ENABLE_ACC        1
 #define ENABLE_ADC        0
-#define ENABLE_SWG        1
-#define ENABLE_BLE        0
+#define ENABLE_SWG        0
+#define ENABLE_BLE        1
 
 // Externa. Interrupt-----------------------------------------------------------
 #define ACC_INT2           30
@@ -59,7 +59,7 @@
 #define ADC_DATA_RATE         ADC_DATA_RATE_5
 #define ADC_CONVERSION_MODE   ADC_CONVERSION_CONTINUOUS
 
-#define ACC_DATA_RATE         ACC_DATA_RATE_9
+#define ACC_DATA_RATE         ACC_DATA_RATE_5
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
