@@ -31,11 +31,11 @@ do {                                                                            
                                       (_port->OUTSET = (0x01 << _pin));         \
 } while(0)
 
-#define DEBUG_START_PIN         8
+#define DEBUG_START_PIN         1
 #define DEBUG_START_PORT        NRF_P1
 #define DEBUG_START()           DEBUG_PIN_TOGGLE(DEBUG_START_PIN, DEBUG_START_PORT)
 
-#define EXT_INT_LATENCY_PIN     7
+#define EXT_INT_LATENCY_PIN     8
 #define EXT_INT_LATENCY_PORT    NRF_P1
 #define EXT_INT_LATENCY()       DEBUG_PIN_TOGGLE(EXT_INT_LATENCY_PIN, EXT_INT_LATENCY_PORT)
 

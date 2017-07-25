@@ -68,40 +68,50 @@ DEFINE_IBLE_SVC_CONFIG(adc_config)
   )
 };
 
-static DEFINE_IBLE_ADV_DATA(advdata) =
-{
-  IBLE_ADV_ADD_DATA(IBLE_DATA_FLAGS, IBLE_FLAGS_GENERAL | IBLE_FLAGS_NO_BREDR),
-  IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
-};
+#if ENABLE_BLE
+  static DEFINE_IBLE_ADV_DATA(advdata) =
+  {
+    IBLE_ADV_ADD_DATA(IBLE_DATA_FLAGS, IBLE_FLAGS_GENERAL | IBLE_FLAGS_NO_BREDR),
+    IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
+  };
 
-static DEFINE_IBLE_ADV_DATA(scanrsp) =
-{
-  IBLE_ADV_ADD_TEXT(IBLE_DATA_NAME_COMPLETE, IBLE_DEVICE_NAME),
-};
-
-// Interrupts-------------------------------------------------------------------
-iGpio_t ext_irq;
-IGPIO_HANDLER(on_ext_irq, pin)
-{
-  EXT_INT_LATENCY();
-  // iPrint("External Interrupt\n");
-}
-
-iTimer_t soft_timer;
-static float ext_int_freq = EXT_INT_FREQ;
-ITIMER_HANDLER(on_soft_timer)
-{
-  ext_int_freq *= 2;
-  swg_set_frequency(ext_int_freq);
-  // iPrint("Software Interrupt\n");
-}
+  static DEFINE_IBLE_ADV_DATA(scanrsp) =
+  {
+    IBLE_ADV_ADD_TEXT(IBLE_DATA_NAME_COMPLETE, IBLE_DEVICE_NAME),
+  };
+#endif  // ENABLE_BLE
 
 // Threads----------------------------------------------------------------------
+typedef enum {
+	SWG_EVENT_FREQ = 0,
+} swgEvent_t;
+
+iEventQueue_t swg_EventQueue;
 extern iEventQueue_t acc_EventQueue;
 extern iEventQueue_t adc_EventQueue;
 
+DEFINE_ITHREAD(swg_thread, 4096, 1);
 DEFINE_ITHREAD(acc_thread, 4096, 1);
 DEFINE_ITHREAD(adc_thread, 4096, 1);
+
+ITHREAD_HANDLER(swg)
+{
+  static float ext_int_freq = EXT_INT_FREQ;
+
+  while(1)
+  {
+    // Wait for event
+    while(iEventQueue_isEmpty(&swg_EventQueue)) { iThread_sleep(); }
+
+    iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
+    if(accEvent == SWG_EVENT_FREQ)  // FIFO full
+    {
+      ext_int_freq = ((ext_int_freq * 2) <= FREQUENCY_MAX) ? (ext_int_freq * 2) : 0;
+      swg_set_frequency(ext_int_freq);
+      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+    }
+  }
+}
 
 ITHREAD_HANDLER(acc)
 {
@@ -115,24 +125,34 @@ ITHREAD_HANDLER(acc)
     {
       acc_getXYZ(&sample, 1);
       // iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
-      iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample.x, sizeof(sample.x));
-      iBle_svc_notify(&acc_svc, 2, (uint8_t*) &sample.y, sizeof(sample.y));
-      iBle_svc_notify(&acc_svc, 3, (uint8_t*) &sample.z, sizeof(sample.z));
+
+      if(iBle_isConnected())
+      {
+        iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample.x, sizeof(sample.x));
+        iBle_svc_notify(&acc_svc, 2, (uint8_t*) &sample.y, sizeof(sample.y));
+        iBle_svc_notify(&acc_svc, 3, (uint8_t*) &sample.z, sizeof(sample.z));
+      }
     }
     else if(accEvent == ACC_EVENT_INT2) // Click
     {
       bool click = true;
-      iBle_svc_notify(&acc_svc, 4, (uint8_t*) &click, sizeof(click));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&acc_svc, 4, (uint8_t*) &click, sizeof(click));
     }
     else if(accEvent == ACC_EVENT_SLEEP) // Sleep
     {
       bool isSleeping = acc_isSleeping();
-      iBle_svc_notify(&acc_svc, 5, (uint8_t*) &isSleeping, sizeof(isSleeping));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&acc_svc, 5, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
     else if(accEvent == ACC_EVENT_WAKEUP) // Wake-Up
     {
       bool isSleeping = acc_isSleeping();
-      iBle_svc_notify(&acc_svc, 5, (uint8_t*) &isSleeping, sizeof(isSleeping));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&acc_svc, 5, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
   }
 }
@@ -150,19 +170,38 @@ ITHREAD_HANDLER(adc)
       // Notify the central
       adc_getMeasurement(&adc_measurement);
       // iPrint("Measurement: %lu[uV]\n", adc_measurement);
-      iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
     }
     else if(adcEvent == ADC_EVENT_SLEEP) // Sleep
     {
       bool isSleeping = adc_isSleeping();
-      iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
     else if(adcEvent == ADC_EVENT_WAKEUP) // Wake-Up
     {
       bool isSleeping = adc_isSleeping();
-      iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
+
+      if(iBle_isConnected())
+        iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
   }
+}
+
+// Interrupts-------------------------------------------------------------------
+iGpio_t ext_irq;
+IGPIO_HANDLER(on_ext_irq, pin)
+{
+  EXT_INT_LATENCY();
+}
+
+iTimer_t soft_timer;
+ITIMER_HANDLER(on_soft_timer)
+{
+  iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 }
 
 // -----------------------------------------------------------------------------
@@ -173,18 +212,27 @@ int main()
 {
   iDebug_init();
 
-  // Thread must be declare before the driver to avoid full filling the event queues
-  iThread_run(&acc_thread, acc);
-  iThread_run(&adc_thread, adc);
+// Thread must be declare before the driver to avoid full filling the event queues
 
-  iDebug_init();
+#if ENABLE_ACC
+  iThread_run(&acc_thread, acc);
+#endif  // ENABLE_ACC
+
+#if ENABLE_ADC
+  iThread_run(&adc_thread, adc);
+#endif  // ENABLE_ADC
+
   bluetooth_init();
   extBoad_init();
+
+#if ENABLE_SWG
+  iThread_run(&swg_thread, swg);
 
   iGpio_interrupt_init(&ext_irq, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_ext_irq);
   iGpio_enable_interrupt(&ext_irq);
 
   iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+#endif  // ENABLE_SWG
 
   while(1)
   {
@@ -197,28 +245,36 @@ int main()
 
 void bluetooth_init()
 {
+#if ENABLE_BLE
   iPrint("\nInitialize Bluetooth\n");
-  iPrint("----------------------\n");
+  iPrint("--------------------\n");
 
   iBle_init();
   iBle_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
   iBle_svc_init(&adc_svc, adc_config, adc_nbr_chrcs);
   iBle_adv_start(advdata, sizeof(advdata)/sizeof(iBle_advdata_t), scanrsp, sizeof(scanrsp)/sizeof(iBle_advdata_t));
+#endif  // ENABLE_BLE
 }
 
 void extBoad_init()
 {
-  iPrint("\nInitialize extBoard\n");
-  iPrint("---------------------\n");
+#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+  iPrint("\nInitialize ExtBoard\n");
+  iPrint("-------------------\n");
 
-  iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
-  swg_init(EXT_INT_FREQ);
+  #if ENABLE_SWG
+    iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
+    swg_init(EXT_INT_FREQ);
+  #endif  // ENABLE_SWG
 
-  iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
-  adc_init();
+  #if ENABLE_ADC
+    iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
+    adc_init();
+  #endif  // ENABLE_ADC
 
-  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
-  acc_init();
+  #if ENABLE_ACC
+    iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
+    acc_init();
+  #endif  // ENABLE_ACC
+#endif  // ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
 }
-
-// NRF_BLE_GATT_MAX_MTU_SIZE

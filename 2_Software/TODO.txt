@@ -1,5 +1,7 @@
 TODO:
 
+- preemptiv, non preemptiv Zephyr
+- click notification
 - nbr packets zephyr
 - Softdevice RAM
 - Time between different packet

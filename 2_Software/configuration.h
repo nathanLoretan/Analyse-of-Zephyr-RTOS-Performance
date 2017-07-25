@@ -15,7 +15,13 @@
   #include "AL/BareMetal/nrf5x_interface.h"
 #endif
 
-// Externa. Interrupt----------------------------------------------------------------------
+//------------------------------------------------------------------------------
+#define ENABLE_ACC        0
+#define ENABLE_ADC        0
+#define ENABLE_SWG        1
+#define ENABLE_BLE        0
+
+// Externa. Interrupt-----------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31
 
