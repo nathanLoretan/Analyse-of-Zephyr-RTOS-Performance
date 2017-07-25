@@ -1,3 +1,17 @@
+http://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.s132.sds%2Fdita%2Fsoftdevices%2Fs130%2Fs130sds.html
+Priority
+-------------------------------------------------------------------------
+nRF:
+7 Priorities, 0 highest, (0,1,4,5 reserved softdevice)
+
+    Level 0 is used for the SoftDevice's timing critical processing.
+    Level 1 is used for handling the memory isolation and run time protection, see Memory isolation and runtime protection.
+    Level 4 is used by higher-level deferrable tasks and the API functions executed as SVC interrupts.
+    Level 5 is reserved for future use for SoftDevice 4.0.x versions that are earlier than 4.0.3.
+
+Zephyr:
+
+
 BLE:
 --------------------------------------------------------------------------------
 slave latency
