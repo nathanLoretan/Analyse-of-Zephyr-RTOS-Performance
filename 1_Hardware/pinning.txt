@@ -5,9 +5,9 @@ x = already used or not compatible with all Nordic development kit
 NRF52840:
 ---------
 
-VDD	X				p0.27	(SCLK) 	x
-VDD	X				p0.26	(SDA)	x
-RESET	X				p0.02	(AREF)
+VDD	X				p0.27	
+VDD	X				p0.26	
+RESET	X				p0.02	
 5V	X				GND
 GND	X				p1.15	D13 (SCK)  ADC SCK  (SPI0)
 GND	X				p1.14	D12 (MISO) ADC MISO (SPI0)
@@ -16,14 +16,14 @@ N.C	X				p1.13	D11 (MOSI) ADC MOSI (SPI0)
 P0.03	A0 Acc. SCL SPC (TWI or SPI)	p1.11	D9		
 p0.04	A1 Acc. SDA SDI (TWI or SPI) 	p1.10	D8
 p0.28	A2 Acc. SA0 SD0 (TWI or SPI)
-p0.29	A3 Acc. CS      (TWI or SPI)	p1.08 	D7 
-p0.30	A4 Acc. INT2			p1.07	D6 
+p0.29	A3 Acc. CS      (TWI or SPI)	p1.08 	D7 EXT LATENCY
+p0.30	A4 Acc. INT2			p1.07	D6 SWG OUT 
 p0.31	A5 Acc. INT1			p1.06	D5 SWG SCK	(SPI1)
 					p1.05	D4 SWG MIS0	(SPI1)
 					p1.04 	D3 SWG MOSI	(SPI1)
 					p1.03	D2 SWG SS   	(SPI1)
-					p1.02	D1 (RX)
-					p1.01	D0 (TX)
+					p1.02	D1 
+					p1.01	D0 DEBUG START
 
 					p0.10	X
 					p0.09	X
@@ -34,14 +34,14 @@ p0.31	A5 Acc. INT1			p1.06	D5 SWG SCK	(SPI1)
 					p0.01	X
 					p0.00	X
 
-p0.11	X		p0.12	X	
-p0.13	X		p0.14	X
-p0.15	X		p0.16	X
+p0.11			p0.12		
+p0.13			p0.14	
+p0.15			p0.16	
 p0.17	X		p0.18	X
 p0.19	X		p0.20	X
 p0.21	X		p0.22	X
-p0.23	X		p0.24	X
-p0.25	X		p1.00	X
+p0.23	X		p0.24	
+p0.25			p1.00	X
 p0.09	X		
 
 -------------------------------------------------------------------------------------------------------
