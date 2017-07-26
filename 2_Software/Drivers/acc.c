@@ -162,7 +162,7 @@
 #define CLICK_X                 0x01
 
 //REGISTER_CLICK_THS---------------
-#define CLICK_THS               0x20
+#define CLICK_THS               0x01
 
 //REGISTER_TIME_WINDOW--------------
 #define TIME_LIMIT              0x80

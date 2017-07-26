@@ -183,7 +183,7 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 
   struct bt_uuid_128* uuid = (struct bt_uuid_128*)svc_config[0].user_data;
 
-	iPrint("[INIT] Service 0x%02x%02x initialized\n", uuid->val[1], uuid->val[0]);
+	iPrint("[INIT] Service 0x%02x%02x initialized\n", uuid->val[13], uuid->val[12]);
 	return 0;
 }
 

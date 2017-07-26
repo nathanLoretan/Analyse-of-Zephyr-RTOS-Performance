@@ -1,5 +1,6 @@
 TODO:
 
+- adc correct gain *2
 - preemptiv, non preemptiv Zephyr
 - click notification
 - nbr packets zephyr

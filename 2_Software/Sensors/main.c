@@ -11,7 +11,7 @@
 #define ACC_UUID_CHRC3   0x3ACC
 #define ACC_UUID_CHRC4   0x4ACC
 #define ACC_UUID_CHRC5   0x5ACC
-#define ACC_UUID_BASE    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0xE0, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00
+#define ACC_UUID_BASE    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBle_svc_t acc_svc;
 size_t acc_nbr_chrcs = 5;
@@ -23,23 +23,23 @@ DEFINE_IBLE_SVC_CONFIG(acc_config)
   (
     DEFINE_IBLE_CHRC (  // AXIS X
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, &sample.x)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.x)
     ),
     DEFINE_IBLE_CHRC (  // AXIS Y
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, &sample.y)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.y)
     ),
     DEFINE_IBLE_CHRC (  // AXIS Z
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC3, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC3, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, &sample.z)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC3, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.z)
     ),
     DEFINE_IBLE_CHRC (  // CLICK
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, NULL)
     ),
     DEFINE_IBLE_CHRC (  // SLEEP
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC5, ACC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC5, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC5, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, NULL)
     ),
   )
 };
@@ -47,7 +47,7 @@ DEFINE_IBLE_SVC_CONFIG(acc_config)
 #define ADC_UUID_SVC     0x0ADC
 #define ADC_UUID_CHRC1   0x1ADC
 #define ADC_UUID_CHRC2   0x2ADC
-#define ADC_UUID_BASE    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xE0, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00
+#define ADC_UUID_BASE    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBle_svc_t adc_svc;
 size_t adc_nbr_chrcs = 2;
@@ -59,11 +59,11 @@ DEFINE_IBLE_SVC_CONFIG(adc_config)
   (
     DEFINE_IBLE_CHRC (  // A/D Converter measurements
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, &adc_measurement)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &adc_measurement)
     ),
     DEFINE_IBLE_CHRC (  // SLEEP
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC2, ADC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC2, ADC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC2, ADC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, NULL)
     ),
   )
 };
@@ -90,10 +90,6 @@ iEventQueue_t swg_EventQueue;
 extern iEventQueue_t acc_EventQueue;
 extern iEventQueue_t adc_EventQueue;
 
-DEFINE_ITHREAD(swg_thread, 4096, 1);
-DEFINE_ITHREAD(acc_thread, 4096, 1);
-DEFINE_ITHREAD(adc_thread, 4096, 1);
-
 ITHREAD_HANDLER(swg)
 {
   static float ext_int_freq = EXT_INT_FREQ;
@@ -104,11 +100,14 @@ ITHREAD_HANDLER(swg)
     while(iEventQueue_isEmpty(&swg_EventQueue)) { iThread_sleep(); }
 
     iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
-    if(accEvent == SWG_EVENT_FREQ)  // FIFO full
+    if(accEvent == SWG_EVENT_FREQ)
     {
-      ext_int_freq = ((ext_int_freq * 2) <= FREQUENCY_MAX) ? (ext_int_freq * 2) : 1;
-      swg_set_frequency(ext_int_freq);
-      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+      if(iBle_isConnected())
+      {
+        CHANGE_FREQUENCY(ext_int_freq);
+        swg_set_frequency(ext_int_freq);
+        iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+      }
     }
   }
 }
@@ -172,7 +171,7 @@ ITHREAD_HANDLER(adc)
       adc_getMeasurement(&adc_measurement);
       // iPrint("Measurement: %lu[uV]\n", adc_measurement);
 
-      if(iBle_isConnected())
+      if(iBle_isConnected()){}
         iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
     }
     else if(adcEvent == ADC_EVENT_SLEEP) // Sleep
@@ -180,17 +179,21 @@ ITHREAD_HANDLER(adc)
       bool isSleeping = adc_isSleeping();
 
       if(iBle_isConnected())
-        iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
+        iBle_svc_notify(&adc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
     else if(adcEvent == ADC_EVENT_WAKEUP) // Wake-Up
     {
       bool isSleeping = adc_isSleeping();
 
       if(iBle_isConnected())
-        iBle_svc_notify(&acc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
+        iBle_svc_notify(&adc_svc, 2, (uint8_t*) &isSleeping, sizeof(isSleeping));
     }
   }
 }
+
+DEFINE_ITHREAD(swg_thread, 4096, 0);
+DEFINE_ITHREAD(acc_thread, 4096, 0);
+DEFINE_ITHREAD(adc_thread, 4096, 0);
 
 // Interrupts-------------------------------------------------------------------
 #if ENABLE_SWG
@@ -205,6 +208,7 @@ ITIMER_HANDLER(on_soft_timer)
 {
   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 }
+
 #endif  // ENABLE_SWG
 // -----------------------------------------------------------------------------
 void bluetooth_init();
@@ -224,11 +228,15 @@ int main()
   iThread_run(&adc_thread, adc);
 #endif  // ENABLE_ADC
 
+#if ENABLE_SWG
+  iThread_run(&swg_thread, swg);
+#endif  // ENABLE_SWG
+
   bluetooth_init();
   extBoad_init();
 
 #if ENABLE_SWG
-  iThread_run(&swg_thread, swg);
+  iEventQueue_init(&swg_EventQueue);
 
   iGpio_interrupt_init(&ext_irq, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_ext_irq);
   iGpio_enable_interrupt(&ext_irq);

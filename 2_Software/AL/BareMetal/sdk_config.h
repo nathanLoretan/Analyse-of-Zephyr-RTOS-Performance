@@ -11,17 +11,17 @@
 #define SPI1_MISO		       (14 + NRF5_GPIO_P1)
 #define SPI1_MOSI		       (13 + NRF5_GPIO_P1)
 #define SPI1_CS0			     (12 + NRF5_GPIO_P1)
-#define SPI1_IRQ_PRIORITY  SPI_DEFAULT_CONFIG_IRQ_PRIORITY
+#define SPI1_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define SPI2_SCK		       (6 + NRF5_GPIO_P1)
 #define SPI2_MISO		       (5 + NRF5_GPIO_P1)
 #define SPI2_MOSI		       (4 + NRF5_GPIO_P1)
 #define SPI2_CS0			     (3 + NRF5_GPIO_P1)
-#define SPI2_IRQ_PRIORITY  SPI_DEFAULT_CONFIG_IRQ_PRIORITY
+#define SPI2_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define I2C0_SCL           3
 #define I2C0_SDA           4
-#define I2C0_IRQ_PRIORITY TWI_DEFAULT_CONFIG_IRQ_PRIORITY
+#define I2C0_IRQ_PRIORITY  2// TWI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 // <e> PIN MAPPING
 //==========================================================
@@ -400,7 +400,7 @@
 	// <6=> 6
 	// <7=> 7
 	#ifndef GPIOTE_CONFIG_IRQ_PRIORITY
-		#define GPIOTE_CONFIG_IRQ_PRIORITY 7
+		#define GPIOTE_CONFIG_IRQ_PRIORITY 2
 	#endif
 
 	// <e> GPIOTE_CONFIG_LOG_ENABLED - Enables logging in the module.

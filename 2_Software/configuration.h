@@ -16,9 +16,9 @@
 #endif
 
 //------------------------------------------------------------------------------
-#define ENABLE_ACC        1
-#define ENABLE_ADC        0
-#define ENABLE_SWG        0
+#define ENABLE_ACC        0
+#define ENABLE_ADC        1
+#define ENABLE_SWG        1
 #define ENABLE_BLE        1
 
 // Externa. Interrupt-----------------------------------------------------------
@@ -49,21 +49,25 @@
 #define ADV_INTERVAL_MAX       60                         // [ms] ranges from 20ms to 10.24s
 #define ADV_TIMEOUT            IBLE_ADV_TIMEOUT_NONE      // [ms]
 
-#define CONN_MIN_INTERVAL     50                          // [ms] ranges from 7.5ms to 4s
-#define CONN_MAX_INTERVAL     100                         // [ms] ranges from 7.5ms to 4s
-#define CONN_TIMEOUT          4000                        // [ms]
+#define CONN_MIN_INTERVAL     10                          // [ms] ranges from 7.5ms to 4s
+#define CONN_MAX_INTERVAL     15                          // [ms] ranges from 7.5ms to 4s
+#define CONN_TIMEOUT          20000                       // [ms]
 
 #define SLAVE_LATENCY         0
 
 // Sensors Configuration--------------------------------------------------------
-#define ADC_DATA_RATE         ADC_DATA_RATE_5
+#define ADC_DATA_RATE         ADC_DATA_RATE_6
 #define ADC_CONVERSION_MODE   ADC_CONVERSION_CONTINUOUS
 
 #define ACC_DATA_RATE         ACC_DATA_RATE_5
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
-#define EXT_INT_FREQ          1     // [Hz]
-#define SOFT_INT_FREQ         1000  // [ms]
+#define EXT_INT_FREQ          1         // [Hz]
+#define SOFT_INT_FREQ         3000      // [ms]
+#define FREQ_STEP             2
+#define FREQ_STEP2            0
+#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq * FREQ_STEP) <= FREQUENCY_MAX) ? (_freq * FREQ_STEP) : (FREQUENCY_MAX + FREQ_STEP2);
+
 
 #endif  // __CONFIGURATION_H__
