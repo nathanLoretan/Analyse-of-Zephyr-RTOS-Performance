@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "/home/nathanloretan/Desktop/Bachelor/2_Software/Debug/iDebug_nRF52840.h"
+#include "Debug/iDebug_nRF52840.h"
 
 #ifdef 	ZEPHYR_USED
   #include "AL/Zephyr/zephyr_interface.h"

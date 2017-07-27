@@ -20,7 +20,6 @@ iEventQueue_t swg_EventQueue;
 #define ACC_UUID_BASE    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBle_svc_t acc_svc;
-// size_t acc_nbr_chrcs = 5;
 size_t acc_nbr_chrcs = 3;
 sample_t sample;
 DEFINE_IBLE_SVC_CONFIG(acc_config)
@@ -32,18 +31,6 @@ DEFINE_IBLE_SVC_CONFIG(acc_config)
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
       IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample)
     ),
-    // DEFINE_IBLE_CHRC (  // AXIS X
-    //   IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-    //   IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.x)
-    // ),
-    // DEFINE_IBLE_CHRC (  // AXIS Y
-    //   IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-    //   IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.y)
-    // ),
-    // DEFINE_IBLE_CHRC (  // AXIS Z
-    //   IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC3, ACC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
-    //   IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC3, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, &sample.z)
-    // ),
     DEFINE_IBLE_CHRC (  // CLICK
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
       IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_GATT_PERM_READ, NULL, NULL)
@@ -110,9 +97,6 @@ ITIMER_HANDLER(on_soft_timer)
 #endif  // ENABLE_SWG
 
 // Threads----------------------------------------------------------------------
-extern iEventQueue_t acc_EventQueue;
-extern iEventQueue_t adc_EventQueue;
-
 #if ENABLE_SWG
 ITHREAD_HANDLER(swg)
 {
@@ -158,9 +142,6 @@ ITHREAD_HANDLER(acc)
         // iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
 
         iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample, sizeof(sample));
-        // iBle_svc_notify(&acc_svc, 1, (uint8_t*) &sample.x, sizeof(sample.x));
-        // iBle_svc_notify(&acc_svc, 2, (uint8_t*) &sample.y, sizeof(sample.y));
-        // iBle_svc_notify(&acc_svc, 3, (uint8_t*) &sample.z, sizeof(sample.z));
       }
     }
     else if(accEvent == ACC_EVENT_INT2) // Click
@@ -254,19 +235,19 @@ int main()
 
 #if ENABLE_SWG
   iThread_run(&swg_thread, swg);
+	iEventQueue_init(&swg_EventQueue);
+	iGpio_interrupt_init(&ext_irq, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_ext_irq);
+	iGpio_enable_interrupt(&ext_irq);
+	iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
 #endif  // ENABLE_SWG
 
+#if ENABLE_BLE
   bluetooth_init();
+#endif  // ENABLE_BLE
+
+#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
   extBoad_init();
-
-#if ENABLE_SWG
-  iEventQueue_init(&swg_EventQueue);
-
-  iGpio_interrupt_init(&ext_irq, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_ext_irq);
-  iGpio_enable_interrupt(&ext_irq);
-
-  iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
-#endif  // ENABLE_SWG
+#endif	// ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
 
   while(1)
   {
@@ -279,7 +260,6 @@ int main()
 
 void bluetooth_init()
 {
-#if ENABLE_BLE
   iPrint("\nInitialize Bluetooth\n");
   iPrint("--------------------\n");
 
@@ -287,28 +267,25 @@ void bluetooth_init()
   iBle_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
   iBle_svc_init(&adc_svc, adc_config, adc_nbr_chrcs);
   iBle_adv_start(advdata, sizeof(advdata)/sizeof(iBle_advdata_t), scanrsp, sizeof(scanrsp)/sizeof(iBle_advdata_t));
-#endif  // ENABLE_BLE
 }
 
 void extBoad_init()
 {
-#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
   iPrint("\nInitialize ExtBoard\n");
   iPrint("-------------------\n");
 
-  #if ENABLE_SWG
-    iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
-    swg_init(EXT_INT_FREQ);
-  #endif  // ENABLE_SWG
+#if ENABLE_SWG
+  iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
+  swg_init(EXT_INT_FREQ);
+#endif  // ENABLE_SWG
 
-  #if ENABLE_ADC
-    iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
-    adc_init();
-  #endif  // ENABLE_ADC
+#if ENABLE_ADC
+  iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
+  adc_init();
+#endif  // ENABLE_ADC
 
-  #if ENABLE_ACC
-    iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
-    acc_init();
-  #endif  // ENABLE_ACC
-#endif  // ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+#if ENABLE_ACC
+  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
+  acc_init();
+#endif  // ENABLE_ACC
 }
