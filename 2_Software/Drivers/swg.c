@@ -44,6 +44,8 @@
 
 static iSpi_id_t spi = SWG_SPI;
 
+static bool isSleeping = false;
+
 void swg_init(float frequency)
 {
 	uint8_t tx_buf[2];
@@ -131,6 +133,8 @@ void swg_sleep()
   // Configure Power down
   ISPI_CREATE_DATA(tx_buf, REGISTER_CONTROL | SELECT_28BITS | SELECT_MSB | SELECT_FREQ0, SLEEP_NO_DAC_CLOCK | WAVE_SQUARE);
 	iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+	isSleeping = true;
 }
 
 void swg_wakeup()
@@ -140,4 +144,11 @@ void swg_wakeup()
   // Configure Wake up
   ISPI_CREATE_DATA(tx_buf, REGISTER_CONTROL | SELECT_28BITS | SELECT_MSB | SELECT_FREQ0, SLEEP_NO | WAVE_SQUARE);
 	iSPI_write(spi, SWG_SPI_CS, tx_buf, 2);
+
+	isSleeping = false;
+}
+
+bool swg_isSleeping()
+{
+	return isSleeping;
 }

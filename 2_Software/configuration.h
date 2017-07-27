@@ -18,7 +18,7 @@
 //------------------------------------------------------------------------------
 #define ENABLE_ACC        0
 #define ENABLE_ADC        1
-#define ENABLE_SWG        1
+#define ENABLE_SWG        0
 #define ENABLE_BLE        1
 
 // Externa. Interrupt-----------------------------------------------------------
@@ -64,10 +64,10 @@
 #define ACC_FIFO              1
 
 #define EXT_INT_FREQ          1         // [Hz]
-#define SOFT_INT_FREQ         3000      // [ms]
+#define SOFT_INT_FREQ         3000       // [ms]
 #define FREQ_STEP             2
-#define FREQ_STEP2            0
-#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq * FREQ_STEP) <= FREQUENCY_MAX) ? (_freq * FREQ_STEP) : (FREQUENCY_MAX + FREQ_STEP2);
+#define FREQ_STEP2            100
+#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq * FREQ_STEP) <= FREQUENCY_MAX) ? (_freq * FREQ_STEP) : (_freq + FREQ_STEP2);
 
 
 #endif  // __CONFIGURATION_H__

@@ -55,7 +55,7 @@ void iEventQueue_add(iEventQueue_t* queue, iEvent_t event)
 	(*nextEvent)->event = event;
 	(*nextEvent)->next 	= NULL;
 
-	// Notify the system of the new event	
+	// Notify the system of the new event
 	isEvent = true;
 	queue->isEmpty = false;
 }

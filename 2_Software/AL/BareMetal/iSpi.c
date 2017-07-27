@@ -16,19 +16,32 @@
 #endif	// SPI1_ENABLED
 
 #if SPI2_ENABLED
-	static const nrf_drv_spi_t	spi2 = NRF_DRV_SPI_INSTANCE(1);
+	static const nrf_drv_spi_t	spi2 = NRF_DRV_SPI_INSTANCE(2);
 	static iGpio_t 							spi2_cs[4];
 	volatile static nrf_mtx_t		spi2_mutex;
 	volatile static bool				spi2_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
 #endif	// SPI2_ENABLED
 
-#if SPI0_ENABLED || SPI1_ENABLED || SPI2_ENABLED
-static void on_spi_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+#if SPI0_ENABLED
+static void on_spi0_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
 {
-	bool* isDataReady = (bool*) p_context;
-	*isDataReady = true;
+	spi0_isDataReady = true;
 }
-#endif	// SPI0_ENABLED || SPI1_ENABLED
+#endif	// SPI0_ENABLED
+
+#if SPI1_ENABLED
+static void on_spi1_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+{
+	spi1_isDataReady = true;
+}
+#endif	// SPI1_ENABLED
+
+#if SPI2_ENABLED
+static void on_spi2_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+{
+	spi2_isDataReady = true;
+}
+#endif	// SPI2_ENABLED
 
 int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order)
 {
@@ -49,13 +62,13 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 										.irq_priority = SPI0_IRQ_PRIORITY,
 										.orc          = 0xFF,
 										.frequency    = freq,
-										.mode         = mode
-										.bit_order    = order
+										.mode         = mode,
+										.bit_order    = order,
 									};
 
 									nrf_drv_spi_uninit(&spi0);
 
-									error = nrf_drv_spi_init(&spi0, &config, on_spi_event, (void*) &spi0_isDataReady);
+									error = nrf_drv_spi_init(&spi0, &config, on_spi0_event, NULL);
 									if (error) {
 										iPrint("/!\\ SPI0 configuration failed: error %d\n", error);
 										return error;
@@ -105,7 +118,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									nrf_drv_spi_uninit(&spi1);
 
-									error = nrf_drv_spi_init(&spi1, &config, on_spi_event, (void*) &spi1_isDataReady);
+									error = nrf_drv_spi_init(&spi1, &config, on_spi1_event, NULL);
 									if (error) {
 										iPrint("/!\\ SPI1 configuration failed: error %d\n", error);
 										return error;
@@ -156,7 +169,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									nrf_drv_spi_uninit(&spi2);
 
-									error = nrf_drv_spi_init(&spi2, &config, on_spi_event, (void*) &spi2_isDataReady);
+									error = nrf_drv_spi_init(&spi2, &config, on_spi2_event, NULL);
 									if (error) {
 										iPrint("/!\\ SPI2 configuration failed: error %d\n", error);
 										return error;
