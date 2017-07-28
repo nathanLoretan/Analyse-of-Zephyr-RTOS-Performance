@@ -1,7 +1,7 @@
 TODO:
 
+- mtu request baremetal
 - adc correct gain *2
-- preemptiv, non preemptiv Zephyr
 - click notification
 - nbr packets zephyr
 - Softdevice RAM
@@ -27,3 +27,8 @@ git log
 git show
 git push -u nathan
 git push --set-upstream nathan nathan_fix_spim_config
+
+
+READ:
+NRF52840 datashee       p289
+BLE core specification  p2568 link layer specification

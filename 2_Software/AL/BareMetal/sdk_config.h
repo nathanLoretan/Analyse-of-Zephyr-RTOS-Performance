@@ -486,8 +486,8 @@
 
 	// <o> NRF_BLE_GATT_MAX_MTU_SIZE - Static maximum MTU size that is passed to the @ref sd_ble_enable function.
 	#ifndef NRF_BLE_GATT_MAX_MTU_SIZE
-		#define NRF_BLE_GATT_MAX_MTU_SIZE 23
-		// #define NRF_BLE_GATT_MAX_MTU_SIZE 251 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
+		// #define NRF_BLE_GATT_MAX_MTU_SIZE 23
+		#define NRF_BLE_GATT_MAX_MTU_SIZE 251 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
 	#endif
 
 #endif //NRF_BLE_GATT_ENABLED

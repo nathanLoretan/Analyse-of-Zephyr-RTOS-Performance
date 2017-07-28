@@ -11,7 +11,7 @@ static nrf_ble_gatt_t gatt_module;
 #define CONN_CFG_TAG						1
 
 // Connection parameters init
-#define MAX_CONN_PARAMS_UPDATE_COUNT			3
+#define MAX_CONN_PARAMS_UPDATE_COUNT			10
 #define NEXT_CONN_PARAMS_UPDATE_DELAY			APP_TIMER_TICKS(30000)
 #define FIRST_CONN_PARAMS_UPDATE_DELAY		APP_TIMER_TICKS(5000)
 
@@ -247,7 +247,9 @@ int iBle_init()
 	// Configure the maximum ATT MTU.
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                 	= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gatt_conn_cfg.att_mtu 	= NRF_BLE_GATT_MAX_MTU_SIZE;	// Maximum size of the ATT packet the SoftDevice can send or receive
+	// Maximum size of the ATT packet the SoftDevice can send or receive, 251Bytes
+	// https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
+	ble_cfg.conn_cfg.params.gatt_conn_cfg.att_mtu 	= NRF_BLE_GATT_MAX_MTU_SIZE;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATT, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the maximum ATT MTU: error %d\n", error);
@@ -262,6 +264,16 @@ int iBle_init()
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GAP, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the maximum event length: error %d\n", error);
+		return error;
+	}
+
+	// Configure the maximum event length.
+	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
+	ble_cfg.conn_cfg.conn_cfg_tag                     				= CONN_CFG_TAG;
+	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 37;
+	error = sd_ble_cfg_set(BLE_CONN_CFG_GATTS, &ble_cfg, ram_start);
+	if(error) {
+		iPrint("/!\\ fail to configure the number of handle value notification: error %d\n", error);
 		return error;
 	}
 

@@ -2,109 +2,106 @@
 #include "../Drivers/acc.h"
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
+#include "../Debug/iDebug_nRF52840.h"
 
-iEventQueue_t eventTh1;
-iEventQueue_t eventTh2;
-iEventQueue_t eventTh3;
-iEventQueue_t eventTh4;
+void bluetooth_init();
+void bluetooth_test();
 
-iTimer_t timer;
+// The attribute value must be static
+uint32_t current_time;
 
-typedef enum  {
-  EV_1 = 0,
-  EV_2,
-  EV_3,
-  EV_4
-} threadEvent_t;
-
-ITHREAD_HANDLER(thread1)
+static DEFINE_IBLE_ADV_DATA(advdata) =
 {
-  while(1)
-  {
-    while(iEventQueue_isEmpty(&eventTh1)) { iThread_sleep(); }
-    iEvent_t event = iEventQueue_get(&eventTh1);
+  IBLE_ADV_ADD_DATA(IBLE_DATA_FLAGS, IBLE_FLAGS_GENERAL | IBLE_FLAGS_NO_BREDR),
 
-    if(event == EV_1)
-      iPrint("TH1 Event1 occured\n");
-  }
+  // Heart Rate(0x180D),  Current Time Service(0x1805), my Service(0xAAAA)
+  IBLE_ADV_ADD_DATA(IBLE_DATA_UUID16_ALL, 0x0d, 0x18, 0x05, 0x18, 0xAA, 0xAA),
+};
+
+static DEFINE_IBLE_ADV_DATA(scanrsp) =
+{
+  IBLE_ADV_ADD_TEXT(IBLE_DATA_NAME_COMPLETE, IBLE_DEVICE_NAME),
+};
+
+// static iBle_adv_config_t adv_config =
+// {
+// 	.mode            = IBLE_ADV_MODE_FAST,
+// 	.interval_min    = IBLE_GAP_ADV_FAST_INT_MIN_1,
+//  	.interval_max    = IBLE_GAP_ADV_FAST_INT_MAX_1,
+// 	.timeout         = IBLE_ADV_NO_TIMEOUT,
+// };
+
+IBLE_WRITE_HANDLER(write_current_time, attr, buf, buf_length, offset)
+{
+  BLE_WRITE();
+  iBle_attr_set_data(attr, buf, buf_length, offset);
+  // Return the number of data written
+  return buf_length;
 }
 
-ITHREAD_HANDLER(thread2)
+iBle_svc_t cts_svc;
+// size_t cts_nbr_attrs = 4;
+size_t cts_nbr_chrcs = 1;
+DEFINE_IBLE_SVC_CONFIG(cts_config)
 {
-  while(1)
-  {
-    while(iEventQueue_isEmpty(&eventTh2)) { iThread_sleep(); }
-    iEvent_t event = iEventQueue_get(&eventTh2);
+  IBLE_SVC_UUID(DEFINE_IBLE_UUID16(BT_UUID_CTS)),
+  DEFINE_IBLE_CHRCS (
+    DEFINE_IBLE_CHRC (
+    	IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY | IBLE_CHRC_PERM_WRITE),
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &current_time)
+    ),
+  )
+};
 
-    if(event == EV_2)
-      iPrint("TH2 Event2 occured\n");
-  }
-}
-
-ITHREAD_HANDLER(thread3)
+iBle_svc_t hrs_svc;
+// size_t hrs_nbr_attrs = 8;
+size_t hrs_nbr_chrcs = 3;
+DEFINE_IBLE_SVC_CONFIG(hrs_config)
 {
-  while(1)
-  {
-    while(iEventQueue_isEmpty(&eventTh3)) { iThread_sleep(); }
-    iEvent_t event = iEventQueue_get(&eventTh3);
+  IBLE_SVC_UUID(DEFINE_IBLE_UUID16(BT_UUID_HRS)),
+  DEFINE_IBLE_CHRCS (
+    DEFINE_IBLE_CHRC (
+      IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_INDICATE | IBLE_CHRC_PERM_WRITE),
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_CTS_CURRENT_TIME), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &current_time)
+    ),
+    DEFINE_IBLE_CHRC_NO_CCCD (
+      IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_BODY_SENSOR), IBLE_CHRC_PERM_READ),
+    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_BODY_SENSOR), IBLE_GATT_PERM_READ, NULL, NULL)
+    ),
+    DEFINE_IBLE_CHRC_NO_CCCD (
+      IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_CONTROL_POINT), IBLE_CHRC_PERM_WRITE),
+    	IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID16(BT_UUID_HRS_CONTROL_POINT), IBLE_GATT_PERM_READ, NULL, NULL)
+    )
+  )
+};
 
-    if(event == EV_3)
-      iPrint("TH3 Event3 occured\n");
-  }
-}
+#define MY_UUID_SVC     0xAAAA
+#define MY_UUID_CHRC    0xBBBB
+#define MY_UUID_BASE    0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x00, 0x00
 
-ITHREAD_HANDLER(thread4)
+iBle_svc_t my_svc;
+// size_t my_nbr_attrs = 2;
+size_t my_nbr_chrcs = 1;
+uint8_t array[20] = {0};
+DEFINE_IBLE_SVC_CONFIG(my_config)
 {
-  while(1)
-  {
-    while(iEventQueue_isEmpty(&eventTh4)) { iThread_sleep(); }
-    iEvent_t event = iEventQueue_get(&eventTh4);
-
-    if(event == EV_4)
-      iPrint("TH4 Event4 occured\n");
-  }
-}
-
-ITIMER_HANDLER(timer_handler)
-{
-  static int cnt = 0;
-  cnt = (cnt + 1) % 4;
-
-  if(cnt == 1){
-    iEventQueue_add(&eventTh1, EV_1);
-  }
-  else if(cnt == 2){
-    iEventQueue_add(&eventTh2, EV_2);
-  }
-  else if(cnt == 3){
-    iEventQueue_add(&eventTh3, EV_3);
-  }
-  else{
-    iEventQueue_add(&eventTh4, EV_4);
-  }
-}
-
-DEFINE_ITHREAD(th1, 4096, 0);
-DEFINE_ITHREAD(th2, 4096, 0);
-DEFINE_ITHREAD(th3, 4096, 0);
-DEFINE_ITHREAD(th4, 4096, 0);
+  IBLE_SVC_UUID(DEFINE_IBLE_UUID128(MY_UUID_SVC, MY_UUID_BASE)),
+  DEFINE_IBLE_CHRCS (
+    DEFINE_IBLE_CHRC (
+    	IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(MY_UUID_CHRC, MY_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY | IBLE_CHRC_PERM_WRITE),
+      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(MY_UUID_CHRC, MY_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, write_current_time, &array)
+    ),
+  )
+};
 
 int main()
 {
-  iPrint("Thread test started\n");
-  iPrint("-------------------\n");
+  iPrint("BLE test started\n");
+  iPrint("----------------\n");
 
-  iThread_run(&th1, thread1);
-  iThread_run(&th2, thread2);
-  iThread_run(&th3, thread3);
-  iThread_run(&th4, thread4);
-
-  iEventQueue_init(&eventTh1);
-  iEventQueue_init(&eventTh2);
-  iEventQueue_init(&eventTh3);
-  iEventQueue_init(&eventTh4);
-
-  iTimer_start(&timer, timer_handler, 1000);
+  iDebug_init();
+  bluetooth_init();
+  bluetooth_test();
 
   while(1)
   {
@@ -113,4 +110,37 @@ int main()
 
   iPrint("-> Exit\n");
   return 0;
+}
+
+void bluetooth_init()
+{
+  iPrint("- Initialize Bluetooth\n");
+
+  iBle_init();
+  iBle_svc_init(&cts_svc, cts_config, cts_nbr_chrcs);
+  iBle_svc_init(&hrs_svc, hrs_config, hrs_nbr_chrcs);
+  iBle_svc_init(&my_svc, my_config, my_nbr_chrcs);
+  iBle_adv_start(advdata, sizeof(advdata)/sizeof(iBle_advdata_t),
+                          scanrsp, sizeof(scanrsp)/sizeof(iBle_advdata_t));
+}
+
+void bluetooth_test()
+{
+  while(1)
+  {
+    if(iBle_isConnected())
+    {
+      iSleep_ms(10);
+      current_time++;
+      for(int i = 0; i < sizeof(array); i++) {
+        array[i] += 1;
+      }
+
+      // iPrint("current time: %lu\n", current_time);
+
+      iBle_svc_notify(&my_svc, 1, (uint8_t*) &array, sizeof(array));
+      // iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      // iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+    }
+  }
 }

@@ -8,8 +8,8 @@ int main()
   iPrint("ADC test started\n");
   iPrint("----------------\n");
 
-  // iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
-  // swg_init(EXT_INT_FREQ);
+  iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
+  swg_init(EXT_INT_FREQ);
 
   iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
   adc_init();

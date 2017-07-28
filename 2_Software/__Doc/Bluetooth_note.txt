@@ -39,8 +39,11 @@ https://stackoverflow.com/questions/38913743/maximum-packet-length-for-bluetooth
 https://punchthrough.com/blog/posts/maximizing-ble-throughput-on-ios-and-android
 https://punchthrough.com/blog/posts/maximizing-ble-throughput-part-2-use-larger-att-mtu
 https://devzone.nordicsemi.com/question/69761/ble-packet-structure/
+
 Packet:
 -------
+p2168 ATT_MTU is defined as the maximum size of any packet sent between a client and a server
+p2169 The maximum length of an attribute value shall be 512 octets
 
 Packet Length:
 --------------
@@ -49,8 +52,6 @@ Packet Length:
     - 4 bytes for L2CAP header (channel ID and packet length),
     - ATT protocol is left with 23 bytes, which is the default and minimal MTU for ATT protocol.
 
-Zephyr Max MTU = 1300Bytes RX, 2000Bytes TX
-Softdevice Max MTU = 512Bytes default softdevice config
 
 With an ATT write request (or notification), 3 bytes are used by command type and attribute ID, 20 bytes are left for the attribute data.
 
@@ -61,4 +62,26 @@ With an ATT write request (or notification), 3 bytes are used by command type an
 
 Throughtput = Nbr of Packets in Connection Interval * Data Per Packet / Connection Interval
 
-Max nbr packet per connection interval = 6
+Softdevice:
+----------
+- Configure the number of notification queues
+  ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= max value depend of the RAM
+- The default value that the module uses is NRF_BLE_GATT_MAX_MTU_SIZE, which is set to 251 bytes.
+  This is also the maximum value that the SoftDevice can handle. https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
+
+Zephyr:
+-------
+Zephyr Max MTU = 1300Bytes RX, 2000Bytes TX
+512 BLE specification.
+
+--------------------------------------------------------------------------------
+Transmition:
+--------------------------------------------------------------------------------
+
+Softdevice:
+-----------
+Can load 3 notficiation of indication between connection interval
+
+
+Zephyr:
+-------

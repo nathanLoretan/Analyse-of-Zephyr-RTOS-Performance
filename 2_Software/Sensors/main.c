@@ -221,7 +221,9 @@ void extBoad_init();
 
 int main()
 {
+#if ENABLE_ACC || ENABLE_ADC || ENABLE_SWG || ENABLE_BLE
   iDebug_init();
+#endif  // ENABLE_ACC || ENABLE_ADC || ENABLE_SWG || ENABLE_BLE
 
 // Thread must be declare before the driver to avoid full filling the event queues
 

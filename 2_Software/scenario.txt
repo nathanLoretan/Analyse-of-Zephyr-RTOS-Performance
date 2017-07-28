@@ -1,7 +1,10 @@
 http://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.s132.sds%2Fdita%2Fsoftdevices%2Fs130%2Fs130sds.html
+--------------------------------------------------------------------------------
 Priority
 -------------------------------------------------------------------------
 nRF:
+----
+----
 7 Priorities, 0 highest, (0,1,4,5 reserved softdevice)
 
     Level 0 is used for the SoftDevice's timing critical processing.
@@ -9,9 +12,65 @@ nRF:
     Level 4 is used by higher-level deferrable tasks and the API functions executed as SVC interrupts.
     Level 5 is reserved for future use for SoftDevice 4.0.x versions that are earlier than 4.0.3.
 
+    App priority
+    ------------
+    I2C0_IRQ_PRIORITY
+    SPI1_IRQ_PRIORITY
+    SPI2_IRQ_PRIORITY
+    GPIOTE_CONFIG_IRQ_PRIORITY
+    APP_TIMER_CONFIG_IRQ_PRIORITY
+
+    enum  	app_irq_priority_t {
+      APP_IRQ_PRIORITY_HIGHEST = 0,
+      APP_IRQ_PRIORITY_HIGH = 1,
+      APP_IRQ_PRIORITY_MID = 2,
+      APP_IRQ_PRIORITY_LOW = 3,
+      APP_IRQ_PRIORITY_LOWEST = 3,
+      APP_IRQ_PRIORITY_THREAD = 4
+    }
+
+  List of IRQn
+  nordic_components/components/device/nrf52840.h
+  ------------
+
+  Interrupts used by the SoftDevice
+  nordic_components/components/softdevice/s140/headers/nrf_nvic.h
+  ---------------------------------
+    POWER_CLOCK_IRQn
+    RADIO_IRQn
+    RTC0_IRQn
+    TIMER0_IRQn
+    RNG_IRQn
+    ECB_IRQn
+    CCM_AAR_IRQn
+    TEMP_IRQn
+    __NRF_NVIC_NVMC_IRQn
+    SWI5_IRQn
+
+    __STATIC_INLINE uint32_t 	sd_nvic_SetPriority (IRQn_Type IRQn, uint32_t priority)
+
 Zephyr:
+-------
+-------
+negative or non-negative, lower priorities takes precedence over numerically higher values
 
+  App priority
+  ------------
+  CONFIG_SPI_1_IRQ_PRI
+  CONFIG_SPI_2_IRQ_PRI
+  CONFIG_I2C_0_IRQ_PRI
+  CONFIG_GPIO_NRF5_PORT_P0_PRI
+  CONFIG_GPIO_NRF5_PORT_P1_PRI
+  CONFIG_SYSTEM_CLOCK_INIT_PRIORITY  should not be modified
 
+  Thread acc
+  Thread adc
+  Thread swg
+
+  (16)  Number of coop priorities         if priority to -CONFIG_NUM_COOP_PRIORITIES to 0
+  (15)  Number of preemptible priorities  CONFIG_NUM_PREEMPT_PRIORITIES-1
+
+--------------------------------------------------------------------------------
 BLE:
 --------------------------------------------------------------------------------
 slave latency
@@ -29,12 +88,14 @@ connection interval max   * 1.25ms ranges from 7.5ms to 4s
 
 Send always one packet per connection interval and 6 packet per connection interval
 
+--------------------------------------------------------------------------------
 SWG:
 --------------------------------------------------------------------------------
 f = fMCLK / 2^28
 fmax = 16MHz  -> 62.5ns
 fmin = 0.06Hz -> 16s
 
+--------------------------------------------------------------------------------
 ADC: 1 svc with 2 chrcs (data, sleep)
 --------------------------------------------------------------------------------
 SPI CLK: 5MHz
@@ -57,6 +118,7 @@ Time between new data:
 Time data frame transmition:
       64us (1/5M * 32)
 
+--------------------------------------------------------------------------------
 ACC: 1 svc with 6 chrcs (axis x, axis y, axis z, sleep, click, temperature)
 --------------------------------------------------------------------------------
 I2C CLK: 400kHz

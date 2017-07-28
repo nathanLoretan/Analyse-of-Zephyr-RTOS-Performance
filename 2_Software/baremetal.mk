@@ -71,8 +71,8 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Drivers/acc.c \
 	$(PROJECT_BASE)/Drivers/adc.c \
 	$(PROJECT_BASE)/Drivers/swg.c \
-	$(PROJECT_BASE)/Sensors/main.c
-	# $(PROJECT_BASE)/Test/main.c
+	$(PROJECT_BASE)/Test/main.c
+	# $(PROJECT_BASE)/Sensors/main.c
 
 
 # Include folders common to all targets
@@ -214,7 +214,7 @@ flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 
 # Flash softdevice
 flash_softdevice:
-	@mkdir -p $(OUTPUT_DIRECTORY)
+	@mkdir -p $(OUTPUT_DIRECTORY)#
 	@echo Flashing: s140_nrf52840_5.0.0-2.alpha_softdevice.hex
 	nrfjprog --program $(SDK_ROOT)/components/softdevice/s140/hex/s140_nrf52840_5.0.0-2.alpha_softdevice.hex -f nrf52 --sectorerase
 	nrfjprog --reset -f nrf52
