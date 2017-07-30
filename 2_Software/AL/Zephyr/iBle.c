@@ -19,7 +19,7 @@ static void iBle_mtu_request(struct bt_conn* conn, u8_t err, struct bt_gatt_exch
 {
   iPrint("\n-> MTU Parameters Update\n");
   iPrint("------------------------\n");
-  iPrint("Connection Client RX MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
+  iPrint("Connection MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
 }
 
 static struct bt_gatt_exchange_params mtu_req = {
@@ -42,6 +42,7 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
     }
 
 		isConnected = true;
+    iEventQueue_add(&ble_EventQueue, BLE_EVENT_CONNECTED);
 
 		iPrint("\n-> Central connected\n");
     iPrint("--------------------\n");
@@ -67,6 +68,7 @@ static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
   }
 
 	isConnected = false;
+  iEventQueue_add(&ble_EventQueue, BLE_EVENT_DISCONNECTED);
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
@@ -101,6 +103,8 @@ int iBle_init()
 
 	// Initialize the mutex for the indication
 	k_mutex_init(&indicate_mutex);
+
+  iEventQueue_init(&ble_EventQueue);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;

@@ -6,13 +6,13 @@
 #include <stdbool.h>
 
 #include "../../configuration.h"
-#include "iBle.h"
 #include "iSpi.h"
 #include "iI2c.h"
 #include "iGpio.h"
 #include "iTimer.h"
 #include "iThread.h"
 #include "iEventQueue.h"
+#include "iBle.h"
 
 #include <zephyr.h>
 #include <kernel.h>

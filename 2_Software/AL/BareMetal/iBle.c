@@ -44,6 +44,7 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 	{
 		case BLE_GAP_EVT_CONNECTED: 		connection = ble_evt->evt.gap_evt.conn_handle;
 																		isConnected = true;
+																		iEventQueue_add(&ble_EventQueue, BLE_EVENT_CONNECTED);
 
 																		iPrint("\n-> Central connected\n");
 																		iPrint("--------------------\n");
@@ -55,6 +56,8 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 		case BLE_GAP_EVT_DISCONNECTED: 	connection = BLE_CONN_HANDLE_INVALID;
 																		isConnected = false;
+																		iEventQueue_add(&ble_EventQueue, BLE_EVENT_DISCONNECTED);
+
 																		iPrint("-> Central disconnected\n");
 
 																		error = sd_ble_gap_adv_start(&adv_params_stored, CONN_CFG_TAG);
@@ -109,7 +112,13 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 																		iPrint("\n-> MTU Parameters Update\n");
 																		iPrint("------------------------\n");
-																		iPrint("Connection Client RX MTU: %u[Bytes]\n", ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu);
+
+																		if(ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu > NRF_BLE_GATT_MAX_MTU_SIZE) {
+																		iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
+																		}
+																		else {
+																			iPrint("Connection MTU: %u[Bytes]\n", ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu);
+																		}
 
 																		error = sd_ble_gatts_exchange_mtu_reply(ble_evt->evt.gatts_evt.conn_handle, NRF_BLE_GATT_MAX_MTU_SIZE);
 																		if(error) {
@@ -270,7 +279,7 @@ int iBle_init()
 	// Configure the maximum event length.
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                     				= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 37;
+	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 2;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATTS, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the number of handle value notification: error %d\n", error);
@@ -388,6 +397,8 @@ int iBle_init()
 		iPrint("/!\\ Peer manager register failed: error %d\n", error);
 		return error;
 	}
+
+	iEventQueue_init(&ble_EventQueue);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 

@@ -82,7 +82,7 @@ DEFINE_IBLE_SVC_CONFIG(hrs_config)
 iBle_svc_t my_svc;
 // size_t my_nbr_attrs = 2;
 size_t my_nbr_chrcs = 1;
-uint8_t array[20] = {0};
+uint8_t array[27] = {0};
 DEFINE_IBLE_SVC_CONFIG(my_config)
 {
   IBLE_SVC_UUID(DEFINE_IBLE_UUID128(MY_UUID_SVC, MY_UUID_BASE)),
@@ -138,9 +138,9 @@ void bluetooth_test()
 
       // iPrint("current time: %lu\n", current_time);
 
-      iBle_svc_notify(&my_svc, 1, (uint8_t*) &array, sizeof(array));
+      // iBle_svc_notify(&my_svc, 1, (uint8_t*) &array, sizeof(array));
       // iBle_svc_notify(&cts_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
-      // iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
+      iBle_svc_indication(&hrs_svc, 1, (uint8_t*) &current_time, sizeof(current_time));
     }
   }
 }

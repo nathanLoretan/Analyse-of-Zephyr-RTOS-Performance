@@ -64,7 +64,7 @@ Throughtput = Nbr of Packets in Connection Interval * Data Per Packet / Connecti
 
 Softdevice:
 ----------
-- Configure the number of notification queues
+- Configure the minimum number of notification queues
   ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= max value depend of the RAM
 - The default value that the module uses is NRF_BLE_GATT_MAX_MTU_SIZE, which is set to 251 bytes.
   This is also the maximum value that the SoftDevice can handle. https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
@@ -74,14 +74,11 @@ Zephyr:
 Zephyr Max MTU = 1300Bytes RX, 2000Bytes TX
 512 BLE specification.
 
---------------------------------------------------------------------------------
-Transmition:
---------------------------------------------------------------------------------
+# nbr can be queued = CONFIG_BLUETOOTH_L2CAP_TX_BUF_COUNT + CONFIG_BLUETOOTH_CONTROLLER_TX_BUFFERS (if CONFIG_BLUETOOTH_CONTROLLER_TX_BUFFERS < CONFIG_BLUETOOTH_CONN_TX_MAX)
 
+--------------------------------------------------------------------------------
+Mode: 2M 1M 250k
+--------------------------------------------------------------------------------
 Softdevice:
------------
-Can load 3 notficiation of indication between connection interval
 
-
-Zephyr:
--------
+Zepyhr:

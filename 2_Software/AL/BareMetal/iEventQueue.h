@@ -1,7 +1,10 @@
 #ifndef __IEVENTQUEUE__
 #define __IEVENTQUEUE__
 
-#include "nrf5x_interface.h"
+#include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 typedef uint32_t 	iEvent_t;		// uint32_t is used to be compatible with C enumeration
 
@@ -14,6 +17,8 @@ typedef struct {
 	volatile bool 		isEmpty;		// Access by iEventQueue_isEmpty()
 	iEvent_list_t*		eventList;
 }	iEventQueue_t;
+
+#include "nrf5x_interface.h"
 
 void iEventQueue_init(iEventQueue_t* queue);
 void iEventQueue_add(iEventQueue_t* queue, iEvent_t event);

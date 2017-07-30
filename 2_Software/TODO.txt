@@ -1,16 +1,18 @@
 TODO:
 
-- mtu request baremetal
-- adc correct gain *2
-- click notification
-- nbr packets zephyr
-- Softdevice RAM
-- Time between different packet
+- scheduler
+- BLE See if 1MBit/s or 2MBit/s
+
 - Adv packet transmition
 - Central BLE interface
 - RTT
-- BM, thread priority
-- BLE See if 1MBit/s or 2MBit/s
+
+READ:
+NRF52840 datashee       p289
+BLE core specification  p2568 link layer specification
+- Time between different packet
+- response of cccd
+
 
 git config --global -e
 git commit -a -s
@@ -27,8 +29,3 @@ git log
 git show
 git push -u nathan
 git push --set-upstream nathan nathan_fix_spim_config
-
-
-READ:
-NRF52840 datashee       p289
-BLE core specification  p2568 link layer specification

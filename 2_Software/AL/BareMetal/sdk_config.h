@@ -400,7 +400,7 @@
 	// <6=> 6
 	// <7=> 7
 	#ifndef GPIOTE_CONFIG_IRQ_PRIORITY
-		#define GPIOTE_CONFIG_IRQ_PRIORITY 2
+		#define GPIOTE_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_HIGHEST
 	#endif
 
 	// <e> GPIOTE_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -486,8 +486,8 @@
 
 	// <o> NRF_BLE_GATT_MAX_MTU_SIZE - Static maximum MTU size that is passed to the @ref sd_ble_enable function.
 	#ifndef NRF_BLE_GATT_MAX_MTU_SIZE
-		// #define NRF_BLE_GATT_MAX_MTU_SIZE 23
-		#define NRF_BLE_GATT_MAX_MTU_SIZE 251 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
+		#define NRF_BLE_GATT_MAX_MTU_SIZE 23
+		// #define NRF_BLE_GATT_MAX_MTU_SIZE 251 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
 	#endif
 
 #endif //NRF_BLE_GATT_ENABLED

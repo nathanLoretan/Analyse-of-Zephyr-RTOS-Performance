@@ -10,15 +10,15 @@ int main()
   iPrint("Gpio simple test started\n");
   iPrint("------------------------\n");
 
-  iGpio_init(&gpio1, 37, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+  iGpio_init(&gpio1, 33, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
 
   while(1)
   {
     iGpio_write(&gpio1, 1);
-    iSleep_ms(1000);
+    iSleep_ms(10);
 
     iGpio_write(&gpio1, 0);
-    iSleep_ms(1000);
+    iSleep_ms(10);
   }
 
   iPrint("-> Exit\n");

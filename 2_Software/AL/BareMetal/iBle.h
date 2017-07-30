@@ -173,6 +173,13 @@ typedef struct {
 																																			.data 					= (uint8_t*)(_p_data)											\
 																																		}
 
+typedef enum {
+	BLE_EVENT_CONNECTED = 0,
+	BLE_EVENT_DISCONNECTED,
+} bleEvent_t;
+
+iEventQueue_t ble_EventQueue;
+
 int iBle_init();
 volatile bool iBle_isConnected();
 int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size);

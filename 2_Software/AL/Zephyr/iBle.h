@@ -149,6 +149,13 @@ typedef struct bt_gatt_attr		 						iBle_cccd_config_t;
 #define IBLE_CHRC_CONFIG(_uuid, _perm) 															BT_GATT_CHARACTERISTIC(_uuid, _perm)
 #define IBLE_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)  		BT_GATT_DESCRIPTOR(_uuid, _perm, iBle_read_handler, _write_handler, _p_data)
 
+typedef enum {
+	BLE_EVENT_CONNECTED = 0,
+	BLE_EVENT_DISCONNECTED,
+} bleEvent_t;
+
+iEventQueue_t ble_EventQueue;
+
 int	iBle_init();
 volatile bool iBle_isConnected();
 int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size);

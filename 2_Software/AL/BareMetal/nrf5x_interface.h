@@ -7,7 +7,6 @@
 #include <stdbool.h>
 
 #include "../../configuration.h"
-#include "iBle.h"
 #include "iSpi.h"
 #include "iI2c.h"
 #include "iGpio.h"
@@ -15,6 +14,7 @@
 #include "iThread.h"
 #include "iBle_uuid.h"
 #include "iEventQueue.h"
+#include "iBle.h"
 
 // Nordic headers
 #include "nrf_delay.h"
