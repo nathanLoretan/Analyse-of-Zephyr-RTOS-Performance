@@ -130,11 +130,11 @@ void bluetooth_test()
   {
     if(iBle_isConnected())
     {
-      iSleep_ms(10);
+      iSleep_ms(1000);
       current_time++;
-      for(int i = 0; i < sizeof(array); i++) {
-        array[i] += 1;
-      }
+      // for(int i = 0; i < sizeof(array); i++) {
+      //   array[i] += 1;
+      // }
 
       // iPrint("current time: %lu\n", current_time);
 

@@ -143,7 +143,7 @@ ITHREAD_HANDLER(ble)
 #if ENABLE_SWG
 ITHREAD_HANDLER(swg)
 {
-  static float ext_int_freq = EXT_INT_FREQ;
+  // static float ext_int_freq = EXT_INT_FREQ;
 
   while(1)
   {
@@ -153,13 +153,13 @@ ITHREAD_HANDLER(swg)
     iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
     if(accEvent == SWG_EVENT_FREQ)
     {
-      CHANGE_FREQUENCY(ext_int_freq);
-
-      iGpio_disable_interrupt(&ext_irq);
-      swg_set_frequency(ext_int_freq);
-      iGpio_enable_interrupt(&ext_irq);
-
-      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+      // CHANGE_FREQUENCY(ext_int_freq);
+			//
+      // iGpio_disable_interrupt(&ext_irq);
+      // swg_set_frequency(ext_int_freq);
+      // iGpio_enable_interrupt(&ext_irq);
+			//
+      // iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
     }
   }
 }
@@ -168,6 +168,10 @@ ITHREAD_HANDLER(swg)
 #if ENABLE_ACC
 ITHREAD_HANDLER(acc)
 {
+	#if !ENABLE_BLE
+		static sample_t sample;
+	#endif	// !ENABLE_BLE
+
   while(1)
   {
     // Wait for event
@@ -208,7 +212,7 @@ ITHREAD_HANDLER(acc)
 ITHREAD_HANDLER(adc)
 {
 	#if !ENABLE_BLE
-		uint32_t adc_measurement;
+		static uint32_t adc_measurement;
 	#endif	// !ENABLE_BLE
 
   while(1)
@@ -220,7 +224,7 @@ ITHREAD_HANDLER(adc)
     if(adcEvent == ADC_EVENT_DATA)  // Data Ready
     {
       adc_getMeasurement(&adc_measurement);
-			// iPrint("Measurement: %lu[uV]\n", adc_measurement);
+			// iPrint("Measurement: %u[uV]\n", adc_measurement);
 
 			#if ENABLE_BLE
 				iBle_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
@@ -313,7 +317,7 @@ void extBoad_init()
 			swg_sleep();
 		#else
 			iGpio_enable_interrupt(&ext_irq);
-			iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+			// iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
 		#endif	// ENABLE_BLE
 	#endif  // ENABLE_SWG
 
