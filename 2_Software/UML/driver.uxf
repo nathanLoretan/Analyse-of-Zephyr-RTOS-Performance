@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>350</y>
+      <w>430</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>acc
+Package::Drivers
+--
+
+--
+acc_init():void
+acc_sleep():void 
+acc_wakeup():void 
+acc_isSleeping():bool 
+acc_getXYZ(samples:sample_t*, nbr_samples:uint8_t):acc_error_t 
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>50</x>
+      <y>570</y>
+      <w>430</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>adc
+Package::Drivers
+--
+
+--
+acc_init():void
+adc_sleep():void 
+adc_wakeup():void 
+adc_isSleeping():bool 
+adc_getMeasurement(measurement:uint32_t*):adc_error_t 
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>60</x>
+      <y>780</y>
+      <w>430</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>swg
+Package::Drivers
+--
+
+--
+swg_init(float frequency):void
+swg_sleep():void
+swg_wakeup():void
+swg_isSleeping():void
+swg_set_frequency(frequency:float):void
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>540</x>
+      <y>350</y>
+      <w>430</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumeration&gt;&gt;
+acc_error_t
+Package::Drivers
+--
+ACC_NO_ERROR
+ACC_ERROR_NO_DATA_AVAILABLE
+ACC_ERROR_DATA_OVERWRITTEN</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>
