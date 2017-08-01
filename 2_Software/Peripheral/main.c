@@ -143,7 +143,7 @@ ITHREAD_HANDLER(ble)
 #if ENABLE_SWG
 ITHREAD_HANDLER(swg)
 {
-  // static float ext_int_freq = EXT_INT_FREQ;
+  static float ext_int_freq = EXT_INT_FREQ;
 
   while(1)
   {
@@ -153,13 +153,13 @@ ITHREAD_HANDLER(swg)
     iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
     if(accEvent == SWG_EVENT_FREQ)
     {
-      // CHANGE_FREQUENCY(ext_int_freq);
-			//
-      // iGpio_disable_interrupt(&ext_irq);
+      CHANGE_FREQUENCY(ext_int_freq);
+
+      iGpio_disable_interrupt(&ext_irq);
       // swg_set_frequency(ext_int_freq);
-      // iGpio_enable_interrupt(&ext_irq);
-			//
-      // iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+      iGpio_enable_interrupt(&ext_irq);
+
+      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
     }
   }
 }

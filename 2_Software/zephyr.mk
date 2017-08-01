@@ -8,7 +8,7 @@ KBUILD_CFLAGS += 	-DZEPHYR_USED
 obj-y += Drivers/
 obj-y += Debug/
 obj-y += AL/Zephyr/
-obj-y += Sensors/
+obj-y += Peripheral/
 # obj-y += Test/
 
 include ${ZEPHYR_BASE}/Makefile.inc
