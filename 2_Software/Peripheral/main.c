@@ -153,13 +153,15 @@ ITHREAD_HANDLER(swg)
     iEvent_t accEvent = iEventQueue_get(&swg_EventQueue);
     if(accEvent == SWG_EVENT_FREQ)
     {
-      CHANGE_FREQUENCY(ext_int_freq);
+			#if !POWER_MEASUREMENT
+	      CHANGE_FREQUENCY(ext_int_freq);
 
-      iGpio_disable_interrupt(&ext_irq);
-      // swg_set_frequency(ext_int_freq);
-      iGpio_enable_interrupt(&ext_irq);
+	      iGpio_disable_interrupt(&ext_irq);
+	      swg_set_frequency(ext_int_freq);
+	      iGpio_enable_interrupt(&ext_irq);
 
-      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+	      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+			#endif	// !POWER_MEASUREMENT
     }
   }
 }
@@ -317,7 +319,10 @@ void extBoad_init()
 			swg_sleep();
 		#else
 			iGpio_enable_interrupt(&ext_irq);
-			// iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+
+			#if !POWER_MEASUREMENT
+				iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+			#endif	// !POWER_MEASUREMENT
 		#endif	// ENABLE_BLE
 	#endif  // ENABLE_SWG
 

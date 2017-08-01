@@ -16,10 +16,11 @@
 #endif
 
 //------------------------------------------------------------------------------
-#define ENABLE_ACC        1
-#define ENABLE_ADC        1
+#define ENABLE_ACC        0
+#define ENABLE_ADC        0
 #define ENABLE_SWG        1
 #define ENABLE_BLE        1
+#define POWER_MEASUREMENT 0
 
 // Externa. Interrupt-----------------------------------------------------------
 #define ACC_INT2           30
@@ -63,8 +64,8 @@
 #define ACC_MODE              ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO              1
 
-#define EXT_INT_FREQ              100000             // [Hz]
-#define SOFT_INT_FREQ             0          // [ms]
+#define EXT_INT_FREQ              0             // [Hz]
+#define SOFT_INT_FREQ             1000          // [ms]
 #define FREQ_STEP                 1000
 #define FREQ_STEP2                10000
 #define FREQ_1TO2                 10000
