@@ -46,15 +46,9 @@
 
 // BLE Configuration------------------------------------------------------------
 // Unit [ms]
-#define ADV_INTERVAL_MIN       30                         // [ms] ranges from 20ms to 10.24s
-#define ADV_INTERVAL_MAX       60                         // [ms] ranges from 20ms to 10.24s
+#define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
+#define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s
 #define ADV_TIMEOUT            IBLE_ADV_TIMEOUT_NONE      // [ms]
-
-#define CONN_MIN_INTERVAL     10                          // [ms] ranges from 7.5ms to 4s
-#define CONN_MAX_INTERVAL     15                          // [ms] ranges from 7.5ms to 4s
-#define CONN_TIMEOUT          20000                       // [ms]
-
-#define SLAVE_LATENCY         0
 
 // Sensors Configuration--------------------------------------------------------
 #define ADC_DATA_RATE         ADC_DATA_RATE_7
@@ -65,7 +59,7 @@
 #define ACC_FIFO              1
 
 #define EXT_INT_FREQ              0             // [Hz]
-#define SOFT_INT_FREQ             1000          // [ms]
+#define INTERVAL             1000          // [ms]
 #define FREQ_STEP                 1000
 #define FREQ_STEP2                10000
 #define FREQ_1TO2                 10000

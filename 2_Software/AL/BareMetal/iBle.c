@@ -24,6 +24,11 @@ static nrf_ble_gatt_t gatt_module;
 #define SEC_PARAM_MAX_KEY_SIZE          16
 #define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE
 
+#define CONN_MIN_INTERVAL     10        // [ms] ranges from 7.5ms to 4s
+#define CONN_MAX_INTERVAL     15        // [ms] ranges from 7.5ms to 4s
+#define CONN_TIMEOUT          20000     // [ms]
+#define SLAVE_LATENCY         0
+
 // iTimer element only used by the system
 extern void iTimer_init();
 
@@ -276,7 +281,7 @@ int iBle_init()
 		return error;
 	}
 
-	// Configure the maximum event length.
+	// Configure the size of the TX buffer
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                     				= CONN_CFG_TAG;
 	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 230;

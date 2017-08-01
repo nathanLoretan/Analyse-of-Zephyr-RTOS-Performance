@@ -156,12 +156,7 @@ typedef enum {
 
 iEventQueue_t ble_EventQueue;
 
-int	iBle_init();
-volatile bool iBle_isConnected();
-int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size);
-int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs);
-int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
-int	iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
-#define iBle_attr_set_data(_attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
+int	iBle_central_init();
+int iBle_scan_start(iBle_scan_params_t scan_params);
 
 #endif	// __IBLE__

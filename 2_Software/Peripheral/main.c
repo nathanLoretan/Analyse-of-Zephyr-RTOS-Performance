@@ -21,7 +21,7 @@ iEventQueue_t swg_EventQueue;
 #define ACC_UUID_BASE    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBle_svc_t acc_svc;
-size_t acc_nbr_chrcs = 3;
+size_t acc_nbr_chrcs = 2;
 sample_t sample;
 DEFINE_IBLE_SVC_CONFIG(acc_config)
 {
@@ -36,10 +36,6 @@ DEFINE_IBLE_SVC_CONFIG(acc_config)
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
       IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC4, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
     ),
-    DEFINE_IBLE_CHRC (  // SLEEP
-      IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC5, ACC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ACC_UUID_CHRC5, ACC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
-    ),
   )
 };
 
@@ -49,7 +45,7 @@ DEFINE_IBLE_SVC_CONFIG(acc_config)
 #define ADC_UUID_BASE    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBle_svc_t adc_svc;
-size_t adc_nbr_chrcs = 2;
+size_t adc_nbr_chrcs = 1;
 uint32_t adc_measurement;
 DEFINE_IBLE_SVC_CONFIG(adc_config)
 {
@@ -59,10 +55,6 @@ DEFINE_IBLE_SVC_CONFIG(adc_config)
     DEFINE_IBLE_CHRC (  // A/D Converter measurements
       IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLE_CHRC_PERM_READ | IBLE_CHRC_PERM_NOTIFY),
       IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, &adc_measurement)
-    ),
-    DEFINE_IBLE_CHRC (  // SLEEP
-      IBLE_CHRC_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC2, ADC_UUID_BASE), IBLE_CHRC_PERM_NOTIFY),
-      IBLE_ATTR_CONFIG(DEFINE_IBLE_UUID128(ADC_UUID_CHRC2, ADC_UUID_BASE), IBLE_GATT_PERM_READ | IBLE_GATT_PERM_WRITE, NULL, NULL)
     ),
   )
 };
@@ -109,7 +101,7 @@ ITHREAD_HANDLER(ble)
 			#if ENABLE_SWG
 				swg_wakeup();
 				iGpio_enable_interrupt(&ext_irq);
-				iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+				iTimer_start(&soft_timer, on_soft_timer, INTERVAL);
 			#endif	// ENABLE_SWG
 
 			#if ENABLE_ADC
@@ -321,7 +313,7 @@ void extBoad_init()
 			iGpio_enable_interrupt(&ext_irq);
 
 			#if !POWER_MEASUREMENT
-				iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+				iTimer_start(&soft_timer, on_soft_timer, INTERVAL);
 			#endif	// !POWER_MEASUREMENT
 		#endif	// ENABLE_BLE
 	#endif  // ENABLE_SWG
