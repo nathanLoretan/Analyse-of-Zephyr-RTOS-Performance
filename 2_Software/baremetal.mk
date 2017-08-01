@@ -73,6 +73,7 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Drivers/swg.c \
 	$(PROJECT_BASE)/Peripheral/main.c
 	# $(PROJECT_BASE)/Test/main.c
+	# $(PROJECT_BASE)/Measurement/main.c
 
 
 # Include folders common to all targets

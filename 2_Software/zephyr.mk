@@ -10,5 +10,6 @@ obj-y += Debug/
 obj-y += AL/Zephyr/
 obj-y += Peripheral/
 # obj-y += Test/
+# obj-y += Measurement/
 
 include ${ZEPHYR_BASE}/Makefile.inc
