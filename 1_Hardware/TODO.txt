@@ -1,3 +1,0 @@
-- MOSFET as power supply switch -> No because each component has a sleep mode
-- Pinning can be used with all processor, only the arduino connector p8 p9 p10
-
