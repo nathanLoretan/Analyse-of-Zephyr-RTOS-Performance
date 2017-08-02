@@ -55,7 +55,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 	{
 		error = bt_le_scan_stop();
 		if(error) {
-			iPrint(" /!\\ [SCAN] Stop LE scan failed: error %d\n", error);
+			iPrint(" /!\\ Stop LE scan failed: error %d\n", error);
 		}
 		return;
 	}
@@ -176,7 +176,7 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 		// 	}
 		// }
 
-		iPrint("\n-> Peripheral  %s connected\n", addr_str);
+		iPrint("\n-> Peripheral %s connected\n", addr_str);
 	}
 	else {
 		iPrint("-> Connection to %s failed: error connection reference\n", addr_str);
@@ -214,7 +214,7 @@ static void _disconnected(struct bt_conn* conn, u8_t reason)
 
 	iPrint("-> Peripheral %s disconnected: %u\n", addr_str, reason);
 
-	iBle_scan_start(NULL);
+	iBleC_scan_start(NULL);
 }
 
 static struct bt_conn_cb connection_callback =

@@ -53,5 +53,4 @@ iBleC_conn_params_t _conn_params =
 int iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 
-
 #endif  // __IBLE__
