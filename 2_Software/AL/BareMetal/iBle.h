@@ -26,7 +26,7 @@
 // attr = attribute
 // svc = service
 
-#define IBLE_DEVICE_NAME										"ExtBoard"
+#define IBLE_DEVICE_NAME										"ExtBoard-P"
 
 #define IBLE_FLAGS_LIMITED 									BLE_GAP_ADV_FLAG_LE_LIMITED_DISC_MODE
 #define IBLE_FLAGS_GENERAL									BLE_GAP_ADV_FLAG_LE_GENERAL_DISC_MODE

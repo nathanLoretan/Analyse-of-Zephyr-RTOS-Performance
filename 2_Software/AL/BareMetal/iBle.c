@@ -71,7 +71,7 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 																			return;
 																		}
 
-																		iPrint("-> Advertising restarted\n");
+																		iPrint("-> Advertising started\n");
 		break;
 
 		case BLE_GAP_EVT_CONN_PARAM_UPDATE:
@@ -82,16 +82,6 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 																		iPrint("Connection Interval Max: %u[us]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval * UNIT_1_25_MS);
 																		iPrint("Connection Slave Latency: %u\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.slave_latency);
 																		iPrint("Connection Timeout: %u[ms]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.conn_sup_timeout * UNIT_10_MS / 1000);
-		break;
-
-		case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
-
-																		error = sd_ble_gap_conn_param_update(ble_evt->evt.gap_evt.conn_handle,
-																																				&ble_evt->evt.gap_evt.params.conn_param_update_request.conn_params);
-																		if(error) {
-																			iPrint("/!\\ Connection parameters update failed: error %d\n", error);
-																			return;
-																		}
 		break;
 
 		case BLE_GATTC_EVT_TIMEOUT: 		// Disconnect on GATT Client timeout event.

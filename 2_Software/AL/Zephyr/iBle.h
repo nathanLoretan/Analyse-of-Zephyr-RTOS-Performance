@@ -18,7 +18,7 @@
 #define UNIT_10_MS                            	10000
 #define UNIT_0_625_MS                         	625
 
-#define IBLE_DEVICE_NAME   											"ExtBoard"
+#define IBLE_DEVICE_NAME   											"ExtBoard-P"
 
 #define IBLE_FLAGS_LIMITED 											BT_LE_AD_LIMITED
 #define IBLE_FLAGS_GENERAL											BT_LE_AD_GENERAL
