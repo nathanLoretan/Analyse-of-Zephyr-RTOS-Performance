@@ -8,7 +8,8 @@ KBUILD_CFLAGS += 	-DZEPHYR_USED
 obj-y += Drivers/
 obj-y += Debug/
 obj-y += AL/Zephyr/
-obj-y += Peripheral/
+obj-y += Central/
+# obj-y += Peripheral/
 # obj-y += Test/
 # obj-y += Measurement/
 

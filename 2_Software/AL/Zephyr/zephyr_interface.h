@@ -13,6 +13,7 @@
 #include "iThread.h"
 #include "iEventQueue.h"
 #include "iBle.h"
+#include "iBleC.h"
 
 #include <zephyr.h>
 #include <kernel.h>

@@ -1,5 +1,5 @@
-#ifndef __IBLE__
-#define __IBLE__
+#ifndef __IBLEC__
+#define __IBLEC__
 
 #include "nrf5x_interface.h"
 
@@ -28,6 +28,11 @@
 #define IBLE_SCAN_PASSIVE	0
 #define IBLE_SCAN_ACTIVE	1
 
+#define CENTRAL_LINK_COUNT        8                                             /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
+#define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
+#define TOTAL_LINK_COUNT          CENTRAL_LINK_COUNT + PERIPHERAL_LINK_COUNT    /**< Total number of links used by the application. */
+
+
 typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
 typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
 
@@ -36,13 +41,13 @@ typedef struct {
   ble_gattc_desc_t desc;
 } iBleC_chrcs_t;
 
-struct {
+typedef struct {
   ble_gattc_service_t	svc;
   uint16_t            nbr_chrcs;
   iBleC_chrcs_t*      chrcs;
 } iBleC_svcs_t;
 
-typedef struct {
+struct {
 	uint16_t	      conn_ref;
   uint16_t        nbr_svcs;
 	iBleC_svcs_t*   svcs;
@@ -55,16 +60,16 @@ iBleC_scan_params_t _scan_params =\
   .active   = _type,\
   .interval = _interval,\
   .window   = _window,\
-  .timeout  = 0x4000,\
+  .timeout  = 0x4000\
 }
 
 #define DEFINE_IBLE_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)\
 iBleC_conn_params_t _conn_params =\
 {\
-	.min_conn_interval	= _interval_min;\
-	.max_conn_interval	= _interval_max;\
-	.slave_latency			= _latency;\
-	.conn_sup_timeout		= _timeout;\
+	.min_conn_interval	= _interval_min,\
+	.max_conn_interval	= _interval_max,\
+	.slave_latency			= _latency,\
+	.conn_sup_timeout		= _timeout\
 }
 
 int iBleC_init(iBleC_conn_params_t* conn_params);
@@ -77,4 +82,4 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 // int iBleC_write
 // int iBleC_...
 
-#endif  // __IBLE__
+#endif  // __IBLEC__

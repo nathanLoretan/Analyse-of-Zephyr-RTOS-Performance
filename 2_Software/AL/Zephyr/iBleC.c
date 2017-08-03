@@ -12,14 +12,14 @@ static struct bt_gatt_subscribe_params subscribe_params;
 
 static int _ad_parse(u8_t type, struct net_buf_simple* advdata, struct net_buf_simple* typedata)
 {
-	u8_t data_ength;
-	u8_t data_type:
+	u8_t data_length;
+	u8_t data_type;
 
 	while(advdata->len > 1)
   {
 		data_length = net_buf_simple_pull_u8(advdata);
 		if(data_length == 0) {
-			return;
+			return -1;
 		}
 
 		if(data_length > advdata->len || advdata->len < 1) {
@@ -31,12 +31,12 @@ static int _ad_parse(u8_t type, struct net_buf_simple* advdata, struct net_buf_s
 
 		if(data_type == type)
 		{
-			typedata->data = adv_data->data;
-			typedata->len = adv_data->len;
+			typedata->data = advdata->data;
+			typedata->len = advdata->len;
 			return 0;
 		}
 
-		net_buf_simple_pull(advdata, data_ength - 1);
+		net_buf_simple_pull(advdata, data_length - 1);
 	}
 
 	return -1;
@@ -46,50 +46,61 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 {
 	int error;
 	char addr_str[BT_ADDR_LE_STR_LEN];
-	struct net_buf_simple device_name;
-	struct bt_conn* new_connection;
+	struct net_buf_simple complete_local_name;
 
 	// Disable the scan if the maximum number of connection is reached
-	if(nbr_connections >= CONFIG_BLUETOOTH_MAX_CONN)
+	if(nbr_conn >= CONFIG_BLUETOOTH_MAX_CONN)
 	{
 		error = bt_le_scan_stop();
 		if(error) {
-			iPrint(" /!\\ Stop LE scan failed: error %d\n", error);
+			iPrint("/!\\ Stop LE scan failed: error %d\n", error);
 		}
 		return;
 	}
 
 	//Convert binary BLE address to string
 	bt_addr_le_to_str(peer_addr, addr_str, BT_ADDR_LE_STR_LEN);
-	iPrint("-> [SCAN] DEVICE: %s, rssi %i\n", addr_str, rssi);
 
 	// Ask more information to the peripheral and check the name to enable a connection
-  error = _ad_parse(BT_DATA_NAME_COMPLETE, advdata, &device_name);
+  error = _ad_parse(BT_DATA_NAME_COMPLETE, advdata, &complete_local_name);
 	if(error) {
 		return;
 	}
 
-	if(device_name->len != sizeof(IBLE_PERIPHERAL_NAME)) {
+	// Only to print correctly the name
+	char complete_local_name_str[complete_local_name.len+1];
+	memset(complete_local_name_str, 0, complete_local_name.len+1);
+	memcpy(complete_local_name_str, complete_local_name.data, complete_local_name.len);
+	// iPrint("-> Device found %s, %d, %d\n", complete_local_name_str, device_name.len, sizeof(IBLE_PERIPHERAL_NAME));
+
+	// Control the size of the peripheral's name, the \0 is not include in the device's name
+	if(complete_local_name.len != sizeof(IBLE_PERIPHERAL_NAME)-1) {
 		return;
 	}
 
-	// Check the name of the device
-	if(memcmp(IBLE_PERIPHERAL_NAME, (char*) device_name.data, sizeof(IBLE_PERIPHERAL_NAME)) != 0) {
+	// Control the the peripheral's name
+	if(memcmp(IBLE_PERIPHERAL_NAME, (char*) complete_local_name.data, sizeof(IBLE_PERIPHERAL_NAME)-1) != 0) {
 		return;
 	}
 
-	iPrint("-> Connection request to device %s\n", (char*) device_name.data);
+	iPrint("-> Connection request to device %s\n", complete_local_name_str);
+
+	error = bt_le_scan_stop();
+	if(error) {
+		iPrint("/!\\ Stop scan failed: error %d\n", error);
+		return;
+	}
 
 	// Create a connection with the new device
-	new_connection = bt_conn_create_le(peer_addr, _conn_params);
-	if(new_connection == NULL) {
-		iPrint("Connection request to %s failed\n", addr_str);
+	new_conn = bt_conn_create_le(peer_addr, _conn_params);
+	if(new_conn == NULL) {
+		iPrint("/!\\  Connection request to %s failed\n", complete_local_name_str);
 	}
 }
 
-static void _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
-	int error;
+	// int error;
 
 	// No more attribute to discover
 	if(attr == NULL) {
@@ -99,9 +110,9 @@ static void _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* 
 	return BT_GATT_ITER_CONTINUE;
 }
 
-static void _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
-  int error;
+  // int error;
 
 	// No more attribute to discover
 	if(attr == NULL) {
@@ -122,14 +133,14 @@ static void _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* 
 
 static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
-	int error;
+	// int error;
 
 	// No more attribute to discover
 	if(attr == NULL) {
 		return BT_GATT_ITER_STOP;
 	}
 
-	printk("[ATTRIBUTE] handle %u\n", attr->handle);
+	iPrint("[ATTRIBUTE] handle %u\n", attr->handle);
 
 	uuid.val 											= BT_UUID_GATT_CHRC_VAL;
 	discover_params.uuid 					= &uuid.uuid;
@@ -144,7 +155,7 @@ static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* 
 
 static void _connected(struct bt_conn* conn, u8_t conn_err)
 {
-	int error
+	int error;
 	char addr_str[BT_ADDR_LE_STR_LEN];
 
 	//Convert binary BLE address to string
@@ -155,6 +166,8 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 	}
 	else if(new_conn == conn)
 	{
+		link[nbr_conn].conn_ref = bt_conn_ref(conn);
+
 		uuid.val 											= BT_UUID_GATT_INCLUDE_VAL;
 		discover_params.uuid 					= &uuid.uuid;
 		discover_params.start_handle 	= 0x0001;
@@ -162,13 +175,12 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 		discover_params.func 					= _on_svcs_discovery;
 		discover_params.type 					= BT_GATT_DISCOVER_INCLUDE;
 
-		error = bt_gatt_discover(default_conn, &discover_params);
+		error = bt_gatt_discover(link[nbr_conn].conn_ref, &discover_params);
 		if(error) {
 			iPrint("Service Discover failed: error %d\n", error);
 			return;
 		}
 
-		link[nbr_conn] = bt_conn_ref(conn);
 		nbr_conn++;
 
 		struct bt_conn_info info;
@@ -182,6 +194,8 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 		iPrint("Connection Interval: %u[us]\n", info.le.interval * UNIT_1_25_MS);
 		iPrint("Connection Slave Latency: %u\n", info.le.latency);
 		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
+
+		iBleC_scan_start(NULL);
 	}
 	else {
 		iPrint("-> Connection to %s failed: error connection reference\n", addr_str);
@@ -190,7 +204,7 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 
 static void _disconnected(struct bt_conn* conn, u8_t reason)
 {
-	int error;
+	// int error;
 	uint8_t ref;
 	char addr_str[BT_ADDR_LE_STR_LEN];
 
@@ -200,21 +214,21 @@ static void _disconnected(struct bt_conn* conn, u8_t reason)
 	// Search which device is disconnected
 	for(int i = 0; i < nbr_conn; i++)
 	{
-		if(link[i] == conn) {
+		if(link[i].conn_ref == conn) {
 			ref = i;
 			break;
 		}
 	}
 
-	bt_conn_unref(link[ref]);
+	bt_conn_unref(link[ref].conn_ref);
 
 	// Remove the device from the list
-	for(int i = ref; i < nbr_conn; i++)
+	for(int i = ref; i < nbr_conn-1; i++)
 	{
-		link[i] = link[i + 1];
+		link[i] = link[i+1];
 	}
 
-	link[nbr_conn-1] = NULL;
+	link[nbr_conn-1].conn_ref = NULL;
 	nbr_conn--;
 
 	iPrint("-> Peripheral %s disconnected: %u\n", addr_str, reason);

@@ -1,4 +1,4 @@
-#include "iBle.h"
+#include "iBleC.h"
 
 // TODO:
 // - Add Peer-manager if it doesn't work
@@ -6,14 +6,11 @@
 
 // GAP init
 #define CONN_CFG_TAG						  1
-#define CENTRAL_LINK_COUNT        8                                             /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
-#define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
-#define TOTAL_LINK_COUNT          CENTRAL_LINK_COUNT + PERIPHERAL_LINK_COUNT    /**< Total number of links used by the application. */
 
 // iTimer element only used by the system
 extern void iTimer_init();
 
-// static ble_db_discovery_t ble_db_discovery[TOTAL_LINK_COUNT];    /**< list of DB structures used by the database discovery module. */
+static nrf_ble_gatt_t   gatt_module;
 
 static iBleC_conn_params_t* _conn_params;
 static iBleC_scan_params_t* _scan_params;
@@ -21,7 +18,7 @@ static iBleC_scan_params_t* _scan_params;
 static uint32_t _ad_parse(uint8_t type, uint8_array_t* p_advdata, uint8_array_t* p_typedata)
 {
   uint32_t  index = 0;
-  uint8_t * p_data;
+  uint8_t* p_data;
 
   p_data = p_advdata->p_data;
 
@@ -45,69 +42,71 @@ static void _on_device_found(ble_evt_t const* ble_evt)
 {
   int error;
   uint8_array_t advdata;
-  uint8_array_t device_name;
+  uint8_array_t complete_local_name;
 
   // For readibility.
-  ble_gap_evt_t* gap_evt = &ble_evt->evt.gap_evt;
-  ble_gap_addr_t* peer_addr = &gap_evt->params.adv_report.peer_addr;
+  ble_gap_evt_t const* gap_evt = &ble_evt->evt.gap_evt;
+  ble_gap_addr_t const* peer_addr = &gap_evt->params.adv_report.peer_addr;
 
   // Prepare advertisement report for parsing.
   advdata.p_data = (uint8_t*) &gap_evt->params.adv_report.data;
   advdata.size   = gap_evt->params.adv_report.dlen;
 
   // Search for advertising names.
-  error = _ad_parse(BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, &advdata, &device_name);
+  error = _ad_parse(BLE_GAP_AD_TYPE_COMPLETE_LOCAL_NAME, &advdata, &complete_local_name);
   if(error) {
     return;
   }
 
-  // Control the size of the peripheral's name
-  if(device_name->size != sizeof(IBLE_PERIPHERAL_NAME)) {
+  iPrint("-> Device found %s, %d, %d\n", (char*) device_name.p_data, complete_local_name.size, sizeof(IBLE_PERIPHERAL_NAME));
+
+  // Control the size of the peripheral's name, the \0 is not include in the device's name
+  if(complete_local_name.size != sizeof(IBLE_PERIPHERAL_NAME)-1) {
 		return;
 	}
 
   // Control the the peripheral's name
-  if(memcmp(IBLE_PERIPHERAL_NAME, device_name.p_data, sizeof(IBLE_PERIPHERAL_NAME)) != 0) {
+  if(memcmp(IBLE_PERIPHERAL_NAME, complete_local_name.p_data, sizeof(IBLE_PERIPHERAL_NAME)-1) != 0) {
     return;
   }
 
-  iPrint("-> Connection request to device %s\n", (char*) device_name.p_data);
+  iPrint("-> Connection request to device %s\n", (char*) complete_local_name.p_data);
 
   // Connect to the peripheral
   error = sd_ble_gap_connect(peer_addr, _scan_params, _conn_params, CONN_CFG_TAG);
   if(error) {
-      iPrint("/!\\ Connection request to %s failed\n");
+      iPrint("/!\\ Connection request to %s failed\n", peer_addr->addr);
   }
 }
 
-static int _get_chrc_ref(uint16_t conn_handle, uint8_t svc_ref, ble_gattc_desc_t desc)
+static int _get_chrc_ref(uint16_t conn_handle, uint8_t svc_ref, uint16_t handle)
 {
   uint8_t nbr_chrcs =  link[conn_handle].svcs[svc_ref].nbr_chrcs;
 
   for(int i = 0; i < nbr_chrcs - 1; i++)
   {
-    if( desc.handle > link[conn_handle].svcs[svc_ref].chrcs[i].chrc.handle_decl &&
-        desc.handle < link[conn_handle].svcs[svc_ref].chrcs[i+1].chrc.handle_decl) {
+    if( handle > link[conn_handle].svcs[svc_ref].chrcs[i].chrc.handle_decl &&
+        handle < link[conn_handle].svcs[svc_ref].chrcs[i+1].chrc.handle_decl) {
       return i;
     }
   }
 
   // Control if it is the last attribute
-  if(desc.handle > link[conn_handle].svcs[svc_ref].chrcs[nbr_chrcs-1].chrc.handle_decl) {
+  if(handle > link[conn_handle].svcs[svc_ref].chrcs[nbr_chrcs-1].chrc.handle_decl) {
     return nbr_chrcs-1;
   }
 
   return -1;
 }
 
-static int _get_svc_ref(uint16_t conn_handle, ble_gattc_char_t* chrc)
+static int _get_svc_ref(uint16_t conn_handle, uint16_t handle)
 {
   uint8_t nbr_svcs  = link[conn_handle].nbr_svcs;
 
   for(int i = 0; i < nbr_svcs; i++)
   {
-    if( chrc.handle_decl > link[conn_handle].svcs[i].svc.handle_range.start_handle &&
-        chrc.handle_decl < link[conn_handle].svcs[i].svc.handle_range.end_handle) {
+    if( handle > link[conn_handle].svcs[i].svc.handle_range.start_handle &&
+        handle < link[conn_handle].svcs[i].svc.handle_range.end_handle) {
       return i;
     }
   }
@@ -115,36 +114,36 @@ static int _get_svc_ref(uint16_t conn_handle, ble_gattc_char_t* chrc)
   return -1;
 }
 
-static void _on_desc_discovery(uint16_t conn_handle, ble_gattc_evt_desc_disc_rsp_t* desc_disc_rsp)
+static void _on_desc_discovery(uint16_t conn_handle, ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp)
 {
   int chrc_ref;
-  uint8_t svc_ref = _get_svc_ref(conn_handle, desc_disc_rsp->descs[0]);
+  uint8_t svc_ref = _get_svc_ref(conn_handle, desc_disc_rsp->descs[0].handle);
 
   for(int i = 0; i < desc_disc_rsp->count; i++)
   {
-    chrc_ref = _get_chrc_ref(conn_handle, svc_ref, desc_disc_rsp->descs[i]);
+    chrc_ref = _get_chrc_ref(conn_handle, svc_ref, desc_disc_rsp->descs[i].handle);
     if(chrc_ref >= 0) {
-      link[conn_handle].svcs[svc_ref].svc.chrcs[chrc_ref].desc = desc_disc_rsp->descs[i];
+      link[conn_handle].svcs[svc_ref].chrcs[chrc_ref].desc = desc_disc_rsp->descs[i];
     }
   }
 }
 
-static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp_t* chrc_disc_rsp)
+static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp)
 {
   int error;
-  int svc_ref = _get_svc_ref(conn_handle, chrc_disc_rsp->chars[0]);
+  int svc_ref = _get_svc_ref(conn_handle, chrc_disc_rsp->chars[0].handle_decl);
 
   if(svc_ref < 0 ) {
     iPrint("ERROR\n");
     return;
   }
 
-  link[conn_handle].svcs[svc_ref].nbr_chrcs = chrc_disc_rsp->count
-  link[conn_handle].svcs[svc_ref].svc.chrcs = (iBleC_chrcs_t*) malloc(sizeof(iBleC_chrcs_t) * chrc_disc_rsp->count);
+  link[conn_handle].svcs[svc_ref].nbr_chrcs = chrc_disc_rsp->count;
+  link[conn_handle].svcs[svc_ref].chrcs = (iBleC_chrcs_t*) malloc(sizeof(iBleC_chrcs_t) * chrc_disc_rsp->count);
 
   for(int i = 0; i < chrc_disc_rsp->count; i++)
   {
-    link[conn_handle].svcs[svc_ref].svc.chrcs[i].chrc = chrc_disc_rsp->chars[i];
+    link[conn_handle].svcs[svc_ref].chrcs[i].chrc = chrc_disc_rsp->chars[i];
     error = sd_ble_gattc_characteristics_discover(conn_handle, &link[conn_handle].svcs[svc_ref].svc.handle_range);
     if(error) {
       iPrint("/!\\ Descriptors discovery failed : error %d\n", error);
@@ -153,7 +152,7 @@ static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp
   }
 }
 
-static void _on_svcs_discovery(uint16_t conn_handle, ble_gattc_evt_prim_srvc_disc_rsp_t* prim_srvc_disc_rsp)
+static void _on_svcs_discovery(uint16_t conn_handle, ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp)
 {
   int error;
 
@@ -181,8 +180,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 		case BLE_GAP_EVT_CONNECTED:
     {
       // For readibility.
-      ble_gap_evt_t* gap_evt              = &ble_evt->evt.gap_evt;
-      ble_gap_conn_params_t* conn_params  = &gap_evt->params.connected.conn_params;
+      ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
+      ble_gap_conn_params_t const* conn_params  = &gap_evt->params.connected.conn_params;
       ble_gattc_handle_range_t handle_range;
 
       // Control if the maximum number of connection is reached
@@ -191,7 +190,13 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       }
 
       // Discover all the services of the peripheral. Event: BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP
-      sd_ble_gattc_attr_info_discover(gap_evt->conn_handle, &handle_range);
+      error = sd_ble_gattc_attr_info_discover(gap_evt->conn_handle, &handle_range);
+      if(error) {
+        iPrint("/!\\ sd_ble_gattc_attr_info_discover failed : error %d\n", error);
+        return;
+
+      }
+
       error = sd_ble_gattc_primary_services_discover(gap_evt->conn_handle, handle_range.start_handle, NULL);
       if(error) {
         iPrint("/!\\ Services discovery failed : error %d\n", error);
@@ -205,51 +210,37 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 	    iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
 	    iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
 
-      iBleC_scan_start(NULL);
+      // // The central stop scanning when it connects to a device
+      // iBleC_scan_start(NULL);
 
 		} break;
 
 		case BLE_GAP_EVT_DISCONNECTED:
     {
       // For readibility.
-      uint16_t conn_handle = &ble_evt->evt.gap_evt.conn_handle;
-
-      // Search which device is disconnected
-    	for(int i = 0; i < nbr_connections; i++)
-    	{
-    		if(connection_list[i] == conn_handle) {
-    			ref = i;
-    			break;
-    		}
-    	}
-
-    	// Remove the device from the list
-    	for(int i = ref; i < nbr_connections - 1; i++)
-    	{
-    		connection_list[i] = connection_list[i + 1];
-    	}
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
 
       for(int i = 0; i < link[conn_handle].nbr_svcs; i++) {
         free(link[conn_handle].svcs[i].chrcs);
       }
       free(link[conn_handle].svcs);
 
-      link[conn_handle].conn_handle = BLE_CONN_HANDLE_INVALID;
+      link[conn_handle].conn_ref = BLE_CONN_HANDLE_INVALID;
 
 			iPrint("-> Peripheral %d disconnected\n", conn_handle);
       iBleC_scan_start(NULL);
 
 		} break;
 
-		case BLE_GAP_EVT_ADV_REPORT: _on_device_found(p_ble_evt);
+		case BLE_GAP_EVT_ADV_REPORT: _on_device_found(ble_evt);
 		break;
 
     // https://devzone.nordicsemi.com/question/48407/how-to-handle-ble_gap_evt_conn_param_update-and-ble_gap_evt_conn_param_update_request-events/
 		case BLE_GAP_EVT_CONN_PARAM_UPDATE:
     {
       // For readibility.
-      uint16_t conn_handle                = ble_evt->evt.gap_evt.conn_handle;
-      ble_gap_conn_params_t* conn_params  = &ble_evt->evt.gap_evt.params.connected.conn_params;
+      uint16_t const conn_handle                = ble_evt->evt.gap_evt.conn_handle;
+      ble_gap_conn_params_t const* conn_params  = &ble_evt->evt.gap_evt.params.connected.conn_params;
 
 			iPrint("\n-> Connection %d Parameters Update\n", conn_handle);
 			iPrint("---------------------------------------\n");
@@ -296,8 +287,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
     case BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP:
     {
       // For readibility.
-      uint16_t conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      ble_gattc_evt_prim_srvc_disc_rsp_t* prim_srvc_disc_rsp = &ble_evt->evt.gattc_evt.params.prim_srvc_disc_rsp;
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp = &ble_evt->evt.gattc_evt.params.prim_srvc_disc_rsp;
 
       _on_svcs_discovery(conn_handle, prim_srvc_disc_rsp);
 
@@ -306,8 +297,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
     case BLE_GATTC_EVT_CHAR_DISC_RSP:
     {
       // For readibility.
-      uint16_t conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      ble_gattc_evt_char_disc_rsp_t* chrc_disc_rsp = &ble_evt->evt.gattc_evt.params.char_disc_rsp;
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp = &ble_evt->evt.gattc_evt.params.char_disc_rsp;
 
       _on_chrs_discovery(conn_handle, chrc_disc_rsp);
 
@@ -316,8 +307,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
     case BLE_GATTC_EVT_DESC_DISC_RSP:
     {
       // For readibility.
-      uint16_t conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      ble_gattc_evt_desc_disc_rsp_t* desc_disc_rsp = &ble_evt->evt.gattc_evt.params.desc_disc_rsp;
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp = &ble_evt->evt.gattc_evt.params.desc_disc_rsp;
 
       _on_desc_discovery(conn_handle, desc_disc_rsp);
 
@@ -328,10 +319,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 	}
 }
 
-static void _ble_evt_dispatch(ble_evt_t const* ble_evt)
+static void _ble_evt_dispatch(ble_evt_t* ble_evt)
 {
-	uint16_t conn_handle = ble_evt->evt.gap_evt.conn_handle;
-
 	// Forward BLE events to the Connection State module.
 	// This must be called before any event handler that uses this module.
 	ble_conn_state_on_ble_evt(ble_evt);
@@ -347,10 +336,13 @@ static void _sys_evt_dispatch(uint32_t sys_evt)
 	fs_sys_event_handler(sys_evt);
 }
 
-int iBleC_init(iBleC_conn_params_t const* conn_params)
+int iBleC_init(iBleC_conn_params_t* conn_params)
 {
 	int error;
-	connection = BLE_CONN_HANDLE_INVALID;
+
+  for(int i = 0; i < TOTAL_LINK_COUNT; i++) {
+    link[i].conn_ref = BLE_CONN_HANDLE_INVALID;
+  }
 
   // Save the connection parameters
   _conn_params = conn_params;
@@ -444,7 +436,7 @@ int iBleC_init(iBleC_conn_params_t const* conn_params)
 	return 0;
 }
 
-int iBleC_scan_start(iBleC_scan_params_t const* scan_params)
+int iBleC_scan_start(iBleC_scan_params_t* scan_params)
 {
 	int error;
 

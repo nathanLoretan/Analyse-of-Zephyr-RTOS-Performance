@@ -61,6 +61,7 @@ SRC_FILES += \
 	$(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBle.c \
+	$(PROJECT_BASE)/AL/BareMetal/iBleC.c \
 	$(PROJECT_BASE)/AL/BareMetal/iI2c.c \
 	$(PROJECT_BASE)/AL/BareMetal/iSpi.c \
 	$(PROJECT_BASE)/AL/BareMetal/iGpio.c \
@@ -71,7 +72,8 @@ SRC_FILES += \
 	$(PROJECT_BASE)/Drivers/acc.c \
 	$(PROJECT_BASE)/Drivers/adc.c \
 	$(PROJECT_BASE)/Drivers/swg.c \
-	$(PROJECT_BASE)/Peripheral/main.c
+	$(PROJECT_BASE)/Central/main.c
+	# $(PROJECT_BASE)/Peripheral/main.c
 	# $(PROJECT_BASE)/Test/main.c
 	# $(PROJECT_BASE)/Measurement/main.c
 

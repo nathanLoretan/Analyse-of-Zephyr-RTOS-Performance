@@ -59,7 +59,7 @@
 #define ACC_FIFO              1
 
 #define EXT_INT_FREQ              0             // [Hz]
-#define INTERVAL             1000          // [ms]
+#define INTERVAL                  1000          // [ms]
 #define FREQ_STEP                 1000
 #define FREQ_STEP2                10000
 #define FREQ_1TO2                 10000

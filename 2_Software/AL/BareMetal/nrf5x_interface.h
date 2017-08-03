@@ -15,6 +15,7 @@
 #include "iBle_uuid.h"
 #include "iEventQueue.h"
 #include "iBle.h"
+#include "iBleC.h"
 
 // Nordic headers
 #include "nrf_delay.h"
