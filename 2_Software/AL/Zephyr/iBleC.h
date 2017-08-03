@@ -47,17 +47,22 @@ typedef struct bt_gatt_attr											iBle_uuid_t;
 typedef struct bt_le_scan_param 	iBleC_scan_params_t;
 typedef struct bt_le_conn_param 	iBleC_conn_params_t;
 
-// typedef struct {
-// 	iBle_uuid_t* svcs_uuid,
-// 	uint8_t nbr_svcs,
-// } iBle_svc_list_t;
-//
-//
-// #define DEFINE_IBLE_SVC_LIST(_svc_list, _svcs...)
-// iBle_svc_list_t _svc_list = {
-// 	.svcs_uuid 		= {_svcs},
-// 	.nbr_svcs 		= (sizeof((iBle_uuid_t[]) {_svcs}) / sizeof(iBle_uuid_t)),
-// }
+typedef struct {
+	struct bt_gatt_attr chrc;
+	struct bt_gatt_attr desc[2];
+} iBleC_chrcs_t;
+
+struct {
+  struct bt_gatt_attr	svc;
+  uint16_t            nbr_chrcs;
+  iBleC_chrcs_t*      chrcs;
+} iBleC_svcs_t;
+
+typedef struct {
+	struct bt_conn*	conn_ref;
+  uint16_t        nbr_svcs;
+	iBleC_svcs_t*   svcs;
+} link[CONFIG_BLUETOOTH_MAX_CONN];
 
 // Interval and Windows in 0,625 Unit
 #define DEFINE_IBLE_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
@@ -78,7 +83,7 @@ iBleC_conn_params_t _conn_params =\
 	.timeout			= _timeout;\
 }
 
-int	iBleC_central_init(iBleC_conn_params_t* conn_params);
+int	iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 
 #endif	// __IBLE__

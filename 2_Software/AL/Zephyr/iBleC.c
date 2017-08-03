@@ -1,8 +1,7 @@
 #include "iBle.h"
 
-static uint8_t 				 nbr_connection = 0;
-static struct bt_conn* connection_list[CONFIG_BLUETOOTH_MAX_CONN];
-static struct bt_conn* new_connection;
+static uint8_t 				 nbr_conn = 0;
+static struct bt_conn* new_conn;
 
 static iBleC_conn_params_t* _conn_params;
 static iBleC_scan_params_t* _scan_params;
@@ -75,9 +74,11 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 	}
 
 	// Check the name of the device
-	if(memcmp(IBLE_PERIPHERAL_NAME, (char*) device_name->data, sizeof(IBLE_PERIPHERAL_NAME)) != 0) {
+	if(memcmp(IBLE_PERIPHERAL_NAME, (char*) device_name.data, sizeof(IBLE_PERIPHERAL_NAME)) != 0) {
 		return;
 	}
+
+	iPrint("-> Connection request to device %s\n", (char*) device_name.data);
 
 	// Create a connection with the new device
 	new_connection = bt_conn_create_le(peer_addr, _conn_params);
@@ -86,56 +87,59 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 	}
 }
 
-static u8_t _service_discovery(struct bt_conn *conn, const struct bt_gatt_attr *attr, struct bt_gatt_discover_params *params)
+static void _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
 	int error;
 
-	if (!attr) {
-		iPrint("Discover complete\n");
-		memset(params, 0, sizeof(*params));
+	// No more attribute to discover
+	if(attr == NULL) {
 		return BT_GATT_ITER_STOP;
 	}
 
-	iPrint("[ATTRIBUTE] handle %u\n", attr->handle);
+	return BT_GATT_ITER_CONTINUE;
+}
 
-	if (BT_UUID_16(discover_params.uuid)->val == BT_UUID_HRS_VAL) {
-		uuid.val = BT_UUID_HRS_MEASUREMENT_VAL;
-		discover_params.uuid = &uuid.uuid;
-		discover_params.start_handle = attr->handle + 1;
-		discover_params.type = BT_GATT_DISCOVER_CHARACTERISTIC;
+static void _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+{
+  int error;
 
-		error = bt_gatt_discover(conn, &discover_params);
-		if (error) {
-			iPrint("Discover failed (error %d)\n", error);
-		}
-	} else if (BT_UUID_16(discover_params.uuid)->val ==
-						BT_UUID_HRS_MEASUREMENT_VAL) {
-		uuid.val = BT_UUID_GATT_CCC_VAL;
-		discover_params.uuid = &uuid.uuid;
-		discover_params.start_handle = attr->handle + 2;
-		discover_params.type = BT_GATT_DISCOVER_DESCRIPTOR;
-		subscribe_params.value_handle = attr->handle + 1;
-
-		error = bt_gatt_discover(conn, &discover_params);
-		if (error) {
-			iPrint("Discover failed (error %d)\n", error);
-		}
-	} else {
-		subscribe_params.notify = notify_func;
-		subscribe_params.value = BT_GATT_CCC_NOTIFY;
-		subscribe_params.ccc_handle = attr->handle;
-
-		error = bt_gatt_subscribe(conn, &subscribe_params);
-		if (error && error != -EALREADY) {
-			iPrint("Subscribe failed (error %d)\n", error);
-		} else {
-			iPrint("[SUBSCRIBED]\n");
-		}
-
+	// No more attribute to discover
+	if(attr == NULL) {
 		return BT_GATT_ITER_STOP;
 	}
 
-	return BT_GATT_ITER_STOP;
+	uuid.val 											= BT_UUID_GATT_CCC_VAL;
+	discover_params.uuid 					= &uuid.uuid;
+	discover_params.start_handle 	= attr->handle + 2;
+	subscribe_params.value_handle = attr->handle + 1;
+	discover_params.func 					= _on_desc_discovery;
+	discover_params.type 					= BT_GATT_DISCOVER_DESCRIPTOR;
+
+	bt_gatt_discover(conn, &discover_params);
+
+	return BT_GATT_ITER_CONTINUE;
+}
+
+static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+{
+	int error;
+
+	// No more attribute to discover
+	if(attr == NULL) {
+		return BT_GATT_ITER_STOP;
+	}
+
+	printk("[ATTRIBUTE] handle %u\n", attr->handle);
+
+	uuid.val 											= BT_UUID_GATT_CHRC_VAL;
+	discover_params.uuid 					= &uuid.uuid;
+	discover_params.start_handle 	= attr->handle + 1;
+	discover_params.func 					= _on_chrs_discovery;
+	discover_params.type 					= BT_GATT_DISCOVER_CHARACTERISTIC;
+
+	bt_gatt_discover(conn, &discover_params);
+
+	return BT_GATT_ITER_CONTINUE;
 }
 
 static void _connected(struct bt_conn* conn, u8_t conn_err)
@@ -149,34 +153,35 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 	if(conn_err) {
 		iPrint("-> Connection to %s failed: error %u\n", addr_str, conn_err);
 	}
-	else if(new_connection == conn)
+	else if(new_conn == conn)
 	{
-		new_connection = bt_conn_ref(conn);
-		connection_list[nbr_connections] = new_connection;
-		nbr_connections++;
+		uuid.val 											= BT_UUID_GATT_INCLUDE_VAL;
+		discover_params.uuid 					= &uuid.uuid;
+		discover_params.start_handle 	= 0x0001;
+		discover_params.end_handle 		= 0xffff;
+		discover_params.func 					= _on_svcs_discovery;
+		discover_params.type 					= BT_GATT_DISCOVER_INCLUDE;
 
-    struct bt_conn_info info;
-    error = bt_conn_get_info(conn, &info);
-    if(error) {
-      iPrint("/!\\ Bluetooth get connection information failed: error %d\n", error);
-    }
+		error = bt_gatt_discover(default_conn, &discover_params);
+		if(error) {
+			iPrint("Service Discover failed: error %d\n", error);
+			return;
+		}
 
-		// for(int i = 0: i < _svc_list->nbr_svcs; i++)
-		// {
-		// 	discover_params.uuid 					= &(svcs->svcs_uuid[i].uuid);
-		// 	discover_params.func 					= _service_discovery;
-		// 	discover_params.start_handle 	= 0x0001;
-		// 	discover_params.end_handle 		= 0xffff;
-		// 	discover_params.type 					= BT_GATT_DISCOVER_PRIMARY;
-		//
-		// 	error = bt_gatt_discover(default_conn, &discover_params);
-		// 	if(error) {
-		// 		iPrint("Service Discover failed: error %d\n", error);
-		// 		return;
-		// 	}
-		// }
+		link[nbr_conn] = bt_conn_ref(conn);
+		nbr_conn++;
+
+		struct bt_conn_info info;
+		error = bt_conn_get_info(conn, &info);
+		if(error) {
+			iPrint("/!\\ Bluetooth get connection information failed: error %d\n", error);
+		}
 
 		iPrint("\n-> Peripheral %s connected\n", addr_str);
+		iPrint("----------------------------\n");
+		iPrint("Connection Interval: %u[us]\n", info.le.interval * UNIT_1_25_MS);
+		iPrint("Connection Slave Latency: %u\n", info.le.latency);
+		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 	}
 	else {
 		iPrint("-> Connection to %s failed: error connection reference\n", addr_str);
@@ -193,27 +198,26 @@ static void _disconnected(struct bt_conn* conn, u8_t reason)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr_str, BT_ADDR_LE_STR_LEN);
 
 	// Search which device is disconnected
-	for(int i = 0; i < nbr_connections; i++)
+	for(int i = 0; i < nbr_conn; i++)
 	{
-		if(connection_list[i] == conn) {
+		if(link[i] == conn) {
 			ref = i;
 			break;
 		}
 	}
 
-	bt_conn_unref(connection_list[ref]);
+	bt_conn_unref(link[ref]);
 
 	// Remove the device from the list
-	for(int i = ref; i < nbr_connections; i++)
+	for(int i = ref; i < nbr_conn; i++)
 	{
-		connection_list[i] = connection_list[i + 1];
+		link[i] = link[i + 1];
 	}
 
-	connection_list[nbr_connections - 1] = NULL;
-	nbr_connections--;
+	link[nbr_conn-1] = NULL;
+	nbr_conn--;
 
 	iPrint("-> Peripheral %s disconnected: %u\n", addr_str, reason);
-
 	iBleC_scan_start(NULL);
 }
 
@@ -223,7 +227,7 @@ static struct bt_conn_cb connection_callback =
 	.disconnected     = _disconnected,
 };
 
-int iBleC_central_init(iBleC_conn_params_t* conn_params)
+int iBleC_init(iBleC_conn_params_t* conn_params)
 {
 	int error;
 
@@ -232,7 +236,7 @@ int iBleC_central_init(iBleC_conn_params_t* conn_params)
 
 	error = bt_enable(NULL);
 	if(error) {
-		iPrint("/!\\ Bluetooth failed to initialized: error %d\n", error);
+		iPrint("/!\\ Bluetooth failed to initialize: error %d\n", error);
 		return error;
   }
 
