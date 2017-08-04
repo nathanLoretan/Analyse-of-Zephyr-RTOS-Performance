@@ -48,6 +48,16 @@ static void _on_device_found(ble_evt_t const* ble_evt)
   ble_gap_evt_t const* gap_evt = &ble_evt->evt.gap_evt;
   ble_gap_addr_t const* peer_addr = &gap_evt->params.adv_report.peer_addr;
 
+  // Disable the scan if the maximum number of connection is reached
+	if(ble_conn_state_n_centrals() >= CENTRAL_LINK_COUNT)
+	{
+		error = sd_ble_gap_scan_stop();
+		if(error) {
+			iPrint("/!\\ Stop LE scan failed: error %d\n", error);
+		}
+		return;
+	}
+
   // Prepare advertisement report for parsing.
   advdata.p_data = (uint8_t*) &gap_evt->params.adv_report.data;
   advdata.size   = gap_evt->params.adv_report.dlen;
@@ -58,7 +68,11 @@ static void _on_device_found(ble_evt_t const* ble_evt)
     return;
   }
 
-  iPrint("-> Device found %s, %d, %d\n", (char*) device_name.p_data, complete_local_name.size, sizeof(IBLE_PERIPHERAL_NAME));
+  // Only to print correctly the name
+	char complete_local_name_str[complete_local_name.size+1];
+	memset(complete_local_name_str, 0, complete_local_name.size+1);
+	memcpy(complete_local_name_str, complete_local_name.p_data, complete_local_name.size);
+  // iPrint("-> Device found %s, %d, %d\n", (char*) complete_local_name_str, complete_local_name.size, sizeof(IBLE_PERIPHERAL_NAME));
 
   // Control the size of the peripheral's name, the \0 is not include in the device's name
   if(complete_local_name.size != sizeof(IBLE_PERIPHERAL_NAME)-1) {
@@ -70,7 +84,7 @@ static void _on_device_found(ble_evt_t const* ble_evt)
     return;
   }
 
-  iPrint("-> Connection request to device %s\n", (char*) complete_local_name.p_data);
+  iPrint("-> Connection request to device %s\n", complete_local_name_str);
 
   // Connect to the peripheral
   error = sd_ble_gap_connect(peer_addr, _scan_params, _conn_params, CONN_CFG_TAG);
@@ -156,6 +170,8 @@ static void _on_svcs_discovery(uint16_t conn_handle, ble_gattc_evt_prim_srvc_dis
 {
   int error;
 
+  iPrint("Service discovery\n");
+
   link[conn_handle].conn_ref = conn_handle;
   link[conn_handle].nbr_svcs = prim_srvc_disc_rsp->count;
   link[conn_handle].svcs = (iBleC_svcs_t*) malloc(sizeof(iBleC_svcs_t) * prim_srvc_disc_rsp->count);
@@ -175,6 +191,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 {
 	int error;
 
+  iPrint("event %d\n", ble_evt->header.evt_id);
+
 	switch (ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
@@ -182,35 +200,21 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       // For readibility.
       ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
       ble_gap_conn_params_t const* conn_params  = &gap_evt->params.connected.conn_params;
-      ble_gattc_handle_range_t handle_range;
-
-      // Control if the maximum number of connection is reached
-      if(ble_conn_state_n_centrals() == CENTRAL_LINK_COUNT) {
-        return;
-      }
-
-      // Discover all the services of the peripheral. Event: BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP
-      error = sd_ble_gattc_attr_info_discover(gap_evt->conn_handle, &handle_range);
-      if(error) {
-        iPrint("/!\\ sd_ble_gattc_attr_info_discover failed : error %d\n", error);
-        return;
-
-      }
-
-      error = sd_ble_gattc_primary_services_discover(gap_evt->conn_handle, handle_range.start_handle, NULL);
+      
+      error = sd_ble_gattc_primary_services_discover(gap_evt->conn_handle, 0x0000, NULL);
       if(error) {
         iPrint("/!\\ Services discovery failed : error %d\n", error);
         return;
       }
 
       iPrint("\n-> Peripheral %d connected\n", gap_evt->conn_handle);
-			iPrint("-------------------------------\n");
+			iPrint("--------------------------\n");
 	    iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
 			iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
 	    iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
 	    iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
 
-      // // The central stop scanning when it connects to a device
+      // The central stop scanning when it connects to a device
       // iBleC_scan_start(NULL);
 
 		} break;

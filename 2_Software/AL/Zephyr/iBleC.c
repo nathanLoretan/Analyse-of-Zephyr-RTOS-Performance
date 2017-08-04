@@ -85,6 +85,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 
 	iPrint("-> Connection request to device %s\n", complete_local_name_str);
 
+	// The central must stop scanning to proceded to the connection
 	error = bt_le_scan_stop();
 	if(error) {
 		iPrint("/!\\ Stop scan failed: error %d\n", error);
