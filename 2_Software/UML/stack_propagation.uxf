@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>15</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1080</x>
+      <y>345</y>
+      <w>345</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>GPIO Notify = 1
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1230</x>
+      <y>105</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>105</y>
+      <w>45</w>
+      <h>135</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1080</x>
+      <y>210</y>
+      <w>345</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>GPIO Error = 0
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1080</x>
+      <y>480</y>
+      <w>345</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>Notify
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1080</x>
+      <y>855</y>
+      <w>345</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>GPIO Notify = 0
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>270</y>
+      <w>45</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>405</y>
+      <w>45</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1215</x>
+      <y>600</y>
+      <w>60</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>type=decision</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>1080</x>
+      <y>720</y>
+      <w>345</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>GPIO Error = 1
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>540</y>
+      <w>45</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;40.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>645</y>
+      <w>105</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>if error
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>780</y>
+      <w>45</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>915</y>
+      <w>45</w>
+      <h>105</h>
+    </coordinates>
+    <panel_attributes>
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;50.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>1230</x>
+      <y>990</y>
+      <w>30</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>type=final</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1230</x>
+      <y>615</y>
+      <w>375</w>
+      <h>240</h>
+    </coordinates>
+    <panel_attributes>if no error
+lt=-&gt;</panel_attributes>
+    <additional_attributes>30.0;10.0;170.0;10.0;170.0;140.0;10.0;140.0</additional_attributes>
+  </element>
+</diagram>
