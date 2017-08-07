@@ -133,6 +133,8 @@ static void _on_desc_discovery(uint16_t conn_handle, ble_gattc_evt_desc_disc_rsp
   int chrc_ref;
   uint8_t svc_ref = _get_svc_ref(conn_handle, desc_disc_rsp->descs[0].handle);
 
+  iPrint("Desc discovery %d \n", desc_disc_rsp->count);
+
   for(int i = 0; i < desc_disc_rsp->count; i++)
   {
     chrc_ref = _get_chrc_ref(conn_handle, svc_ref, desc_disc_rsp->descs[i].handle);
@@ -147,10 +149,12 @@ static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp
   int error;
   int svc_ref = _get_svc_ref(conn_handle, chrc_disc_rsp->chars[0].handle_decl);
 
-  if(svc_ref < 0 ) {
+  if(svc_ref < 0) {
     iPrint("ERROR\n");
     return;
   }
+
+  iPrint("Chrcs discovery %d \n",   chrc_disc_rsp->count);
 
   link[conn_handle].svcs[svc_ref].nbr_chrcs = chrc_disc_rsp->count;
   link[conn_handle].svcs[svc_ref].chrcs = (iBleC_chrcs_t*) malloc(sizeof(iBleC_chrcs_t) * chrc_disc_rsp->count);
@@ -158,7 +162,7 @@ static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp
   for(int i = 0; i < chrc_disc_rsp->count; i++)
   {
     link[conn_handle].svcs[svc_ref].chrcs[i].chrc = chrc_disc_rsp->chars[i];
-    error = sd_ble_gattc_characteristics_discover(conn_handle, &link[conn_handle].svcs[svc_ref].svc.handle_range);
+    error = sd_ble_gattc_descriptors_discover(conn_handle, &link[conn_handle].svcs[svc_ref].svc.handle_range);
     if(error) {
       iPrint("/!\\ Descriptors discovery failed : error %d\n", error);
       return;
@@ -170,7 +174,7 @@ static void _on_svcs_discovery(uint16_t conn_handle, ble_gattc_evt_prim_srvc_dis
 {
   int error;
 
-  iPrint("Service discovery\n");
+  iPrint("Service discovery %d \n",  prim_srvc_disc_rsp->count);
 
   link[conn_handle].conn_ref = conn_handle;
   link[conn_handle].nbr_svcs = prim_srvc_disc_rsp->count;
@@ -200,8 +204,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       // For readibility.
       ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
       ble_gap_conn_params_t const* conn_params  = &gap_evt->params.connected.conn_params;
-      
-      error = sd_ble_gattc_primary_services_discover(gap_evt->conn_handle, 0x0000, NULL);
+
+      error = sd_ble_gattc_primary_services_discover(gap_evt->conn_handle, 0x0001, NULL);
       if(error) {
         iPrint("/!\\ Services discovery failed : error %d\n", error);
         return;
