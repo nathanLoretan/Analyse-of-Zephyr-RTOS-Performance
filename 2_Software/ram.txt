@@ -10,3 +10,5 @@ SDK Application RAM = 3d940hex
 
 Moi S140 RAM = 20kB = 20480dec = 5000hex
 Application RAM = (40000-5000)hex = 35000hex
+
+projecttools.nordicsemi.no/confluence/display/PRESTUD/Benchmarking_1

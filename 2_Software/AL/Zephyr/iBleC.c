@@ -1,4 +1,6 @@
-#include "iBle.h"
+#if	CONFIG_BLUETOOTH_CENTRAL
+
+#include "iBleC.h"
 
 static uint8_t 				 nbr_conn = 0;
 static struct bt_conn* new_conn;
@@ -102,7 +104,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
 	// int error;
-
+iPrint("_on_desc_discovery\n");
 	// No more attribute to discover
 	if(attr == NULL) {
 		return BT_GATT_ITER_STOP;
@@ -114,6 +116,7 @@ static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* 
 static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
   // int error;
+	iPrint("_on_chrs_discovery\n");
 
 	// No more attribute to discover
 	if(attr == NULL) {
@@ -135,23 +138,24 @@ static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* 
 static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
 	// int error;
-
+iPrint("_on_svcs_discovery\n");
 	// No more attribute to discover
-	if(attr == NULL) {
-		return BT_GATT_ITER_STOP;
-	}
+	// if(attr == NULL) {
+	// 	return BT_GATT_ITER_STOP;
+	// }
+	//
+	// iPrint("[ATTRIBUTE] handle %u\n", attr->handle);
+	//
+	// uuid.val 											= BT_UUID_GATT_CHRC_VAL;
+	// discover_params.uuid 					= &uuid.uuid;
+	// discover_params.start_handle 	= attr->handle + 1;
+	// discover_params.func 					= _on_chrs_discovery;
+	// discover_params.type 					= BT_GATT_DISCOVER_CHARACTERISTIC;
+	//
+	// bt_gatt_discover(conn, &discover_params);
 
-	iPrint("[ATTRIBUTE] handle %u\n", attr->handle);
-
-	uuid.val 											= BT_UUID_GATT_CHRC_VAL;
-	discover_params.uuid 					= &uuid.uuid;
-	discover_params.start_handle 	= attr->handle + 1;
-	discover_params.func 					= _on_chrs_discovery;
-	discover_params.type 					= BT_GATT_DISCOVER_CHARACTERISTIC;
-
-	bt_gatt_discover(conn, &discover_params);
-
-	return BT_GATT_ITER_CONTINUE;
+	return BT_GATT_ITER_STOP;
+	// return BT_GATT_ITER_CONTINUE;
 }
 
 static void _connected(struct bt_conn* conn, u8_t conn_err)
@@ -167,23 +171,24 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 	}
 	else if(new_conn == conn)
 	{
-		link[nbr_conn].conn_ref = bt_conn_ref(conn);
+		// link[nbr_conn].conn_ref = bt_conn_ref(conn);
+		// new_conn = bt_conn_ref(conn);
+		//
+		// uuid.val 											= BT_UUID_GATT_INCLUDE_VAL;
+		// discover_params.uuid 					= &uuid.uuid;
+		// discover_params.start_handle 	= 0x0001;
+		// discover_params.end_handle 		= 0xffff;
+		// discover_params.func 					= _on_svcs_discovery;
+		// discover_params.type 					= BT_GATT_DISCOVER_INCLUDE;
 
-		uuid.val 											= BT_UUID_GATT_INCLUDE_VAL;
-		discover_params.uuid 					= &uuid.uuid;
-		discover_params.start_handle 	= 0x0001;
-		discover_params.end_handle 		= 0xffff;
-		discover_params.func 					= _on_svcs_discovery;
-		discover_params.type 					= BT_GATT_DISCOVER_INCLUDE;
+		// error = bt_gatt_discover(link[nbr_conn].conn_ref, &discover_params);
+		// if(error) {
+		// 	iPrint("Service Discover failed: error %d\n", error);
+		// 	return;
+		// }
 
-		error = bt_gatt_discover(link[nbr_conn].conn_ref, &discover_params);
-		if(error) {
-			iPrint("Service Discover failed: error %d\n", error);
-			return;
-		}
-
-		nbr_conn++;
-
+		// nbr_conn++;
+		//
 		struct bt_conn_info info;
 		error = bt_conn_get_info(conn, &info);
 		if(error) {
@@ -196,7 +201,7 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 		iPrint("Connection Slave Latency: %u\n", info.le.latency);
 		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 
-		iBleC_scan_start(NULL);
+		// iBleC_scan_start(NULL);
 	}
 	else {
 		iPrint("-> Connection to %s failed: error connection reference\n", addr_str);
@@ -213,26 +218,29 @@ static void _disconnected(struct bt_conn* conn, u8_t reason)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr_str, BT_ADDR_LE_STR_LEN);
 
 	// Search which device is disconnected
-	for(int i = 0; i < nbr_conn; i++)
-	{
-		if(link[i].conn_ref == conn) {
-			ref = i;
-			break;
-		}
-	}
+	// for(int i = 0; i < nbr_conn; i++)
+	// {
+	// 	if(link[i].conn_ref == conn) {
+	// 		ref = i;
+	// 		break;
+	// 	}
+	// }
+	//
+	// bt_conn_unref(link[ref].conn_ref);
+	//
+	// // Remove the device from the list
+	// for(int i = ref; i < nbr_conn-1; i++)
+	// {
+	// 	link[i] = link[i+1];
+	// }
+	//
+	// link[nbr_conn-1].conn_ref = NULL;
+	// nbr_conn--;
 
-	bt_conn_unref(link[ref].conn_ref);
+	bt_conn_unref(new_conn);
+	new_conn = NULL;
 
-	// Remove the device from the list
-	for(int i = ref; i < nbr_conn-1; i++)
-	{
-		link[i] = link[i+1];
-	}
-
-	link[nbr_conn-1].conn_ref = NULL;
-	nbr_conn--;
-
-	iPrint("-> Peripheral %s disconnected: %u\n", addr_str, reason);
+	iPrint("-> Peripheral %s disconnected: %x\n", addr_str, reason);
 	iBleC_scan_start(NULL);
 }
 
@@ -285,3 +293,5 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
   iPrint("-> Scanning started\n");
   return 0;
 }
+
+#endif	// CONFIG_BLUETOOTH_CENTRAL

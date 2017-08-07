@@ -1,3 +1,5 @@
+#if CONFIG_BLUETOOTH_PERIPHERAL
+
 #include "iBle.h"
 
 volatile static bool isConnected = false;
@@ -263,3 +265,5 @@ int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t 
 
   return error;
 }
+
+#endif  // CONFIG_BLUETOOTH_PERIPHERAL

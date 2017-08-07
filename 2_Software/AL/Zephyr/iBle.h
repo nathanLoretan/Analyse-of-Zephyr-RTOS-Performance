@@ -1,3 +1,5 @@
+#if CONFIG_BLUETOOTH_PERIPHERAL
+
 #ifndef __IBLE__
 #define __IBLE__
 
@@ -165,3 +167,5 @@ int	iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_
 #define iBle_attr_set_data(_attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
 
 #endif	// __IBLE__
+
+#endif  // CONFIG_BLUETOOTH_PERIPHERAL

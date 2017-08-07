@@ -18,7 +18,7 @@
 //------------------------------------------------------------------------------
 #define ENABLE_ACC        0
 #define ENABLE_ADC        0
-#define ENABLE_SWG        1
+#define ENABLE_SWG        0
 #define ENABLE_BLE        1
 #define POWER_MEASUREMENT 0
 

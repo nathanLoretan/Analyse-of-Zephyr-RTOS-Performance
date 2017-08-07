@@ -21,6 +21,7 @@ void bluetooth_init();
 
 int main()
 {
+	iDebug_init();
 	bluetooth_init();
 
   while(1)

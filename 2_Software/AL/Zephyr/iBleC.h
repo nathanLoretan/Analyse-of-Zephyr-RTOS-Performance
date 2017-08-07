@@ -1,3 +1,5 @@
+#if CONFIG_BLUETOOTH_CENTRAL
+
 #ifndef __IBLEC__
 #define __IBLEC__
 
@@ -10,6 +12,12 @@
 #include <bluetooth/gatt.h>
 #include <bluetooth/bluetooth.h>
 
+#define MSEC_TO_UNITS(_time, _unit)           	(_time*1000)/_unit
+#define UNIT_1_25_MS                          	1250
+#define UNIT_10_MS                            	10000
+#define UNIT_0_625_MS                         	625
+
+// #define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
 #define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
 #define IBLE_CENTRAL_NAME   				"ExtBoard-C"
 
@@ -59,3 +67,5 @@ int	iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 
 #endif	// __IBLEC__
+
+#endif	// CONFIG_BLUETOOTH_CENTRAL
