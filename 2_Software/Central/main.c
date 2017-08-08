@@ -17,6 +17,57 @@
 DEFINE_IBLE_SCAN_PARAMS(scan_params, IBLE_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
 DEFINE_IBLE_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
 
+// if 128bit uuid. octect 12-13
+
+iBle_attr_disc_t attr_disc_array[] =
+{
+	{
+		.uuid16			= 0x1805,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_SVC,
+	},
+	{
+		.uuid16			= 0x2A08,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2A09,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2A0A,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x180D,
+		.uuid_type 	= UUID_16,
+		.disc_type	= IBLE_DISCOVER_SVC,
+	},
+	{
+		.uuid16			= 0x2A21,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2A37,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x180F,
+		.uuid_type 	= UUID_16,
+		.disc_type	= IBLE_DISCOVER_SVC,
+	},
+	{
+		.uuid16			= 0x2A19,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+};
+
 void bluetooth_init();
 
 int main()
@@ -39,5 +90,6 @@ void bluetooth_init()
   iPrint("--------------------\n");
 
 	iBleC_init(&conn_params);
+	iBleC_discovery_init(attr_disc_array, sizeof(attr_disc_array) / sizeof(iBle_attr_disc_t));
 	iBleC_scan_start(&scan_params);
 }

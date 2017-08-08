@@ -53,6 +53,26 @@ struct {
 	iBleC_svcs_t*   svcs;
 } link[TOTAL_LINK_COUNT];
 
+typedef enum {
+	IBLE_DISCOVER_SVC,
+	IBLE_DISCOVER_DESC,
+	IBLE_DISCOVER_CHRC,
+} iBle_disc_type_t;
+
+typedef enum {
+	UUID_16  = BLE_UUID_TYPE_BLE,
+	UUID_128 = BLE_UUID_TYPE_VENDOR_BEGIN,
+} iBle_uuid_type_t;
+
+typedef struct {
+	union {
+		uint16_t	uuid16;
+		uint8_t 	uuid128[16];
+	};
+	iBle_uuid_type_t uuid_type;
+	iBle_disc_type_t disc_type;
+} iBle_attr_disc_t;
+
 // Interval and Windows in 0,625 Unit
 #define DEFINE_IBLE_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
 iBleC_scan_params_t _scan_params =\
@@ -74,12 +94,6 @@ iBleC_conn_params_t _conn_params =\
 
 int iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
-
-// #define iBleC_nbr_links()  ble_conn_state_n_centrals()
-// int iBleC_getService();
-
-// int iBleC_read
-// int iBleC_write
-// int iBleC_...
+void iBleC_discovery_init(iBle_attr_disc_t* attr_disc_array, uint16_t _nbr_disc_attrs);
 
 #endif  // __IBLEC__

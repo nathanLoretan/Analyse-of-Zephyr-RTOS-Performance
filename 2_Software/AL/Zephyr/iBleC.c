@@ -7,8 +7,12 @@ static struct bt_conn* new_conn;
 
 static iBleC_conn_params_t* _conn_params;
 static iBleC_scan_params_t* _scan_params;
+static iBle_attr_disc_t* 		_attr_disc_array;
+static uint8_t 							_disc_ref;
+static uint8_t 							_nbr_disc_attrs;
 
-static struct bt_uuid_16 uuid = BT_UUID_INIT_16(0);
+static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
+static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
 static struct bt_gatt_discover_params discover_params;
 static struct bt_gatt_subscribe_params subscribe_params;
 
@@ -98,64 +102,126 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 	new_conn = bt_conn_create_le(peer_addr, _conn_params);
 	if(new_conn == NULL) {
 		iPrint("/!\\  Connection request to %s failed\n", complete_local_name_str);
+		iBleC_scan_start(NULL);
 	}
 }
 
-static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+// static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+// {
+// 	return -1;
+// }
+//
+// static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+// {
+// 	return -1;
+// }
+//
+// static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr)
+// {
+// 	return -1;
+// }
+
+static u8_t _discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
-	// int error;
-iPrint("_on_desc_discovery\n");
-	// No more attribute to discover
-	if(attr == NULL) {
+	int error;
+
+	if(params->type == BT_GATT_DISCOVER_PRIMARY && attr != NULL)
+	{
+		iPrint("Service discovered\n");
+		// _on_svcs_discovery();
+	}
+	else if(params->type == BT_GATT_DISCOVER_CHARACTERISTIC && attr != NULL)
+	{
+		iPrint("Characteristic discovered\n");
+		// _on_chrs_discovery();
+	}
+	else if(params->type == BT_GATT_DISCOVER_DESCRIPTOR && attr != NULL)
+	{
+		iPrint("Descriptor discovered\n");
+		// _on_desc_discovery();
+	}
+
+	_disc_ref++;
+	if(_disc_ref >= _nbr_disc_attrs)
+	{
+		iPrint("Discovery finished\n");
 		return BT_GATT_ITER_STOP;
 	}
 
-	return BT_GATT_ITER_CONTINUE;
-}
-
-static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
-{
-  // int error;
-	iPrint("_on_chrs_discovery\n");
-
-	// No more attribute to discover
-	if(attr == NULL) {
-		return BT_GATT_ITER_STOP;
+	// Set the next attribute's uuid to discover
+	if(_attr_disc_array[_disc_ref].uuid_type == UUID_128)
+	{
+		memcpy(uuid128.val,_attr_disc_array[_disc_ref].uuid128, 16);
+		discover_params.uuid	= &uuid128.uuid;
+	}
+	else if(_attr_disc_array[_disc_ref].uuid_type == UUID_16)
+	{
+		uuid16.val 						= _attr_disc_array[_disc_ref].uuid16;
+		discover_params.uuid 	= &uuid16.uuid;
 	}
 
-	uuid.val 											= BT_UUID_GATT_CCC_VAL;
-	discover_params.uuid 					= &uuid.uuid;
-	discover_params.start_handle 	= attr->handle + 2;
-	subscribe_params.value_handle = attr->handle + 1;
-	discover_params.func 					= _on_desc_discovery;
-	discover_params.type 					= BT_GATT_DISCOVER_DESCRIPTOR;
-
-	bt_gatt_discover(conn, &discover_params);
-
-	return BT_GATT_ITER_CONTINUE;
-}
-
-static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
-{
-	// int error;
-iPrint("_on_svcs_discovery\n");
-	// No more attribute to discover
-	// if(attr == NULL) {
-	// 	return BT_GATT_ITER_STOP;
+	// Set the next attributes handle range to discover
+	if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_SVC)
+	{
+		discover_params.start_handle 	= 0x0001;
+		discover_params.end_handle 		= 0xffff;
+	}
+	else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC)// &&
+					// params->type == BT_GATT_DISCOVER_PRIMARY)
+	{
+		discover_params.start_handle 	= attr->handle + 1;
+	}
+	// else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC &&
+	// 				params->type == BT_GATT_DISCOVER_CHARACTERISTIC)
+	// {
+	// 	discover_params.start_handle 	= attr->handle + 2;
 	// }
-	//
-	// iPrint("[ATTRIBUTE] handle %u\n", attr->handle);
-	//
-	// uuid.val 											= BT_UUID_GATT_CHRC_VAL;
-	// discover_params.uuid 					= &uuid.uuid;
-	// discover_params.start_handle 	= attr->handle + 1;
-	// discover_params.func 					= _on_chrs_discovery;
-	// discover_params.type 					= BT_GATT_DISCOVER_CHARACTERISTIC;
-	//
-	// bt_gatt_discover(conn, &discover_params);
+	else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_DESC)
+	{
+		discover_params.start_handle 	= attr->handle + 2;
+	}
+
+	// Set the next attribute's type to discover
+	discover_params.func 					= _discovery;
+	discover_params.type 					= _attr_disc_array[_disc_ref].disc_type;
+
+	error = bt_gatt_discover(conn, &discover_params);
+	if(error) {
+		iPrint("Start Discovery failed: error %d\n", error);
+		return;
+	}
 
 	return BT_GATT_ITER_STOP;
 	// return BT_GATT_ITER_CONTINUE;
+}
+
+static void _start_discovery(struct bt_conn* conn)
+{
+	int error;
+
+	_disc_ref = 0;
+
+	if(_attr_disc_array[_disc_ref].uuid_type == UUID_128)
+	{
+		memcpy(uuid128.val,_attr_disc_array[_disc_ref].uuid128, 16);
+		discover_params.uuid = &uuid128.uuid;
+	}
+	else if(_attr_disc_array[_disc_ref].uuid_type == UUID_16)
+	{
+		uuid16.val 						= _attr_disc_array[_disc_ref].uuid16;
+		discover_params.uuid 	= &uuid16.uuid;
+	}
+
+	discover_params.start_handle 	= 0x0001;
+	discover_params.end_handle 		= 0xffff;
+	discover_params.func 					= _discovery;
+	discover_params.type 					= _attr_disc_array[_disc_ref].disc_type;
+
+	error = bt_gatt_discover(conn, &discover_params);
+	if(error) {
+		iPrint("Start Discovery failed: error %d\n", error);
+		return;
+	}
 }
 
 static void _connected(struct bt_conn* conn, u8_t conn_err)
@@ -171,24 +237,13 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 	}
 	else if(new_conn == conn)
 	{
-		// link[nbr_conn].conn_ref = bt_conn_ref(conn);
-		// new_conn = bt_conn_ref(conn);
-		//
-		// uuid.val 											= BT_UUID_GATT_INCLUDE_VAL;
-		// discover_params.uuid 					= &uuid.uuid;
-		// discover_params.start_handle 	= 0x0001;
-		// discover_params.end_handle 		= 0xffff;
-		// discover_params.func 					= _on_svcs_discovery;
-		// discover_params.type 					= BT_GATT_DISCOVER_INCLUDE;
+		link[nbr_conn].conn_ref = bt_conn_ref(conn);
+		new_conn = bt_conn_ref(conn);
 
-		// error = bt_gatt_discover(link[nbr_conn].conn_ref, &discover_params);
-		// if(error) {
-		// 	iPrint("Service Discover failed: error %d\n", error);
-		// 	return;
-		// }
+		_start_discovery(link[nbr_conn].conn_ref);
 
-		// nbr_conn++;
-		//
+		nbr_conn++;
+
 		struct bt_conn_info info;
 		error = bt_conn_get_info(conn, &info);
 		if(error) {
@@ -201,7 +256,7 @@ static void _connected(struct bt_conn* conn, u8_t conn_err)
 		iPrint("Connection Slave Latency: %u\n", info.le.latency);
 		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 
-		// iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL);
 	}
 	else {
 		iPrint("-> Connection to %s failed: error connection reference\n", addr_str);
@@ -218,24 +273,24 @@ static void _disconnected(struct bt_conn* conn, u8_t reason)
 	bt_addr_le_to_str(bt_conn_get_dst(conn), addr_str, BT_ADDR_LE_STR_LEN);
 
 	// Search which device is disconnected
-	// for(int i = 0; i < nbr_conn; i++)
-	// {
-	// 	if(link[i].conn_ref == conn) {
-	// 		ref = i;
-	// 		break;
-	// 	}
-	// }
-	//
-	// bt_conn_unref(link[ref].conn_ref);
-	//
-	// // Remove the device from the list
-	// for(int i = ref; i < nbr_conn-1; i++)
-	// {
-	// 	link[i] = link[i+1];
-	// }
-	//
-	// link[nbr_conn-1].conn_ref = NULL;
-	// nbr_conn--;
+	for(int i = 0; i < nbr_conn; i++)
+	{
+		if(link[i].conn_ref == conn) {
+			ref = i;
+			break;
+		}
+	}
+
+	bt_conn_unref(link[ref].conn_ref);
+
+	// Remove the device from the list
+	for(int i = ref; i < nbr_conn-1; i++)
+	{
+		link[i] = link[i+1];
+	}
+
+	link[nbr_conn-1].conn_ref = NULL;
+	nbr_conn--;
 
 	bt_conn_unref(new_conn);
 	new_conn = NULL;
@@ -292,6 +347,12 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
 
   iPrint("-> Scanning started\n");
   return 0;
+}
+
+void iBleC_discovery_init(iBle_attr_disc_t* attr_disc_array, uint16_t nbr_disc_attrs)
+{
+	_nbr_disc_attrs		= nbr_disc_attrs;
+	_attr_disc_array 	= attr_disc_array;
 }
 
 #endif	// CONFIG_BLUETOOTH_CENTRAL
