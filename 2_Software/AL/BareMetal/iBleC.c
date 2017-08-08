@@ -23,9 +23,9 @@ static ble_uuid_t uuid = {0};
 typedef struct {
   union
   {
-    ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp;
-    ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp;
-    ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp;
+    ble_gattc_evt_prim_srvc_disc_rsp_t const*   prim_srvc_disc_rsp;
+    ble_gattc_evt_char_disc_rsp_t const*        chrc_disc_rsp;
+    ble_gattc_evt_desc_disc_rsp_t const*        desc_disc_rsp;
   };
 } iBle_disc_rsp_t;
 
@@ -107,126 +107,36 @@ static void _on_device_found(ble_evt_t const* ble_evt)
   }
 }
 
-// static int _get_chrc_ref(uint16_t conn_handle, uint8_t svc_ref, uint16_t handle)
-// {
-//   uint8_t nbr_chrcs =  link[conn_handle].svcs[svc_ref].nbr_chrcs;
-//
-//   for(int i = 0; i < nbr_chrcs - 1; i++)
-//   {
-//     if( handle > link[conn_handle].svcs[svc_ref].chrcs[i].chrc.handle_decl &&
-//         handle < link[conn_handle].svcs[svc_ref].chrcs[i+1].chrc.handle_decl) {
-//       return i;
-//     }
-//   }
-//
-//   // Control if it is the last attribute
-//   if(handle > link[conn_handle].svcs[svc_ref].chrcs[nbr_chrcs-1].chrc.handle_decl) {
-//     return nbr_chrcs-1;
-//   }
-//
-//   return -1;
-// }
-//
-// static int _get_svc_ref(uint16_t conn_handle, uint16_t handle)
-// {
-//   uint8_t nbr_svcs  = link[conn_handle].nbr_svcs;
-//
-//   for(int i = 0; i < nbr_svcs; i++)
-//   {
-//     if( handle > link[conn_handle].svcs[i].svc.handle_range.start_handle &&
-//         handle < link[conn_handle].svcs[i].svc.handle_range.end_handle) {
-//       return i;
-//     }
-//   }
-//
-//   return -1;
-// }
-
-// static void _on_desc_discovery(uint16_t conn_handle, ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp)
-// {
-//   int chrc_ref;
-//   uint8_t svc_ref = _get_svc_ref(conn_handle, desc_disc_rsp->descs[0].handle);
-//
-//   iPrint("Desc discovery %d \n", desc_disc_rsp->count);
-//
-//   for(int i = 0; i < desc_disc_rsp->count; i++)
-//   {
-//     chrc_ref = _get_chrc_ref(conn_handle, svc_ref, desc_disc_rsp->descs[i].handle);
-//     if(chrc_ref >= 0) {
-//       link[conn_handle].svcs[svc_ref].chrcs[chrc_ref].desc = desc_disc_rsp->descs[i];
-//     }
-//   }
-// }
-//
-// static void _on_chrs_discovery(uint16_t conn_handle, ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp)
-// {
-//   int error;
-//   int svc_ref = _get_svc_ref(conn_handle, chrc_disc_rsp->chars[0].handle_decl);
-//
-//   if(svc_ref < 0) {
-//     iPrint("ERROR\n");
-//     return;
-//   }
-//
-//   iPrint("Chrcs discovery %d \n",   chrc_disc_rsp->count);
-//
-//   link[conn_handle].svcs[svc_ref].nbr_chrcs = chrc_disc_rsp->count;
-//   link[conn_handle].svcs[svc_ref].chrcs = (iBleC_chrcs_t*) malloc(sizeof(iBleC_chrcs_t) * chrc_disc_rsp->count);
-//
-//   for(int i = 0; i < chrc_disc_rsp->count; i++)
-//   {
-//     link[conn_handle].svcs[svc_ref].chrcs[i].chrc = chrc_disc_rsp->chars[i];
-//     error = sd_ble_gattc_descriptors_discover(conn_handle, &link[conn_handle].svcs[svc_ref].svc.handle_range);
-//     if(error) {
-//       iPrint("/!\\ Descriptors discovery failed : error %d\n", error);
-//       return;
-//     }
-//   }
-// }
-//
-// static void _on_svcs_discovery(uint16_t conn_handle, ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp)
-// {
-//   int error;
-//
-//   iPrint("Service discovery %d \n",  prim_srvc_disc_rsp->count);
-//
-//   link[conn_handle].conn_ref = conn_handle;
-//   link[conn_handle].nbr_svcs = prim_srvc_disc_rsp->count;
-//   link[conn_handle].svcs = (iBleC_svcs_t*) malloc(sizeof(iBleC_svcs_t) * prim_srvc_disc_rsp->count);
-//
-//   for(int i = 0; i < prim_srvc_disc_rsp->count; i++)
-//   {
-//     link[conn_handle].svcs[i].svc = prim_srvc_disc_rsp->services[i];
-//     error = sd_ble_gattc_characteristics_discover(conn_handle, &link[conn_handle].svcs[i].svc.handle_range);
-//     if(error) {
-//       iPrint("/!\\ Characteristics discovery failed : error %d\n", error);
-//       return;
-//     }
-//   }
-// }
-
 ble_gattc_handle_range_t handle_range;
 
-static void _discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_disc_rsp_t* disc_rsp)
+static void _on_discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_disc_rsp_t* disc_rsp)
 {
 	int error = 0;
 
 	if(disc_type == IBLE_DISCOVER_SVC)
 	{
-		iPrint("Service discovered %x\n", disc_rsp->prim_srvc_disc_rsp->services[0].uuid.uuid);
+		iPrint("Service discovered %x, %x, %x\n", disc_rsp->prim_srvc_disc_rsp->services[0].uuid.uuid,
+                                              disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle,
+                                              disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.end_handle);
     handle_range.start_handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
     handle_range.end_handle   = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
-		// _on_svcs_discovery();
+    _attr_disc_array[_disc_ref].handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
 	}
 	else if(disc_type == IBLE_DISCOVER_CHRC)
 	{
-		iPrint("Characteristic discovered %x\n", disc_rsp->chrc_disc_rsp->chars[0].uuid.uuid);
-		// _on_chrs_discovery();
+		iPrint("Characteristic discovered %x, %x, %x\n",  disc_rsp->chrc_disc_rsp->chars[0].uuid.uuid,
+                                                      disc_rsp->chrc_disc_rsp->chars[0].handle_decl,
+                                                      disc_rsp->chrc_disc_rsp->chars[0].handle_value);
+    handle_range.start_handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
+    handle_range.end_handle   = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
+    _attr_disc_array[_disc_ref].handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
 	}
 	else if(disc_type == IBLE_DISCOVER_DESC)
 	{
-		iPrint("Descriptor discovered %x\n", disc_rsp->desc_disc_rsp->descs[0].uuid.uuid);
-		// _on_desc_discovery();
+		iPrint("Descriptor discovered %x, %x\n", disc_rsp->desc_disc_rsp->descs[0].uuid.uuid, disc_rsp->desc_disc_rsp->descs[0].handle);
+    handle_range.start_handle = disc_rsp->desc_disc_rsp->descs[0].handle;
+    handle_range.end_handle   = disc_rsp->desc_disc_rsp->descs[0].handle;
+    _attr_disc_array[_disc_ref].handle = disc_rsp->desc_disc_rsp->descs[0].handle;
 	}
 
 	_disc_ref++;
@@ -235,15 +145,6 @@ static void _discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_d
 		iPrint("Discovery finished\n");
 		return;
 	}
-
-  // typedef struct {
-  //   union
-  //   {
-  //     ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp;
-  //     ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp;
-  //     ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp;
-  //   };
-  // } iBle_disc_rsp_t;
 
   if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_SVC)
   {
@@ -257,24 +158,18 @@ static void _discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_d
 
     error = sd_ble_gattc_primary_services_discover(conn_handle, 0x0001, &uuid);
   }
-  else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC &&
-          disc_type == IBLE_DISCOVER_SVC)
+  else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC)
   {
     handle_range.start_handle++;
     handle_range.end_handle++;
-    error = sd_ble_gattc_characteristics_discover(conn_handle, &handle_range);
-  }
-  else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC &&
-          disc_type == IBLE_DISCOVER_CHRC)
-  {
-    handle_range.start_handle += 2;
-    handle_range.end_handle   += 2;
+    iPrint("chrcs Searched %x, %x\n", handle_range.start_handle, handle_range.end_handle);
     error = sd_ble_gattc_characteristics_discover(conn_handle, &handle_range);
   }
   else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_DESC)
   {
-    handle_range.start_handle += 2;
-    handle_range.end_handle   += 2;
+    handle_range.start_handle++;
+    handle_range.end_handle++;
+    iPrint("desc Searched %x, %x\n", handle_range.start_handle, handle_range.end_handle);
     error = sd_ble_gattc_descriptors_discover(conn_handle, &handle_range);
   }
 
@@ -282,48 +177,6 @@ static void _discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_d
     iPrint("/!\\ Start Discovery failed : error %d\n", error);
     return;
   }
-
-	// // Set the next attribute's uuid to discover
-	// if(_attr_disc_array[_disc_ref].uuid_type == UUID_128)
-	// {
-	// 	memcpy(uuid128.val,_attr_disc_array[_disc_ref].uuid128, 16);
-	// 	discover_params.uuid	= &uuid128.uuid;
-	// }
-	// else if(_attr_disc_array[_disc_ref].uuid_type == UUID_16)
-	// {
-	// 	uuid16.val 						= _attr_disc_array[_disc_ref].uuid16;
-	// 	discover_params.uuid 	= &uuid16.uuid;
-	// }
-  //
-	// // Set the next attribute's type to discover
-	// if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_SVC)
-	// {
-	// 	discover_params.start_handle 	= 0x0001;
-	// 	discover_params.end_handle 		= 0xffff;
-	// }
-	// else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC)// &&
-	// 				// params->type == BT_GATT_DISCOVER_PRIMARY)
-	// {
-	// 	discover_params.start_handle 	= attr->handle + 1;
-	// }
-	// // else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC &&
-	// // 				params->type == BT_GATT_DISCOVER_CHARACTERISTIC)
-	// // {
-	// // 	discover_params.start_handle 	= attr->handle + 2;
-	// // }
-	// else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_DESC)
-	// {
-	// 	discover_params.start_handle 	= attr->handle + 2;
-	// }
-  //
-	// discover_params.func 					= _discovery;
-	// discover_params.type 					= _attr_disc_array[_disc_ref].disc_type;
-  //
-	// error = bt_gatt_discover(conn, &discover_params);
-	// if(error) {
-	// 	iPrint("Start Discover failed: error %d\n", error);
-	// 	return;
-	// }
 }
 
 static void _start_discovery(uint16_t conn_handle)
@@ -372,7 +225,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 	    iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
 
       // The central stop scanning when it connects to a device
-      // iBleC_scan_start(NULL);
+      iBleC_scan_start(NULL);
 
 		} break;
 
@@ -464,9 +317,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       iBle_disc_rsp_t disc_rsp = {
         .prim_srvc_disc_rsp = &ble_evt->evt.gattc_evt.params.prim_srvc_disc_rsp,
       };
-      _discovery(conn_handle, IBLE_DISCOVER_SVC, &disc_rsp);
-
-      // _on_svcs_discovery(conn_handle, prim_srvc_disc_rsp);
+      _on_discovery(conn_handle, IBLE_DISCOVER_SVC, &disc_rsp);
     } break;
 
     case BLE_GATTC_EVT_CHAR_DISC_RSP:
@@ -478,9 +329,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       iBle_disc_rsp_t disc_rsp = {
         .chrc_disc_rsp = &ble_evt->evt.gattc_evt.params.char_disc_rsp,
       };
-      _discovery(conn_handle, IBLE_DISCOVER_CHRC, &disc_rsp);
-
-      // _on_chrs_discovery(conn_handle, chrc_disc_rsp);
+      _on_discovery(conn_handle, IBLE_DISCOVER_CHRC, &disc_rsp);
 		} break;
 
     case BLE_GATTC_EVT_DESC_DISC_RSP:
@@ -492,9 +341,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       iBle_disc_rsp_t disc_rsp = {
         .desc_disc_rsp = &ble_evt->evt.gattc_evt.params.desc_disc_rsp,
       };
-      _discovery(conn_handle, IBLE_DISCOVER_DESC, &disc_rsp);
-
-      // _on_desc_discovery(conn_handle, desc_disc_rsp);
+      _on_discovery(conn_handle, IBLE_DISCOVER_DESC, &disc_rsp);
     } break;
 
 		default:	// NOTHING

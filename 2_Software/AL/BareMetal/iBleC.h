@@ -32,25 +32,29 @@
 #define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 #define TOTAL_LINK_COUNT          CENTRAL_LINK_COUNT + PERIPHERAL_LINK_COUNT    /**< Total number of links used by the application. */
 
-
 typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
 typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
 
-typedef struct {
-  ble_gattc_char_t chrc;
-  ble_gattc_desc_t desc;
-} iBleC_chrcs_t;
-
-typedef struct {
-  ble_gattc_service_t	svc;
-  uint16_t            nbr_chrcs;
-  iBleC_chrcs_t*      chrcs;
-} iBleC_svcs_t;
+// typedef struct {
+//   ble_gattc_char_t chrc;
+//   ble_gattc_desc_t desc;
+// } iBleC_chrcs_t;
+//
+// typedef struct {
+//   ble_gattc_service_t	svc;
+//   uint16_t            nbr_chrcs;
+//   iBleC_chrcs_t*      chrcs;
+// } iBleC_svcs_t;
+//
+// struct {
+// 	uint16_t	      conn_ref;
+//   uint16_t        nbr_svcs;
+// 	iBleC_svcs_t*   svcs;
+// } link[TOTAL_LINK_COUNT];
 
 struct {
-	uint16_t	      conn_ref;
-  uint16_t        nbr_svcs;
-	iBleC_svcs_t*   svcs;
+	uint16_t	conn_ref;
+	uint16_t* handles;
 } link[TOTAL_LINK_COUNT];
 
 typedef enum {
@@ -72,6 +76,14 @@ typedef struct {
 	iBle_uuid_type_t uuid_type;
 	iBle_disc_type_t disc_type;
 } iBle_attr_disc_t;
+
+// #define ADD_ATTR_TO_SEARCH(_disc_type, _uuid_type, _uuid...)    {
+//                                                                   ((_uuid_type == UUID_16) ?
+//                                                                   (.uuid16		= _uuid) :
+//                                                                   (.uuid128		= _uuid)),
+//                                                                   .uuid_type 	= _uuid_type,
+//                                                                   .disc_type 	= _disc_type,
+//                                                                 }
 
 // Interval and Windows in 0,625 Unit
 #define DEFINE_IBLE_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
@@ -95,5 +107,9 @@ iBleC_conn_params_t _conn_params =\
 int iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 void iBleC_discovery_init(iBle_attr_disc_t* attr_disc_array, uint16_t _nbr_disc_attrs);
+
+// uint32_t 	sd_ble_gattc_write (uint16_t conn_handle, ble_gattc_write_params_t const *p_write_params)
+// uint32_t 	sd_ble_gattc_read (uint16_t conn_handle, uint16_t handle, uint16_t offset)
+// uint32_t 	sd_ble_gattc_hv_confirm (uint16_t conn_handle, uint16_t handle)
 
 #endif  // __IBLEC__

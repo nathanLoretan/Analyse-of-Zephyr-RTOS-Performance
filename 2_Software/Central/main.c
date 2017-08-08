@@ -32,9 +32,19 @@ iBle_attr_disc_t attr_disc_array[] =
 		.disc_type 	= IBLE_DISCOVER_CHRC,
 	},
 	{
+		.uuid16			= 0x2902,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_DESC,
+	},
+	{
 		.uuid16			= 0x2A09,
 		.uuid_type 	= UUID_16,
 		.disc_type 	= IBLE_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2902,
+		.uuid_type 	= UUID_16,
+		.disc_type 	= IBLE_DISCOVER_DESC,
 	},
 	{
 		.uuid16			= 0x2A0A,

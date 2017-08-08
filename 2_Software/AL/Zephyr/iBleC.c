@@ -106,38 +106,26 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi, u8_t advt
 	}
 }
 
-// static u8_t _on_desc_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
-// {
-// 	return -1;
-// }
-//
-// static u8_t _on_chrs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
-// {
-// 	return -1;
-// }
-//
-// static u8_t _on_svcs_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr)
-// {
-// 	return -1;
-// }
-
-static u8_t _discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
+static u8_t _on_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, struct bt_gatt_discover_params* params)
 {
 	int error;
 
 	if(params->type == BT_GATT_DISCOVER_PRIMARY && attr != NULL)
 	{
-		iPrint("Service discovered\n");
+		iPrint("Service discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		_attr_disc_array[_disc_ref].handle = attr->handle;
 		// _on_svcs_discovery();
 	}
 	else if(params->type == BT_GATT_DISCOVER_CHARACTERISTIC && attr != NULL)
 	{
-		iPrint("Characteristic discovered\n");
+		iPrint("Characteristic discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		_attr_disc_array[_disc_ref].handle = attr->handle;
 		// _on_chrs_discovery();
 	}
 	else if(params->type == BT_GATT_DISCOVER_DESCRIPTOR && attr != NULL)
 	{
-		iPrint("Descriptor discovered\n");
+		iPrint("Descriptor discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		_attr_disc_array[_disc_ref].handle = attr->handle;
 		// _on_desc_discovery();
 	}
 
@@ -178,17 +166,17 @@ static u8_t _discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr, st
 	// }
 	else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_DESC)
 	{
-		discover_params.start_handle 	= attr->handle + 2;
+		discover_params.start_handle 	= attr->handle + 1;
 	}
 
 	// Set the next attribute's type to discover
-	discover_params.func 					= _discovery;
+	discover_params.func 					= _on_discovery;
 	discover_params.type 					= _attr_disc_array[_disc_ref].disc_type;
 
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		return;
+		return BT_GATT_ITER_STOP;
 	}
 
 	return BT_GATT_ITER_STOP;
@@ -214,7 +202,7 @@ static void _start_discovery(struct bt_conn* conn)
 
 	discover_params.start_handle 	= 0x0001;
 	discover_params.end_handle 		= 0xffff;
-	discover_params.func 					= _discovery;
+	discover_params.func 					= _on_discovery;
 	discover_params.type 					= _attr_disc_array[_disc_ref].disc_type;
 
 	error = bt_gatt_discover(conn, &discover_params);
