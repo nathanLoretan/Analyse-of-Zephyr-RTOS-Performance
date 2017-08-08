@@ -113,20 +113,17 @@ static u8_t _on_discovery(struct bt_conn* conn, const struct bt_gatt_attr* attr,
 	if(params->type == BT_GATT_DISCOVER_PRIMARY && attr != NULL)
 	{
 		iPrint("Service discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
-		_attr_disc_array[_disc_ref].handle = attr->handle;
-		// _on_svcs_discovery();
+		link[gap_evt->conn_handle].handles[_disc_ref] = attr->handle;
 	}
 	else if(params->type == BT_GATT_DISCOVER_CHARACTERISTIC && attr != NULL)
 	{
 		iPrint("Characteristic discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
-		_attr_disc_array[_disc_ref].handle = attr->handle;
-		// _on_chrs_discovery();
+		link[gap_evt->conn_handle].handles[_disc_ref] = attr->handle;
 	}
 	else if(params->type == BT_GATT_DISCOVER_DESCRIPTOR && attr != NULL)
 	{
 		iPrint("Descriptor discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
-		_attr_disc_array[_disc_ref].handle = attr->handle;
-		// _on_desc_discovery();
+		link[gap_evt->conn_handle].handles[_disc_ref] = attr->handle;
 	}
 
 	_disc_ref++;

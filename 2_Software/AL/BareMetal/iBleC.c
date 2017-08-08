@@ -120,7 +120,7 @@ static void _on_discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBl
                                               disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.end_handle);
     handle_range.start_handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
     handle_range.end_handle   = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
-    _attr_disc_array[_disc_ref].handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
+    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
 	}
 	else if(disc_type == IBLE_DISCOVER_CHRC)
 	{
@@ -129,14 +129,14 @@ static void _on_discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBl
                                                       disc_rsp->chrc_disc_rsp->chars[0].handle_value);
     handle_range.start_handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
     handle_range.end_handle   = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
-    _attr_disc_array[_disc_ref].handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
+    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
 	}
 	else if(disc_type == IBLE_DISCOVER_DESC)
 	{
 		iPrint("Descriptor discovered %x, %x\n", disc_rsp->desc_disc_rsp->descs[0].uuid.uuid, disc_rsp->desc_disc_rsp->descs[0].handle);
     handle_range.start_handle = disc_rsp->desc_disc_rsp->descs[0].handle;
     handle_range.end_handle   = disc_rsp->desc_disc_rsp->descs[0].handle;
-    _attr_disc_array[_disc_ref].handle = disc_rsp->desc_disc_rsp->descs[0].handle;
+    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->desc_disc_rsp->descs[0].handle;
 	}
 
 	_disc_ref++;
@@ -215,6 +215,10 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
       ble_gap_conn_params_t const* conn_params  = &gap_evt->params.connected.conn_params;
 
+      link[gap_evt->conn_handle].conn_ref = gap_evt->conn_handle;
+      link[gap_evt->conn_handle].handles  = (uint16_t*) malloc(sizeof(uint16_t*) * _nbr_disc_attrs);
+      link[gap_evt->conn_handle].handler  = (iBleC_handler_t*) malloc(sizeof(iBleC_handler_t*) * _nbr_disc_attrs);;
+
       _start_discovery(gap_evt->conn_handle);
 
       iPrint("\n-> Peripheral %d connected\n", gap_evt->conn_handle);
@@ -234,22 +238,9 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       // For readibility.
       uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
 
-    //   for(int i = 0; i < link[conn_handle].nbr_svcs; i++) {
-    //  {
-    //    iPrint("Service discovered\n");
-    //    // _on_svcs_discovery();
-    //  }
-    //  else if(type == IBLE_DISCOVER_CHRC)
-    //  {
-    //    iPrint("Characteristic discovered\n");
-    //    // _on_chrs_discovery();
-    //  }
-    //  else if(type == IBLE_DISCOVER_DESC)
-    //     free(link[conn_handle].svcs[i].chrcs);
-    //   }
-    //   free(link[conn_handle].svcs);
-     //
-    //   link[conn_handle].conn_ref = BLE_CONN_HANDLE_INVALID;
+      free(link[gap_evt->conn_handle].handles);
+      free(link[gap_evt->conn_handle].handler);
+      link[gap_evt->conn_handle].conn_ref = BLE_CONN_HANDLE_INVALID;
 
 			iPrint("-> Peripheral %d disconnected\n", conn_handle);
       iBleC_scan_start(NULL);
