@@ -24,57 +24,57 @@ DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAV
 // 	{
 // 		.uuid16			= 0x1805,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_SVC,
+// 		.type 	= IBLEP_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A08,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2902,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_DESC,
+// 		.type 	= IBLEP_DISCOVER_DESC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A09,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2902,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_DESC,
+// 		.type 	= IBLEP_DISCOVER_DESC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A0A,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x180D,
 // 		.uuid_type 	= UUID_16,
-// 		.type	= IBLE_DISCOVER_SVC,
+// 		.type	= IBLEP_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A21,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A37,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x180F,
 // 		.uuid_type 	= UUID_16,
-// 		.type	= IBLE_DISCOVER_SVC,
+// 		.type	= IBLEP_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A19,
 // 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLEP_DISCOVER_CHRC,
 // 	},
 // };
 

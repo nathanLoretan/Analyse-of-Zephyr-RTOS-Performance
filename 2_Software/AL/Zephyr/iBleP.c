@@ -1,6 +1,6 @@
 #if CONFIG_BLUETOOTH_PERIPHERAL
 
-#include "iBle.h"
+#include "iBleP.h"
 
 volatile static bool isConnected = false;
 static struct bt_conn* 									default_conn;
@@ -10,7 +10,7 @@ static struct bt_gatt_indicate_params 	ind_params;
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
 struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 
-ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
+ssize_t iBleP_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
                           void *buf, u16_t buf_length, u16_t offset)
 {
   BLE_READ();
@@ -18,7 +18,7 @@ ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr 
 }
 
 
-static void iBle_mtu_request(struct bt_conn* conn, u8_t err,
+static void iBleP_mtu_request(struct bt_conn* conn, u8_t err,
                              struct bt_gatt_exchange_params* params)
 {
   iPrint("\n-> MTU Parameters Update\n");
@@ -27,10 +27,10 @@ static void iBle_mtu_request(struct bt_conn* conn, u8_t err,
 }
 
 static struct bt_gatt_exchange_params mtu_req = {
-  .func = iBle_mtu_request,
+  .func = iBleP_mtu_request,
 };
 
-static void iBle_connected(struct bt_conn *conn, u8_t error)
+static void iBleP_connected(struct bt_conn *conn, u8_t error)
 {
 	if (error) {
 		iPrint("-> Connection failed: %u\n", error);
@@ -63,7 +63,7 @@ static void iBle_connected(struct bt_conn *conn, u8_t error)
 	}
 }
 
-static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
+static void iBleP_disconnected(struct bt_conn *conn, u8_t reason)
 {
   if(default_conn)
   {
@@ -76,7 +76,7 @@ static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
-static void iBle_conn_parameters_update(struct bt_conn *conn,
+static void iBleP_conn_parameters_update(struct bt_conn *conn,
                                         u16_t interval, u16_t latency,
                                         u16_t timeout)
 {
@@ -89,12 +89,12 @@ static void iBle_conn_parameters_update(struct bt_conn *conn,
 
 static struct bt_conn_cb connection_callback =
 {
-	.connected 		    = iBle_connected,
-	.disconnected     = iBle_disconnected,
-  .le_param_updated = iBle_conn_parameters_update,
+	.connected 		    = iBleP_connected,
+	.disconnected     = iBleP_disconnected,
+  .le_param_updated = iBleP_conn_parameters_update,
 };
 
-int iBle_init()
+int iBleP_init()
 {
 	int error;
 
@@ -116,7 +116,7 @@ int iBle_init()
 	return 0;
 }
 
-volatile bool iBle_isConnected()
+volatile bool iBleP_isConnected()
 {
 	return isConnected;
 }
@@ -129,8 +129,8 @@ static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
 
 K_TIMER_DEFINE(adv_timeout_timer, on_advertise_timeout, NULL);
 
-int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
-                    iBle_advdata_t* scanrsp, size_t scanrsp_size)
+int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
+                    iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
 	struct bt_le_adv_param* adv_params;
@@ -149,7 +149,7 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
 	}
 
 	// Define timeout to stop advertising, no timeout if 0
-	if(ADV_TIMEOUT != IBLE_ADV_TIMEOUT_NONE) {
+	if(ADV_TIMEOUT != IBLEP_ADV_TIMEOUT_NONE) {
 		k_timer_start(&adv_timeout_timer, K_MSEC(ADV_TIMEOUT), 0);
 	}
 
@@ -157,7 +157,7 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
 	return 0;
 }
 
-static size_t iBle_get_nbr_attrs(iBle_svc_config_t* svc_config, size_t nbr_chrcs)
+static size_t iBleP_get_nbr_attrs(iBleP_svc_config_t* svc_config, size_t nbr_chrcs)
 {
   size_t nbr_attrs = 1; // Add the service uuid attribute
 
@@ -176,11 +176,11 @@ static size_t iBle_get_nbr_attrs(iBle_svc_config_t* svc_config, size_t nbr_chrcs
 	return nbr_attrs;
 }
 
-int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs)
+int iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_chrcs)
 {
 	int error;
 
-  size_t nbr_attrs = iBle_get_nbr_attrs(svc_config, nbr_chrcs);
+  size_t nbr_attrs = iBleP_get_nbr_attrs(svc_config, nbr_chrcs);
 
 	// Store the attributes within the service
 	*svc = (struct bt_gatt_service) {.attrs = svc_config, .attr_count = nbr_attrs};
@@ -198,7 +198,7 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 	return 0;
 }
 
-struct bt_gatt_attr* iBle_get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr)
+struct bt_gatt_attr* iBleP_get_chrc_handle(iBleP_svc_t* svc, uint8_t chrc_nbr)
 {
 	uint8_t attr_nbr = 0;
 
@@ -223,14 +223,14 @@ struct bt_gatt_attr* iBle_get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr)
 	return &svc->attrs[attr_nbr];
 }
 
-int	iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
+int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
   int error;
 
   BLE_ERROR(0);
 
   BLE_NOTIFY(1);
-  error = bt_gatt_notify(NULL, iBle_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
+  error = bt_gatt_notify(NULL, iBleP_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
   BLE_NOTIFY(0);
 
   if(error) {
@@ -246,14 +246,14 @@ static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *a
 	k_mutex_unlock(&indicate_mutex);
 }
 
-int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
+int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
   int error;
 
 	// Avoid to rewrite the indication parameters
 	k_mutex_lock(&indicate_mutex, K_FOREVER);
 
-	ind_params.attr = iBle_get_chrc_handle(svc, chrc_nbr);
+	ind_params.attr = iBleP_get_chrc_handle(svc, chrc_nbr);
 	ind_params.func = on_indicate_event;
 	ind_params.data = buf;
 	ind_params.len 	= buf_length;

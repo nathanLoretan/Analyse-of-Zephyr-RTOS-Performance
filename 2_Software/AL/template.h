@@ -180,95 +180,95 @@ void iI2C_write(iI2c_t* i2c, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg,
 // chrc = characteristic
 // attr = attribute
 // svc = service
-#define IBLE_DEVICE_NAME										xxx
+#define IBLEP_DEVICE_NAME										xxx
 
-#define IBLE_FLAGS_LIMITED 									xxx
-#define IBLE_FLAGS_GENERAL									xxx
-#define IBLE_FLAGS_NO_BREDR									xxx
+#define IBLEP_FLAGS_LIMITED 									xxx
+#define IBLEP_FLAGS_GENERAL									xxx
+#define IBLEP_FLAGS_NO_BREDR									xxx
 
-#define IBLE_DATA_FLAGS                   	xxx
-#define IBLE_DATA_UUID16_SOME             	xxx
-#define IBLE_DATA_UUID16_ALL              	xxx
-#define IBLE_DATA_UUID32_SOME             	xxx
-#define IBLE_DATA_UUID32_ALL              	xxx
-#define IBLE_DATA_UUID128_SOME            	xxx
-#define IBLE_DATA_UUID128_ALL             	xxx
-#define IBLE_DATA_NAME_SHORTENED          	xxx
-#define IBLE_DATA_NAME_COMPLETE           	xxx
-#define IBLE_DATA_TX_POWER                	xxx
-#define IBLE_DATA_SOLICIT128              	xxx
-#define IBLE_DATA_SVC_DATA16              	xxx
-#define IBLE_DATA_SOLICIT16               	xxx
-#define IBLE_DATA_GAP_APPEARANCE          	xxx
-#define IBLE_DATA_SOLICIT32               	xxx
-#define IBLE_DATA_SVC_DATA32              	xxx
-#define IBLE_DATA_SVC_DATA128             	xxx
-#define IBLE_DATA_MANUFACTURER_DATA 				xxx
+#define IBLEP_DATA_FLAGS                   	xxx
+#define IBLEP_DATA_UUID16_SOME             	xxx
+#define IBLEP_DATA_UUID16_ALL              	xxx
+#define IBLEP_DATA_UUID32_SOME             	xxx
+#define IBLEP_DATA_UUID32_ALL              	xxx
+#define IBLEP_DATA_UUID128_SOME            	xxx
+#define IBLEP_DATA_UUID128_ALL             	xxx
+#define IBLEP_DATA_NAME_SHORTENED          	xxx
+#define IBLEP_DATA_NAME_COMPLETE           	xxx
+#define IBLEP_DATA_TX_POWER                	xxx
+#define IBLEP_DATA_SOLICIT128              	xxx
+#define IBLEP_DATA_SVC_DATA16              	xxx
+#define IBLEP_DATA_SOLICIT16               	xxx
+#define IBLEP_DATA_GAP_APPEARANCE          	xxx
+#define IBLEP_DATA_SOLICIT32               	xxx
+#define IBLEP_DATA_SVC_DATA32              	xxx
+#define IBLEP_DATA_SVC_DATA128             	xxx
+#define IBLEP_DATA_MANUFACTURER_DATA 				xxx
 
-#define IBLE_GAP_ADV_FAST_INT_MIN_1					xxx
-#define IBLE_GAP_ADV_FAST_INT_MAX_1					xxx
-#define IBLE_GAP_ADV_FAST_INT_MIN_2					xxx
-#define IBLE_GAP_ADV_FAST_INT_MAX_2					xxx
-#define IBLE_GAP_ADV_SLOW_INT_MIN						xxx
-#define IBLE_GAP_ADV_SLOW_INT_MAX						xxx
+#define IBLEP_GAP_ADV_FAST_INT_MIN_1					xxx
+#define IBLEP_GAP_ADV_FAST_INT_MAX_1					xxx
+#define IBLEP_GAP_ADV_FAST_INT_MIN_2					xxx
+#define IBLEP_GAP_ADV_FAST_INT_MAX_2					xxx
+#define IBLEP_GAP_ADV_SLOW_INT_MIN						xxx
+#define IBLEP_GAP_ADV_SLOW_INT_MAX						xxx
 
-#define IBLE_CHRC_PERM_BROADCAST 						xxx
-#define IBLE_CHRC_PERM_READ 								xxx
-#define IBLE_CHRC_PERM_WRITE_WITHOUT_RESP 	xxx
-#define IBLE_CHRC_PERM_WRITE 								xxx
-#define IBLE_CHRC_PERM_NOTIFY 							xxx
-#define IBLE_CHRC_PERM_INDICATE 						xxx
-#define IBLE_CHRC_PERM_AUTH 								xxx
-#define IBLE_CHRC_PERM_EXT_PROP 						xxx
+#define IBLEP_CHRC_PERM_BROADCAST 						xxx
+#define IBLEP_CHRC_PERM_READ 								xxx
+#define IBLEP_CHRC_PERM_WRITE_WITHOUT_RESP 	xxx
+#define IBLEP_CHRC_PERM_WRITE 								xxx
+#define IBLEP_CHRC_PERM_NOTIFY 							xxx
+#define IBLEP_CHRC_PERM_INDICATE 						xxx
+#define IBLEP_CHRC_PERM_AUTH 								xxx
+#define IBLEP_CHRC_PERM_EXT_PROP 						xxx
 
-#define IBLE_GATT_PERM_NONE									xxx
-#define IBLE_GATT_PERM_READ									xxx
-#define IBLE_GATT_PERM_WRITE								xxx
-#define IBLE_GATT_PERM_READ_ENCRYPT					xxx
-#define IBLE_GATT_PERM_WRITE_ENCRYPT				xxx
-#define	IBLE_GATT_PERM_READ_AUTHEN					xxx
-#define IBLE_GATT_PERM_WRITE_AUTHEN					xxx
-#define IBLE_GATT_PERM_PREPARE_WRITE				xxx
+#define IBLEP_GATT_PERM_NONE									xxx
+#define IBLEP_GATT_PERM_READ									xxx
+#define IBLEP_GATT_PERM_WRITE								xxx
+#define IBLEP_GATT_PERM_READ_ENCRYPT					xxx
+#define IBLEP_GATT_PERM_WRITE_ENCRYPT				xxx
+#define	IBLEP_GATT_PERM_READ_AUTHEN					xxx
+#define IBLEP_GATT_PERM_WRITE_AUTHEN					xxx
+#define IBLEP_GATT_PERM_PREPARE_WRITE				xxx
 
-#define IBLE_ADV_NO_TIMEOUT									xxx
+#define IBLEP_ADV_NO_TIMEOUT									xxx
 
 typedef enum {
-	IBLE_ADV_MODE_FAST,
-	IBLE_ADV_MODE_SLOW
-} iBle_adv_mode_t;
+	IBLEP_ADV_MODE_FAST,
+	IBLEP_ADV_MODE_SLOW
+} iBleP_adv_mode_t;
 
-typedef xxx iBle_adv_mode_t;
-typedef xxx iBle_uuid_t;
-typedef xxx iBle_adv_config_t;
-typedef xxx iBle_advdata_t;
-typedef xxx iBle_chrc_config_t;
-typedef xxx iBle_attr_config_t;
-typedef xxx iBle_chrc_t;
-typedef xxx	iBle_svc_config_t;
-typedef xxx	iBle_svc_t;
-typedef xxx iBle_chrc_handle_t;
+typedef xxx iBleP_adv_mode_t;
+typedef xxx iBleP_uuid_t;
+typedef xxx iBleP_adv_config_t;
+typedef xxx iBleP_advdata_t;
+typedef xxx iBleP_chrc_config_t;
+typedef xxx iBleP_attr_config_t;
+typedef xxx iBleP_chrc_t;
+typedef xxx	iBleP_svc_config_t;
+typedef xxx	iBleP_svc_t;
+typedef xxx iBleP_chrc_handle_t;
 
-#define IBLE_ADV_ADD_DATA(_type, _data...)	 						xxx
-#define IBLE_ADV_ADD_TEXT(_type, _data...)							xxx
-#define DEFINE_IBLE_ADV_DATA(var)												xxx
-#define DEFINE_IBLE_UUID16(_uuid)												xxx
-#define DEFINE_IBLE_UUID128(_uuid, _base...)						xxx
-#define DEFINE_IBLE_SVC_CONFIG(_svc)										xxx
-#define DEFINE_IBLE_CHRCS(...)													xxx
-#define DEFINE_IBLE_CHRC(_chrc_cfg, _attr_cfg)					xxx
-#define DEFINE_IBLE_CHRC_NO_CCCD(_chrc_cfg, _attr_cfg)	xxx
-#define IBLE_SVC_UUID(_uuid) 														xxx
-#define IBLE_CHRC_CONFIG(_uuid, _perm)									xxx
-#define IBLE_ATTR_CONFIG(_uuid, _perm, _p_data)					xxx
+#define IBLEP_ADV_ADD_DATA(_type, _data...)	 						xxx
+#define IBLEP_ADV_ADD_TEXT(_type, _data...)							xxx
+#define DEFINE_IBLEP_ADV_DATA(var)												xxx
+#define DEFINE_IBLEP_UUID16(_uuid)												xxx
+#define DEFINE_IBLEP_UUID128(_uuid, _base...)						xxx
+#define DEFINE_IBLEP_SVC_CONFIG(_svc)										xxx
+#define DEFINE_IBLEP_CHRCS(...)													xxx
+#define DEFINE_IBLEP_CHRC(_chrc_cfg, _attr_cfg)					xxx
+#define DEFINE_IBLEP_CHRC_NO_CCCD(_chrc_cfg, _attr_cfg)	xxx
+#define IBLEP_SVC_UUID(_uuid) 														xxx
+#define IBLEP_CHRC_CONFIG(_uuid, _perm)									xxx
+#define IBLEP_ATTR_CONFIG(_uuid, _perm, _p_data)					xxx
 
 
-int  iBle_init();
+int  iBleP_init();
 void ble_sleep();
-bool iBle_isConnected();
-int  iBle_adv_start(iBle_adv_config_t* adv_config, iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size);
-int  iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_attrs, size_t nbr_chrcs);
-int  iBle_notify(iBle_chrc_handle_t* chrc_handle, uint8_t* buf, size_t buf_length);
-int  iBle_indication(iBle_chrc_handle_t* chrc_handle, uint8_t* buf, size_t buf_length);
-iBle_chrc_handle_t get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr);
+bool iBleP_isConnected();
+int  iBleP_adv_start(iBleP_adv_config_t* adv_config, iBleP_advdata_t* advdata, size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
+int  iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_attrs, size_t nbr_chrcs);
+int  iBleP_notify(iBleP_chrc_handle_t* chrc_handle, uint8_t* buf, size_t buf_length);
+int  iBleP_indication(iBleP_chrc_handle_t* chrc_handle, uint8_t* buf, size_t buf_length);
+iBleP_chrc_handle_t get_chrc_handle(iBleP_svc_t* svc, uint8_t chrc_nbr);
 
 #endif	// __NRF5X_INTERFACE_H__

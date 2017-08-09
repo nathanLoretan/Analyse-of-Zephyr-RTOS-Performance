@@ -48,7 +48,7 @@
 // Unit [ms]
 #define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
 #define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s
-#define ADV_TIMEOUT            IBLE_ADV_TIMEOUT_NONE      // [ms]
+#define ADV_TIMEOUT            IBLEP_ADV_TIMEOUT_NONE      // [ms]
 
 // Sensors Configuration--------------------------------------------------------
 #define ADC_DATA_RATE         ADC_DATA_RATE_7

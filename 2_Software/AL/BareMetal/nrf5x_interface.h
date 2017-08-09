@@ -14,7 +14,7 @@
 #include "iThread.h"
 #include "iBle_uuid.h"
 #include "iEventQueue.h"
-#include "iBle.h"
+#include "iBleP.h"
 #include "iBleC.h"
 
 // Nordic headers

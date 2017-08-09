@@ -87,7 +87,7 @@ static void _on_device_found(ble_evt_t const* ble_evt)
 	char complete_local_name_str[complete_local_name.size+1];
 	memset(complete_local_name_str, 0, complete_local_name.size+1);
 	memcpy(complete_local_name_str, complete_local_name.p_data, complete_local_name.size);
-  // iPrint("-> Device found %s, %d, %d\n", (char*) complete_local_name_str, complete_local_name.size, sizeof(IBLE_PERIPHERAL_NAME));
+  // iPrint("-> Device found %s, %d, %d\n", (char*) complete_local_name_str, complete_local_name.size, sizeof(IBLEP_PERIPHERAL_NAME));
 
   // Control the size of the peripheral's name, the \0 is not include in the device's name
   if(complete_local_name.size != sizeof(IBLE_PERIPHERAL_NAME)-1) {

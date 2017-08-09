@@ -128,13 +128,6 @@ typedef struct iBleC_write_params_t			iBleC_write_params_t;
 typedef struct iBleC_notify_params_t 		iBleC_notify_params_t;
 typedef struct iBleC_indicate_params_t 	iBleC_indicate_params_t;
 
-// typedef union {
-// 	iBleC_read_params_t				read_params;
-// 	iBleC_write_params_t			write_params;
-// 	iBleC_notify_params_t			notify_params;
-// 	iBleC_indicate_params_t		indicate_params;
-// } iBleC_params_t;
-
 typedef struct {
 	uint16_t					uuid16;
 	iBleC_attr_type_t type;

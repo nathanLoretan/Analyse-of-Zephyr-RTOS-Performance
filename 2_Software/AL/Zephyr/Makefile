@@ -1,5 +1,5 @@
 # Used with Zephyr
-obj-y += iBle.o
+obj-y += iBleP.o
 obj-y += iBleC.o
 obj-y += iSpi.o
 obj-y += iI2c.o

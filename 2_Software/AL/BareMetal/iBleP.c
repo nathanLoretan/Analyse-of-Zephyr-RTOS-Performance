@@ -1,4 +1,4 @@
-#include "iBle.h"
+#include "iBleP.h"
 
 // The default address set is BLE_GAP_ADDR_TYPE_RANDOM_STATIC
 
@@ -32,13 +32,13 @@ static nrf_ble_gatt_t gatt_module;
 // iTimer element only used by the system
 extern void iTimer_init();
 
-typedef struct iBle_writeHandler_list {
-	iBle_attr_config_t*							attr;
+typedef struct iBleP_writeHandler_list {
+	iBleP_attr_config_t*							attr;
 	uint16_t 												attr_handle;
-	struct iBle_writeHandler_list* 	next;
-}	iBle_writeHandler_list_t;
+	struct iBleP_writeHandler_list* 	next;
+}	iBleP_writeHandler_list_t;
 
-static iBle_writeHandler_list_t* writeHandler_list = NULL;
+static iBleP_writeHandler_list_t* writeHandler_list = NULL;
 
 // Event handlers
 static void on_ble_evt(ble_evt_t* ble_evt)
@@ -132,7 +132,7 @@ static void on_ble_svc_evt(ble_evt_t* ble_evt)
 	switch (ble_evt->header.evt_id)
 	{
 		case BLE_GATTS_EVT_WRITE:		{
-																	iBle_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+																	iBleP_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
 																	void *buf					= (void*) ble_evt->evt.gatts_evt.params.write.data;
 																	size_t offset			= ble_evt->evt.gatts_evt.params.write.offset;
 																	uint16_t handle		= ble_evt->evt.gatts_evt.params.write.handle;
@@ -210,7 +210,7 @@ static void sys_evt_dispatch(uint32_t sys_evt)
 	ble_advertising_on_sys_evt(sys_evt);
 }
 
-int iBle_init()
+int iBleP_init()
 {
 	int error;
 	connection = BLE_CONN_HANDLE_INVALID;
@@ -307,7 +307,7 @@ int iBle_init()
 
 	// Set security mode  to require no protection, open link.
 	BLE_GAP_CONN_SEC_MODE_SET_OPEN(&security_mode);
-	error = sd_ble_gap_device_name_set(&security_mode, (const uint8_t*) IBLE_DEVICE_NAME, (sizeof(IBLE_DEVICE_NAME) - 1));
+	error = sd_ble_gap_device_name_set(&security_mode, (const uint8_t*) IBLEP_DEVICE_NAME, (sizeof(IBLEP_DEVICE_NAME) - 1));
 	if(error) {
 		iPrint("/!\\ fail to set security mode: error %d\n", error);
 		return error;
@@ -400,15 +400,15 @@ int iBle_init()
 	return 0;
 }
 
-volatile bool iBle_isConnected()
+volatile bool iBleP_isConnected()
 {
 	return isConnected;
 }
 
 // https://devzone.nordicsemi.com/blogs/782/bluetooth-smart-and-the-nordics-softdevices-part-1/
 // https://devzone.nordicsemi.com/question/110308/i-want-to-change-the-ble-address/
-int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
-									 iBle_advdata_t* scanrsp, size_t scanrsp_size)
+int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
+									 iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
 
@@ -468,19 +468,19 @@ int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
 	return 0;
 }
 
-static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t chrc_nbr)
+static uint32_t iBleP_svc_char_add(iBleP_svc_t* svc, iBleP_chrc_t* chrc, uint8_t chrc_nbr)
 {
 	int error;
 
 	// Add read/write properties to the characteristic
 	ble_gatts_char_md_t chrc_md = {0};
-	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLE_CHRC_PERM_BROADCAST) 					? 1 : 0;
-	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_READ) 								? 1 : 0;
-	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE_WITHOUT_RESP) 	? 1 : 0;
-	chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)						 		? 1 : 0;
-	chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLE_CHRC_PERM_AUTH) 								? 1 : 0;
-	chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_NOTIFY) 							? 1 : 0;
-	chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLE_CHRC_PERM_INDICATE) 						? 1 : 0;
+	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_BROADCAST) 					? 1 : 0;
+	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_READ) 								? 1 : 0;
+	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE_WITHOUT_RESP) 	? 1 : 0;
+	chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE)						 		? 1 : 0;
+	chrc_md.char_props.auth_signed_wr = (chrc->chrc_config.perm & IBLEP_CHRC_PERM_AUTH) 								? 1 : 0;
+	chrc_md.char_props.notify 				= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_NOTIFY) 							? 1 : 0;
+	chrc_md.char_props.indicate				= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_INDICATE) 						? 1 : 0;
 
 	// Configuring Client Characteristic Configuration Descriptor metadata and add to char_md structure
 	ble_gatts_attr_md_t cccd_md = {0};
@@ -494,10 +494,10 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	attr_md.vloc = BLE_GATTS_VLOC_USER;
 	attr_md.vlen = 1;
 
-	if((chrc->attr_config.perm & IBLE_GATT_PERM_READ)) {
+	if((chrc->attr_config.perm & IBLEP_GATT_PERM_READ)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.read_perm);
 	}
-	if((chrc->attr_config.perm & IBLE_GATT_PERM_WRITE)) {
+	if((chrc->attr_config.perm & IBLEP_GATT_PERM_WRITE)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&attr_md.write_perm);
 	}
 
@@ -527,9 +527,9 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	}
 
 	// Store where to notify a write request
-	if(chrc->chrc_config.perm & IBLE_CHRC_PERM_WRITE)
+	if(chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE)
 	{
-		iBle_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+		iBleP_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
 
 		// Search the last element of the list
 		while(*nextWriteHandler != NULL)  {
@@ -537,7 +537,7 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 		}
 
 		// Add a new element in the list
-		*nextWriteHandler =	(iBle_writeHandler_list_t*) malloc(sizeof(iBle_writeHandler_list_t));
+		*nextWriteHandler =	(iBleP_writeHandler_list_t*) malloc(sizeof(iBleP_writeHandler_list_t));
 		(*nextWriteHandler)->attr 					= &chrc->attr_config;
 		(*nextWriteHandler)->attr_handle  	= svc->chrcs_handle[chrc_nbr].value_handle;
 		(*nextWriteHandler)->next 	  			= NULL;
@@ -546,7 +546,7 @@ static uint32_t iBle_svc_char_add(iBle_svc_t* svc, iBle_chrc_t* chrc, uint8_t ch
 	return 0;
 }
 
-int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chrcs)
+int iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_chrcs)
 {
 	int error;
 
@@ -571,7 +571,7 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 
 	svc->chrcs_handle = (ble_gatts_char_handles_t*) malloc(nbr_chrcs * sizeof(ble_gatts_char_handles_t));
 	for(int i = 0; i < nbr_chrcs; i++) {
-		 error = iBle_svc_char_add(svc, &svc_config->chrcs[i], i);
+		 error = iBleP_svc_char_add(svc, &svc_config->chrcs[i], i);
 		 if(error) {
 			 return error;
 		 }
@@ -581,17 +581,17 @@ int iBle_svc_init(iBle_svc_t* svc, iBle_svc_config_t* svc_config, size_t nbr_chr
 	return 0;
 }
 
-static uint16_t iBle_get_chrc_handle(iBle_svc_t* svc, uint8_t chrc_nbr)
+static uint16_t iBleP_get_chrc_handle(iBleP_svc_t* svc, uint8_t chrc_nbr)
 {
 	return svc->chrcs_handle[chrc_nbr-1].value_handle;
 }
 
-int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
+int iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
 	int error;
 	ble_gatts_hvx_params_t hvx_params = {0};
 
-	hvx_params.handle = iBle_get_chrc_handle(svc, chrc_nbr);
+	hvx_params.handle = iBleP_get_chrc_handle(svc, chrc_nbr);
 	hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
 	hvx_params.offset = 0;
 	hvx_params.p_len  = (uint16_t*) &buf_length;
@@ -610,12 +610,12 @@ int iBle_svc_notify(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_
 	return error;
 }
 
-int iBle_svc_indication(iBle_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
+int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
 	int error;
 	ble_gatts_hvx_params_t hvx_params = {0};
 
-	hvx_params.handle = iBle_get_chrc_handle(svc, chrc_nbr);
+	hvx_params.handle = iBleP_get_chrc_handle(svc, chrc_nbr);
 	hvx_params.type   = BLE_GATT_HVX_INDICATION;
 	hvx_params.offset = 0;
 	hvx_params.p_len  = (uint16_t*) &buf_length;

@@ -39,8 +39,8 @@ do {                                                                            
 #define EXT_INT_LATENCY_PORT    NRF_P1
 #define EXT_INT_LATENCY()       DEBUG_PIN_TOGGLE(EXT_INT_LATENCY_PIN, EXT_INT_LATENCY_PORT)
 
-//  -> iBle_svc_indication()
-//  -> iBle_svc_notify()
+//  -> iBleP_svc_indication()
+//  -> iBleP_svc_notify()
 #define BLE_ERROR_PIN           28
 #define BLE_ERROR_PORT          NRF_P0
 #define BLE_ERROR(_flag)        DEBUG_PIN_SET(BLE_ERROR_PIN, BLE_ERROR_PORT, _flag)
@@ -52,7 +52,7 @@ do {                                                                            
 #define BLE_CONN_EVT_PORT       NRF_P0
 #define BLE_CONN_EVT(_flag)     DEBUG_PIN_SET(BLE_CONN_EVT_PIN, BLE_CONN_EVT_PORT, _flag)
 
-//  -> iBle_svc_indication()
+//  -> iBleP_svc_indication()
 #define BLE_INDICATE_PIN        15
 #define BLE_INDICATE_PORT       NRF_P0
 #define BLE_INDICATE(_flag)     DEBUG_PIN_SET(BLE_INDICATE_PIN, BLE_INDICATE_PORT, _flag)
@@ -63,18 +63,18 @@ do {                                                                            
 #define BLE_INDICATE_RSP_PORT   NRF_P0
 #define BLE_INDICATE_RSP()      DEBUG_PIN_TOGGLE(BLE_INDICATE_RSP_PIN, BLE_INDICATE_RSP_PORT)
 
-//  -> iBle_svc_notify()
+//  -> iBleP_svc_notify()
 #define BLE_NOTIFY_PIN          24
 #define BLE_NOTIFY_PORT         NRF_P0
 #define BLE_NOTIFY(_flag)       DEBUG_PIN_SET(BLE_NOTIFY_PIN, BLE_NOTIFY_PORT, _flag)
 
 // Zephyr:
-//  -> iBle_read_handler()
+//  -> iBleP_read_handler()
 #define BLE_READ_PIN            27
 #define BLE_READ_PORT           NRF_P0
 #define BLE_READ()              DEBUG_PIN_TOGGLE(BLE_READ_PIN, BLE_READ_PORT)
 
-//  -> iBle_write_handler_t
+//  -> iBleP_write_handler_t
 #define BLE_WRITE_PIN           26
 #define BLE_WRITE_PORT          NRF_P0
 #define BLE_WRITE()             DEBUG_PIN_TOGGLE(BLE_WRITE_PIN, BLE_WRITE_PORT)

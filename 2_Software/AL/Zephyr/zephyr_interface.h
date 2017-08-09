@@ -12,7 +12,7 @@
 #include "iTimer.h"
 #include "iThread.h"
 #include "iEventQueue.h"
-#include "iBle.h"
+#include "iBleP.h"
 #include "iBleC.h"
 
 #include <zephyr.h>
