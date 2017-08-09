@@ -14,9 +14,9 @@ static nrf_ble_gatt_t   gatt_module;
 
 static iBleC_conn_params_t* _conn_params;
 static iBleC_scan_params_t* _scan_params;
-static iBle_attr_disc_t* 		_attr_disc_array;
+static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_disc_ref;
-static uint8_t 							_nbr_disc_attrs;
+static uint8_t 							_nbr_handles;
 
 static ble_uuid_t uuid = {0};
 
@@ -27,7 +27,7 @@ typedef struct {
     ble_gattc_evt_char_disc_rsp_t const*        chrc_disc_rsp;
     ble_gattc_evt_desc_disc_rsp_t const*        desc_disc_rsp;
   };
-} iBle_disc_rsp_t;
+} iBleC_disc_rsp_t;
 
 static uint32_t _ad_parse(uint8_t type, uint8_array_t* p_advdata, uint8_array_t* p_typedata)
 {
@@ -109,63 +109,77 @@ static void _on_device_found(ble_evt_t const* ble_evt)
 
 ble_gattc_handle_range_t handle_range;
 
-static void _on_discovery( uint16_t conn_handle, iBle_disc_type_t disc_type, iBle_disc_rsp_t* disc_rsp)
+static void _on_discovery(uint16_t conn_handle, iBleC_attr_type_t type, iBleC_disc_rsp_t* disc_rsp)
 {
 	int error = 0;
 
-	if(disc_type == IBLE_DISCOVER_SVC)
+	if(type == IBLEC_DISCOVER_SVC)
 	{
 		iPrint("Service discovered %x, %x, %x\n", disc_rsp->prim_srvc_disc_rsp->services[0].uuid.uuid,
                                               disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle,
                                               disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.end_handle);
+
     handle_range.start_handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
     handle_range.end_handle   = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
-    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
+
+    uint16_t handle = disc_rsp->prim_srvc_disc_rsp->services[0].handle_range.start_handle;
+    link[conn_handle].attrs[handle].type    = IBLEC_DISCOVER_SVC;
+    link[conn_handle].attrs[handle].uuid16  = disc_rsp->prim_srvc_disc_rsp->services[0].uuid.uuid;
 	}
-	else if(disc_type == IBLE_DISCOVER_CHRC)
+	else if(type == IBLEC_DISCOVER_CHRC)
 	{
 		iPrint("Characteristic discovered %x, %x, %x\n",  disc_rsp->chrc_disc_rsp->chars[0].uuid.uuid,
                                                       disc_rsp->chrc_disc_rsp->chars[0].handle_decl,
                                                       disc_rsp->chrc_disc_rsp->chars[0].handle_value);
+
     handle_range.start_handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
     handle_range.end_handle   = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
-    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
+
+    uint16_t handle = disc_rsp->chrc_disc_rsp->chars[0].handle_value;
+    link[conn_handle].attrs[handle].type   = IBLEC_DISCOVER_CHRC;
+    link[conn_handle].attrs[handle].uuid16 = disc_rsp->chrc_disc_rsp->chars[0].uuid.uuid;
 	}
-	else if(disc_type == IBLE_DISCOVER_DESC)
+	else if(type == IBLEC_DISCOVER_DESC)
 	{
-		iPrint("Descriptor discovered %x, %x\n", disc_rsp->desc_disc_rsp->descs[0].uuid.uuid, disc_rsp->desc_disc_rsp->descs[0].handle);
+		iPrint("Descriptor discovered %x, %x\n", disc_rsp->desc_disc_rsp->descs[0].uuid.uuid,
+                                             disc_rsp->desc_disc_rsp->descs[0].handle);
+
     handle_range.start_handle = disc_rsp->desc_disc_rsp->descs[0].handle;
     handle_range.end_handle   = disc_rsp->desc_disc_rsp->descs[0].handle;
-    link[gap_evt->conn_handle].handles[_disc_ref] = disc_rsp->desc_disc_rsp->descs[0].handle;
+
+    uint16_t handle = disc_rsp->desc_disc_rsp->descs[0].handle;
+    link[conn_handle].attrs[handle].type   = IBLEC_DISCOVER_DESC;
+    link[conn_handle].attrs[handle].uuid16 = disc_rsp->desc_disc_rsp->descs[0].uuid.uuid;
 	}
 
 	_disc_ref++;
-	if(_disc_ref >= _nbr_disc_attrs)
+	if(_disc_ref >= _nbr_handles)
 	{
+    link[conn_handle].isReady = true;
 		iPrint("Discovery finished\n");
 		return;
 	}
 
-  if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_SVC)
+  if(_attr_disc_list[_disc_ref].type == IBLEC_DISCOVER_SVC)
   {
-    if(_attr_disc_array[_disc_ref].uuid_type == UUID_128) {
-      memcpy(&uuid.uuid, &_attr_disc_array[_disc_ref].uuid128[12], 2);
+    if(_attr_disc_list[_disc_ref].uuid_type == UUID_128) {
+      memcpy(&uuid.uuid, &_attr_disc_list[_disc_ref].uuid128[12], 2);
     }
-    else if(_attr_disc_array[_disc_ref].uuid_type == UUID_16) {
-      uuid.uuid = _attr_disc_array[_disc_ref].uuid16;
+    else if(_attr_disc_list[_disc_ref].uuid_type == UUID_16) {
+      uuid.uuid = _attr_disc_list[_disc_ref].uuid16;
     }
-    uuid.type = _attr_disc_array[_disc_ref].uuid_type;
+    uuid.type = _attr_disc_list[_disc_ref].uuid_type;
 
     error = sd_ble_gattc_primary_services_discover(conn_handle, 0x0001, &uuid);
   }
-  else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_CHRC)
+  else if(_attr_disc_list[_disc_ref].type == IBLEC_DISCOVER_CHRC)
   {
     handle_range.start_handle++;
     handle_range.end_handle++;
     iPrint("chrcs Searched %x, %x\n", handle_range.start_handle, handle_range.end_handle);
     error = sd_ble_gattc_characteristics_discover(conn_handle, &handle_range);
   }
-  else if(_attr_disc_array[_disc_ref].disc_type == IBLE_DISCOVER_DESC)
+  else if(_attr_disc_list[_disc_ref].type == IBLEC_DISCOVER_DESC)
   {
     handle_range.start_handle++;
     handle_range.end_handle++;
@@ -186,19 +200,84 @@ static void _start_discovery(uint16_t conn_handle)
 	_disc_ref = 0;
 
   // Set the next attribute's uuid to discover
-  if(_attr_disc_array[_disc_ref].uuid_type == UUID_128) {
-    memcpy(&uuid.uuid, &_attr_disc_array[_disc_ref].uuid128[12], 2);
+  if(_attr_disc_list[_disc_ref].uuid_type == UUID_128) {
+    memcpy(&uuid.uuid, &_attr_disc_list[_disc_ref].uuid128[12], 2);
   }
-  else if(_attr_disc_array[_disc_ref].uuid_type == UUID_16) {
-    uuid.uuid = _attr_disc_array[_disc_ref].uuid16;
+  else if(_attr_disc_list[_disc_ref].uuid_type == UUID_16) {
+    uuid.uuid = _attr_disc_list[_disc_ref].uuid16;
   }
-  uuid.type = _attr_disc_array[_disc_ref].uuid_type;
+  uuid.type = _attr_disc_list[_disc_ref].uuid_type;
 
   error = sd_ble_gattc_primary_services_discover(conn_handle, 0x0001, &uuid);
   if(error) {
     iPrint("/!\\ Start Discovery failed : error %d\n", error);
     return;
   }
+}
+
+static void _on_read_rsp(uint16_t conn_handle, ble_gattc_evt_read_rsp_t const* read_rsp)
+{
+	uint16_t handle = read_rsp->handle;
+
+	link[conn_handle].params[handle].read_params.data = read_rsp->data;
+	link[conn_handle].params[handle].read_params.length = read_rsp->len;
+	link[conn_handle].params[handle].read_params.handler(conn_handle, &link[conn_handle].params[handle].read_params);
+}
+
+static void _on_write_rsp(uint16_t conn_handle, ble_gattc_evt_write_rsp_t const* write_rsp)
+{
+	uint16_t handle = write_rsp->handle;
+
+	// link[conn_handle].params[handle].write_params.data    = write_rsp->data;
+	// link[conn_handle].params[handle].write_params.length  = write_rsp->len;
+	link[conn_handle].params[handle].write_params.handler(conn_handle, &link[conn_handle].params[handle].write_params);
+}
+
+static void _on_notify_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
+{
+  uint16_t handle = hvx->handle;
+
+	link[conn_handle].params[handle].notify_params.data 		= hvx->data;
+	link[conn_handle].params[handle].notify_params.length 	= hvx->len;
+	link[conn_handle].params[handle].notify_params.handler(conn_handle, &link[conn_handle].params[handle].notify_params);
+}
+
+static void _on_indicate_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
+{
+  uint16_t handle = hvx->handle;
+
+	link[conn_handle].params[handle].indicate_params.data 		= hvx->data;
+	link[conn_handle].params[handle].indicate_params.length 	= hvx->len;
+	link[conn_handle].params[handle].indicate_params.handler(conn_handle, &link[conn_handle].params[handle].indicate_params);
+}
+
+static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t const* conn_params)
+{
+  link[gap_evt->conn_handle].conn_ref = gap_evt->conn_handle;
+  link[gap_evt->conn_handle].isReady  = false;
+  link[gap_evt->conn_handle].attrs    = (iBleC_attr_t*) malloc(sizeof(iBleC_attr_t*) * _nbr_handles);
+
+  _start_discovery(gap_evt->conn_handle);
+
+  iPrint("\n-> Peripheral %d connected\n", gap_evt->conn_handle);
+  iPrint("--------------------------\n");
+  iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
+  iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
+
+  // The central stop scanning when it connects to a device
+  iBleC_scan_start(NULL);
+}
+
+static void _on_disconnection(uint16_t conn_handle)
+{
+  free(link[conn_handle].attrs);
+  link[conn_handle].isReady  = false;
+  link[conn_handle].conn_ref = BLE_CONN_HANDLE_INVALID;
+
+  iPrint("-> Peripheral %d disconnected\n", conn_handle);
+  iBleC_scan_start(NULL);
 }
 
 static void _on_ble_evt(ble_evt_t const* ble_evt)
@@ -213,24 +292,9 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
     {
       // For readibility.
       ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
-      ble_gap_conn_params_t const* conn_params  = &gap_evt->params.connected.conn_params;
+      ble_gap_conn_params_t  const* conn_params  = &gap_evt->params.connected.conn_params;
 
-      link[gap_evt->conn_handle].conn_ref = gap_evt->conn_handle;
-      link[gap_evt->conn_handle].handles  = (uint16_t*) malloc(sizeof(uint16_t*) * _nbr_disc_attrs);
-      link[gap_evt->conn_handle].handler  = (iBleC_handler_t*) malloc(sizeof(iBleC_handler_t*) * _nbr_disc_attrs);;
-
-      _start_discovery(gap_evt->conn_handle);
-
-      iPrint("\n-> Peripheral %d connected\n", gap_evt->conn_handle);
-			iPrint("--------------------------\n");
-	    iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
-			iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
-	    iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
-	    iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
-
-      // The central stop scanning when it connects to a device
-      iBleC_scan_start(NULL);
-
+      _on_connection(gap_evt, conn_params);
 		} break;
 
 		case BLE_GAP_EVT_DISCONNECTED:
@@ -238,13 +302,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       // For readibility.
       uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
 
-      free(link[gap_evt->conn_handle].handles);
-      free(link[gap_evt->conn_handle].handler);
-      link[gap_evt->conn_handle].conn_ref = BLE_CONN_HANDLE_INVALID;
-
-			iPrint("-> Peripheral %d disconnected\n", conn_handle);
-      iBleC_scan_start(NULL);
-
+      _on_disconnection(conn_handle);
 		} break;
 
 		case BLE_GAP_EVT_ADV_REPORT: _on_device_found(ble_evt);
@@ -303,36 +361,67 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
     {
       // For readibility.
       uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      // ble_gattc_evt_prim_srvc_disc_rsp_t const* prim_srvc_disc_rsp = &ble_evt->evt.gattc_evt.params.prim_srvc_disc_rsp;
-
-      iBle_disc_rsp_t disc_rsp = {
+      iBleC_disc_rsp_t disc_rsp = {
         .prim_srvc_disc_rsp = &ble_evt->evt.gattc_evt.params.prim_srvc_disc_rsp,
       };
-      _on_discovery(conn_handle, IBLE_DISCOVER_SVC, &disc_rsp);
+
+      _on_discovery(conn_handle, IBLEC_DISCOVER_SVC, &disc_rsp);
     } break;
 
     case BLE_GATTC_EVT_CHAR_DISC_RSP:
     {
       // For readibility.
       uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      // ble_gattc_evt_char_disc_rsp_t const* chrc_disc_rsp = &ble_evt->evt.gattc_evt.params.char_disc_rsp;
-
-      iBle_disc_rsp_t disc_rsp = {
+      iBleC_disc_rsp_t disc_rsp = {
         .chrc_disc_rsp = &ble_evt->evt.gattc_evt.params.char_disc_rsp,
       };
-      _on_discovery(conn_handle, IBLE_DISCOVER_CHRC, &disc_rsp);
+
+      _on_discovery(conn_handle, IBLEC_DISCOVER_CHRC, &disc_rsp);
 		} break;
 
     case BLE_GATTC_EVT_DESC_DISC_RSP:
     {
       // For readibility.
       uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
-      // ble_gattc_evt_desc_disc_rsp_t const* desc_disc_rsp = &ble_evt->evt.gattc_evt.params.desc_disc_rsp;
-
-      iBle_disc_rsp_t disc_rsp = {
+      iBleC_disc_rsp_t disc_rsp = {
         .desc_disc_rsp = &ble_evt->evt.gattc_evt.params.desc_disc_rsp,
       };
-      _on_discovery(conn_handle, IBLE_DISCOVER_DESC, &disc_rsp);
+
+      _on_discovery(conn_handle, IBLEC_DISCOVER_DESC, &disc_rsp);
+    } break;
+
+    case BLE_GATTC_EVT_READ_RSP:
+    {
+      // For readibility.
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_read_rsp_t const* read_rsp = &ble_evt->evt.gattc_evt.params.read_rsp;
+
+      _on_read_rsp(conn_handle, read_rsp);
+    } break;
+
+    case BLE_GATTC_EVT_WRITE_RSP:
+    {
+      // For readibility.
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_write_rsp_t const* write_rsp = &ble_evt->evt.gattc_evt.params.write_rsp;
+
+      _on_write_rsp(conn_handle, write_rsp);
+    } break;
+
+    case BLE_GATTC_EVT_HVX:
+    {
+      // For readibility.
+      uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+      ble_gattc_evt_hvx_t const* hvx = &ble_evt->evt.gattc_evt.params.hvx;
+
+      if(hvx->type == BLE_GATT_HVX_NOTIFICATION) {
+        _on_notify_rsp(conn_handle, hvx);
+      }
+      else if(hvx->type == BLE_GATT_HVX_INDICATION) {
+        _on_indicate_rsp(conn_handle, hvx);
+        sd_ble_gattc_hv_confirm(conn_handle, hvx->handle);
+      }
+
     } break;
 
 		default:	// NOTHING
@@ -481,8 +570,150 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
   return 0;
 }
 
-void iBleC_discovery_init(iBle_attr_disc_t* attr_disc_array, uint16_t nbr_disc_attrs)
+void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
 {
-	_nbr_disc_attrs		= nbr_disc_attrs;
-	_attr_disc_array 	= attr_disc_array;
+  uint16_t nbr_handles = 0;
+
+  for(int i = 0; i < nbr_attrs; i++)
+  {
+      (attr_disc_list[i].type == IBLEC_DISCOVER_CHRC) ? nbr_handles += 2 :
+                                                        nbr_handles += 1 ;
+  }
+
+  _nbr_handles = nbr_handles;
+	_attr_disc_list = attr_disc_list;
+}
+
+int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params)
+{
+  int error;
+
+  memcpy(&link[conn].params[params->handle].read_params, params, sizeof(iBleC_read_params_t));
+
+  error = sd_ble_gattc_read(link[conn].conn_ref, params->handle, params->offset);
+  if(error) {
+    iPrint("/!\\ Read request failed: error %d\n", error);
+    return error;
+  }
+
+  return 0;
+}
+
+int iBleC_write(iBleC_conn_t conn, iBleC_write_params_t* params)
+{
+  int error;
+
+  params->write_params.write_op  = BLE_GATT_OP_WRITE_REQ;
+  params->write_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
+  params->write_params.handle    = params->handle;
+  params->write_params.offset    = params->offset;
+  params->write_params.len       = params->length;
+  params->write_params.p_value   = params->data;
+  memcpy(&link[conn].params[params->handle].write_params, params, sizeof(iBleC_write_params_t));
+
+	error = sd_ble_gattc_write(link[conn].conn_ref, &params->write_params);
+  if(error) {
+    iPrint("/!\\ Write request failed: error %d\n", error);
+    return error;
+  }
+
+  return 0;
+}
+
+int iBleC_subscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
+{
+  int error;
+
+  params->isEnabled = 1;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
+  params->subscribe_params.handle    = params->ccc_handle;
+  params->subscribe_params.offset    = 0;
+  params->subscribe_params.len       = 2;
+  params->subscribe_params.p_value   = (void*) &params->isEnabled;
+  memcpy(&link[conn].params[params->handle].notify_params, params, sizeof(iBleC_notify_params_t));
+
+  error = sd_ble_gattc_write(conn, &link[conn].params[params->handle].notify_params.subscribe_params);
+  if(error) {
+    iPrint("/!\\ Notify request failed: error %d\n", error);
+    return error;
+  }
+
+  return 0;
+}
+
+int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
+{
+  int error;
+
+  params->isEnabled = 1;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
+  params->subscribe_params.handle    = params->ccc_handle;
+  params->subscribe_params.offset    = 0;
+  params->subscribe_params.len       = 2;
+  params->subscribe_params.p_value   = (void*) &params->isEnabled;
+  memcpy(&link[conn].params[params->handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
+
+  error = sd_ble_gattc_write(conn, &link[conn].params[params->handle].indicate_params.subscribe_params);
+	if(error) {
+		iPrint("/!\\ Indicate request failed: error %d\n", error);
+		return error;
+	}
+
+	return 0;
+}
+
+int iBleC_unsubscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
+{
+  int error;
+
+  params->isEnabled = 0;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
+  params->subscribe_params.handle    = params->ccc_handle;
+  params->subscribe_params.offset    = 0;
+  params->subscribe_params.len       = 2;
+  params->subscribe_params.p_value   = (void*) &params->isEnabled;
+  memcpy(&link[conn].params[params->handle].notify_params, params, sizeof(iBleC_notify_params_t));
+
+  error = sd_ble_gattc_write(conn, &link[conn].params[params->handle].notify_params.subscribe_params);
+  if(error) {
+    iPrint("/!\\ Notify request failed: error %d\n", error);
+    return error;
+  }
+
+  return 0;
+}
+
+int iBleC_unsubscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
+{
+  int error;
+
+  params->isEnabled = 0;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
+  params->subscribe_params.handle    = params->ccc_handle;
+  params->subscribe_params.offset    = 0;
+  params->subscribe_params.len       = 2;
+  params->subscribe_params.p_value   = (void*) &params->isEnabled;
+  memcpy(&link[conn].params[params->handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
+
+  error = sd_ble_gattc_write(conn, &link[conn].params[params->handle].indicate_params.subscribe_params);
+	if(error) {
+		iPrint("/!\\ Indicate request failed: error %d\n", error);
+		return error;
+	}
+
+	return 0;
+}
+
+uint16_t iBleC_get_svc_handle(uint16_t svc_uuid)
+{
+
+}
+
+uint16_t iBleC_get_chrc_handle(uint16_t svc_uuid, uint16_t chrc_uuid)
+{
+
 }

@@ -34,7 +34,8 @@ typedef struct {
 	iGpio_device_t 				device;
 } iGpio_t;
 
-void 		iGpio_interrupt_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_edge_t edge, iGpio_pull_t pull, iGpio_handler_t handler);
+void 		iGpio_interrupt_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_edge_t edge,
+														 iGpio_pull_t pull, iGpio_handler_t handler);
 #define iGpio_enable_interrupt(_gpio)		 	nrf_drv_gpiote_in_event_enable((_gpio)->pin, true)
 #define iGpio_disable_interrupt(_gpio)	 	nrf_drv_gpiote_in_event_disable((_gpio)->pin)
 

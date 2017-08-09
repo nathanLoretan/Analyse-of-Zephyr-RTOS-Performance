@@ -17,62 +17,40 @@
 #define UNIT_10_MS                            	10000
 #define UNIT_0_625_MS                         	625
 
-// #define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
 #define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
 #define IBLE_CENTRAL_NAME   				"ExtBoard-C"
 
-#define IBLE_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
-#define IBLE_SCAN_ACTIVE	BT_HCI_LE_SCAN_ACTIVE
+#define IBLEC_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
+#define IBLEC_SCAN_ACTIVE	BT_HCI_LE_SCAN_ACTIVE
 
-typedef struct bt_conn*						iBleC_conn_t;
+#define NOT_CONNECTED	NULL
+
+typedef uint16_t									iBleC_conn_t;
 typedef struct bt_le_scan_param 	iBleC_scan_params_t;
 typedef struct bt_le_conn_param 	iBleC_conn_params_t;
 
-// typedef struct {
-// 	uint16_t decl_handle;
-// 	uint16_t val_handle;
-// 	uint16_t desc_handle;
-// } iBleC_chrcs_t;
-//
-// typedef struct {
-//   struct bt_gatt_attr	svc;
-//   uint16_t            nbr_chrcs;
-//   iBleC_chrcs_t*      chrcs;
-// } iBleC_svcs_t;
-//
-// struct {
-// 	struct bt_conn*	conn_ref;
-//   uint16_t        nbr_svcs;
-// 	iBleC_svcs_t*   svcs;
-// } link[CONFIG_BLUETOOTH_MAX_CONN];
-
-struct {
-	uint16_t	conn_ref;
-	uint16_t* handles;
-} link[TOTAL_LINK_COUNT];
-
 typedef enum {
-	IBLE_DISCOVER_SVC 	= BT_GATT_DISCOVER_PRIMARY,
-	IBLE_DISCOVER_DESC 	= BT_GATT_DISCOVER_DESCRIPTOR,
-	IBLE_DISCOVER_CHRC 	= BT_GATT_DISCOVER_CHARACTERISTIC,
-} iBle_disc_type_t;
+	IBLEC_DISCOVER_SVC 		= BT_GATT_DISCOVER_PRIMARY,
+	IBLEC_DISCOVER_DESC 	= BT_GATT_DISCOVER_DESCRIPTOR,
+	IBLEC_DISCOVER_CHRC 	= BT_GATT_DISCOVER_CHARACTERISTIC,
+} iBleC_attr_type_t;
 
 typedef enum {
 	UUID_16,
 	UUID_128,
-} iBle_uuid_type_t;
+} iBleC_uuid_type_t;
 
 typedef struct {
 	union {
 		uint16_t	uuid16;
 		uint8_t 	uuid128[16];
 	};
-	iBle_uuid_type_t uuid_type;
-	iBle_disc_type_t disc_type;
-} iBle_attr_disc_t;
+	iBleC_uuid_type_t uuid_type;
+	iBleC_attr_type_t type;
+} iBleC_attr_disc_t;
 
 // Interval and Windows in 0,625 Unit
-#define DEFINE_IBLE_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
+#define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
 iBleC_scan_params_t _scan_params =\
 {\
 	.type       = _type,\
@@ -81,7 +59,7 @@ iBleC_scan_params_t _scan_params =\
 	.filter_dup = BT_HCI_LE_SCAN_FILTER_DUP_DISABLE,\
 }
 
-#define DEFINE_IBLE_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)\
+#define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)\
 iBleC_conn_params_t _conn_params =\
 {\
 	.interval_min	= _interval_min,\
@@ -90,27 +68,98 @@ iBleC_conn_params_t _conn_params =\
 	.timeout			= _timeout,\
 }
 
+struct iBleC_write_params_t;
+struct iBleC_read_params_t;
+struct iBleC_notify_params_t;
+struct iBleC_indicate_params_t;
+
+typedef void (*iBleC_read_handler_t)			(iBleC_conn_t conn, struct iBleC_read_params_t* params);
+typedef void (*iBleC_write_handler_t)			(iBleC_conn_t conn, struct iBleC_write_params_t* params);
+typedef void (*iBleC_notify_handler_t)		(iBleC_conn_t conn, struct iBleC_notify_params_t* params);
+typedef void (*iBleC_indicate_handler_t)	(iBleC_conn_t conn, struct iBleC_indicate_params_t* params);
+
+struct iBleC_write_params_t {
+	iBleC_write_handler_t	handler;
+	uint16_t 				handle;
+	uint16_t 				offset;
+	uint16_t 				length;
+	void const* 	 	data;
+	struct bt_gatt_write_params write_params;
+};
+
+struct iBleC_read_params_t{
+	iBleC_read_handler_t	handler;
+	uint16_t				handle;
+	uint16_t 				offset;
+	uint16_t 				length;
+	void const* 	 	data;
+	struct bt_gatt_read_params read_params;
+};
+
+struct iBleC_notify_params_t{
+	iBleC_notify_handler_t	handler;
+	uint16_t				value_handle;
+	uint16_t				ccc_handle;
+	uint16_t 				length;
+	void const* 	 	data;
+	struct bt_gatt_subscribe_params subscribe_params;
+};
+
+struct iBleC_indicate_params_t{
+	iBleC_indicate_handler_t	handler;
+	uint16_t				value_handle;
+	uint16_t				ccc_handle;
+	uint16_t 				length;
+	void const* 	 	data;
+	struct bt_gatt_subscribe_params subscribe_params;
+};
+
+typedef struct iBleC_write_params_t 		iBleC_write_params_t;
+typedef struct iBleC_read_params_t 			iBleC_read_params_t;
+typedef struct iBleC_notify_params_t 		iBleC_notify_params_t;
+typedef struct iBleC_indicate_params_t 	iBleC_indicate_params_t;
+
+typedef union {
+	iBleC_read_params_t				read_params;
+	iBleC_write_params_t			write_params;
+	iBleC_notify_params_t			notify_params;
+	iBleC_indicate_params_t		indicate_params;
+} iBleC_params_t;
+
+typedef struct {
+	uint16_t					uuid16;
+	iBleC_attr_type_t type;
+	iBleC_params_t 		params;
+} iBleC_attr_t;
+
+struct {
+	struct bt_conn*	conn_ref;
+	iBleC_attr_t* attrs;
+	volatile bool isReady;
+} link[CONFIG_BLUETOOTH_MAX_CONN];
+
+#define IBLEC_READ_HANDLER(handler, params)\
+	void handler(iBleC_conn_t conn, iBleC_read_params_t* params)
+#define IBLEC_WRITE_HANDLER(handler, params)\
+	void handler(iBleC_conn_t conn, iBleC_write_params_t* params)
+#define IBLEC_NOTIFY_HANDLER(handler, params)\
+	void handler(iBleC_conn_t conn, iBleC_notify_params_t* params)
+#define IBLEC_INDICATE_HANDLER(handler, params)\
+	void handler(iBleC_conn_t conn, iBleC_indicate_params_t* params)
+
 int	iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
-void iBleC_discovery_init(iBle_attr_disc_t* attr_disc_array, uint16_t _nbr_disc_attrs);
+void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs);
 
-typedef bt_gatt_read_func_t 	iBle_read_handler_t;
-typedef bt_gatt_write_func_t 	iBle_write_handler_t;
-typedef bt_gatt_notify_func_t iBle_notify_handler_t;
+int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params);
+int iBleC_write(iBleC_conn_t conn, iBleC_write_params_t* params);
+int iBleC_subscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params);
+int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params);
+int iBleC_unsubscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params);
+int iBleC_unsubscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params);
 
-#define IBLEC_READ_HANDLER()
-#define IBLEC_WRITE_HANDLER()
-#define IBLEC_NOTIFY_HANDLER()
-
-int iBleC_read(iBleC_conn_t conn, uint16_t handle, iBle_read_handler_t read_handler);
-int iBleC_write(iBleC_conn_t conn, uint16_t handle, iBle_write_handler_t write_handler);
-int iBleC_subscribe(iBleC_conn_t conn, uint16_t handle, iBle_notify_handler_t notify_handler);
-int iBleC_unsubscribe(iBleC_conn_t conn, uint16_t handle);
-// int bt_gatt_read(struct bt_conn *conn, struct bt_gatt_read_params *params)
-// int bt_gatt_write(struct bt_conn *conn, struct bt_gatt_write_params *params)
-// int bt_gatt_write_without_response(struct bt_conn *conn, u16_t handle, const void *data, u16_t length, bool sign)
-// int bt_gatt_subscribe(struct bt_conn *conn, struct bt_gatt_subscribe_params *params)
-// int bt_gatt_unsubscribe(struct bt_conn *conn, struct bt_gatt_subscribe_params *params)
+uint16_t iBleC_get_svc_handle(uint16_t svc_uuid);
+uint16_t iBleC_get_chrc_handle(uint16_t svc_uuid, uint16_t chrc_uuid);
 
 #endif	// __IBLEC__
 

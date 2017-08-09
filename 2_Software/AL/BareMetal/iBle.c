@@ -407,7 +407,8 @@ volatile bool iBle_isConnected()
 
 // https://devzone.nordicsemi.com/blogs/782/bluetooth-smart-and-the-nordics-softdevices-part-1/
 // https://devzone.nordicsemi.com/question/110308/i-want-to-change-the-ble-address/
-int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size)
+int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
+									 iBle_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
 

@@ -10,14 +10,16 @@ static struct bt_gatt_indicate_params 	ind_params;
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
 struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 
-ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset)
+ssize_t iBle_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
+                          void *buf, u16_t buf_length, u16_t offset)
 {
   BLE_READ();
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
 
-static void iBle_mtu_request(struct bt_conn* conn, u8_t err, struct bt_gatt_exchange_params* params)
+static void iBle_mtu_request(struct bt_conn* conn, u8_t err,
+                             struct bt_gatt_exchange_params* params)
 {
   iPrint("\n-> MTU Parameters Update\n");
   iPrint("------------------------\n");
@@ -74,7 +76,9 @@ static void iBle_disconnected(struct bt_conn *conn, u8_t reason)
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
-static void iBle_conn_parameters_update(struct bt_conn *conn, u16_t interval, u16_t latency, u16_t timeout)
+static void iBle_conn_parameters_update(struct bt_conn *conn,
+                                        u16_t interval, u16_t latency,
+                                        u16_t timeout)
 {
   iPrint("\n-> Connection Parameters Update\n");
   iPrint("-------------------------------\n");
@@ -125,7 +129,8 @@ static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
 
 K_TIMER_DEFINE(adv_timeout_timer, on_advertise_timeout, NULL);
 
-int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size, iBle_advdata_t* scanrsp, size_t scanrsp_size)
+int iBle_adv_start(iBle_advdata_t* advdata, size_t advdata_size,
+                    iBle_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
 	struct bt_le_adv_param* adv_params;
