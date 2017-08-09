@@ -26,7 +26,7 @@
 #define IBLE_CENTRAL_NAME   				"ExtBoard-C"
 
 #define IBLEC_SCAN_PASSIVE	0
-#define IBLEC_SCAN_ACTIVE	1
+#define IBLEC_SCAN_ACTIVE		1
 
 #define CENTRAL_LINK_COUNT        8                                             /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
 #define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
@@ -128,17 +128,22 @@ typedef struct iBleC_write_params_t			iBleC_write_params_t;
 typedef struct iBleC_notify_params_t 		iBleC_notify_params_t;
 typedef struct iBleC_indicate_params_t 	iBleC_indicate_params_t;
 
-typedef union {
-	iBleC_read_params_t				read_params;
-	iBleC_write_params_t			write_params;
-	iBleC_notify_params_t			notify_params;
-	iBleC_indicate_params_t		indicate_params;
-} iBleC_params_t;
+// typedef union {
+// 	iBleC_read_params_t				read_params;
+// 	iBleC_write_params_t			write_params;
+// 	iBleC_notify_params_t			notify_params;
+// 	iBleC_indicate_params_t		indicate_params;
+// } iBleC_params_t;
 
 typedef struct {
 	uint16_t					uuid16;
 	iBleC_attr_type_t type;
-	iBleC_params_t 		params;
+	union {
+		iBleC_read_params_t				read_params;
+		iBleC_write_params_t			write_params;
+		iBleC_notify_params_t			notify_params;
+		iBleC_indicate_params_t		indicate_params;
+	};
 } iBleC_attr_t;
 
 struct {
@@ -167,7 +172,9 @@ int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
 int iBleC_unsubscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params);
 int iBleC_unsubscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params);
 
-uint16_t iBleC_get_svc_handle(uint16_t svc_uuid);
-uint16_t iBleC_get_chrc_handle(uint16_t svc_uuid, uint16_t chrc_uuid);
+uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid);
+uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid);
+uint16_t iBleC_get_chrc_val_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid);
+uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid, uint16_t desc_uuid);
 
 #endif  // __IBLEC__

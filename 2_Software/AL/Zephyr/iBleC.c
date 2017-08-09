@@ -7,7 +7,8 @@ static struct bt_conn* new_conn;
 
 static iBleC_conn_params_t* _conn_params;
 static iBleC_scan_params_t* _scan_params;
-static iBleC_attr_disc_t* 		_attr_disc_list;
+static iBleC_attr_disc_t* 	_attr_disc_list;
+static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
 
@@ -138,31 +139,31 @@ static u8_t _on_discovery(struct bt_conn* conn,
 
 	if(params->type == BT_GATT_DISCOVER_PRIMARY && attr != NULL)
 	{
-		iPrint("Service discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		iPrint("Service discovered %x, %x\n", BT_UUID_16(params->uuid)->val, attr->handle);
 
 		uint16_t handle = attr->handle;
 		link[ref].attrs[handle].type   = IBLEC_DISCOVER_SVC;
-		link[ref].attrs[handle].uuid16 = BT_UUID_16(attr->uuid)->val;
+		link[ref].attrs[handle].uuid16 = BT_UUID_16(params->uuid)->val;
 	}
 	else if(params->type == BT_GATT_DISCOVER_CHARACTERISTIC && attr != NULL)
 	{
-		iPrint("Characteristic discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		iPrint("Characteristic discovered %x, %x\n", BT_UUID_16(params->uuid)->val, attr->handle);
 
 		uint16_t handle = attr->handle;
 		link[ref].attrs[handle].type   = IBLEC_DISCOVER_CHRC;
-		link[ref].attrs[handle].uuid16 = BT_UUID_16(attr->uuid)->val;
+		link[ref].attrs[handle].uuid16 = BT_UUID_16(params->uuid)->val;
 	}
 	else if(params->type == BT_GATT_DISCOVER_DESCRIPTOR && attr != NULL)
 	{
-		iPrint("Descriptor discovered %x, %x\n", BT_UUID_16(attr->uuid)->val, attr->handle);
+		iPrint("Descriptor discovered %x, %x\n", BT_UUID_16(params->uuid)->val, attr->handle);
 
 		uint16_t handle = attr->handle;
 		link[ref].attrs[handle].type   = IBLEC_DISCOVER_DESC;
-		link[ref].attrs[handle].uuid16 = BT_UUID_16(attr->uuid)->val;
+		link[ref].attrs[handle].uuid16 = BT_UUID_16(params->uuid)->val;
 	}
 
 	_disc_ref++;
-	if(_disc_ref >= _nbr_handles)
+	if(_disc_ref >= _nbr_attr_disc)
 	{
 		link[ref].isReady = true;
 		iPrint("Discovery finished\n");
@@ -244,11 +245,11 @@ static u8_t _on_read_rsp(struct bt_conn *conn, u8_t err,
 												 const void *data, u16_t length)
 {
 	uint8_t ref = _get_conn_ref(conn);
-	// uint16_t handle = params->single.handle;
+	uint16_t handle = params->single.handle;
 
-	link[ref].params[params->handle].read_params.data 		= data;
-	link[ref].params[params->handle].read_params.length 	= length;
-	link[ref].params[params->handle].read_params.handler(ref, &link[ref].params[params->handle].read_params);
+	link[ref].attrs[handle].read_params.data 		= data;
+	link[ref].attrs[handle].read_params.length 	= length;
+	link[ref].attrs[handle].read_params.handler(ref, &link[ref].attrs[handle].read_params);
 
 	return 0;
 }
@@ -257,11 +258,11 @@ static void _on_write_rsp(struct bt_conn *conn, u8_t err,
 													struct bt_gatt_write_params *params)
 {
 	uint8_t ref = _get_conn_ref(conn);
-	// uint16_t handle = params->handle;
+	uint16_t handle = params->handle;
 
-	link[ref].params[params->handle].write_params.data 		= params->data;
-	link[ref].params[params->handle].write_params.length 	= params->length;
-	link[ref].params[params->handle].write_params.handler(ref, &link[ref].params[params->handle].write_params);
+	link[ref].attrs[handle].write_params.data 		= params->data;
+	link[ref].attrs[handle].write_params.length 	= params->length;
+	link[ref].attrs[handle].write_params.handler(ref, &link[ref].attrs[handle].write_params);
 }
 
 static u8_t _on_notify_rsp(struct bt_conn *conn,
@@ -269,10 +270,11 @@ static u8_t _on_notify_rsp(struct bt_conn *conn,
 											 		 const void *data, u16_t length)
 {
 	uint8_t ref = _get_conn_ref(conn);
+	uint16_t handle = params->ccc_handle;
 
-	link[ref].params[params->handle].notify_params.data 		= data;
-	link[ref].params[params->handle].notify_params.length 	= length;
-	link[ref].params[params->handle].notify_params.handler(ref, &link[ref].params[params->handle].notify_params);
+	link[ref].attrs[handle].notify_params.data 		= data;
+	link[ref].attrs[handle].notify_params.length 	= length;
+	link[ref].attrs[handle].notify_params.handler(ref, &link[ref].attrs[handle].notify_params);
 
 	return BT_GATT_ITER_CONTINUE;
 }
@@ -282,10 +284,11 @@ static u8_t _on_indicate_rsp(struct bt_conn *conn,
 												 		 const void *data, u16_t length)
 {
 	uint8_t ref = _get_conn_ref(conn);
+	uint16_t handle = params->ccc_handle;
 
-	link[ref].params[params->handle].indicate_params.data 		= data;
-	link[ref].params[params->handle].indicate_params.length 	= length;
-	link[ref].params[params->handle].indicate_params.handler(ref, &link[ref].params[params->handle].indicate_params);
+	link[ref].attrs[handle].indicate_params.data 		= data;
+	link[ref].attrs[handle].indicate_params.length 	= length;
+	link[ref].attrs[handle].indicate_params.handler(ref, &link[ref].attrs[handle].indicate_params);
 
 	return BT_GATT_ITER_CONTINUE;
 }
@@ -307,8 +310,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 		link[ref].conn_ref 	= bt_conn_ref(conn);
 		link[ref].isReady 	= false;
-		link[ref].handles 	= (uint16_t*) k_malloc(sizeof(uint16_t*) * _nbr_handles);
-		link[ref].params  	= (iBleC_params_t*) k_malloc(sizeof(iBleC_params_t*) * _nbr_handles);;
+		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t*) * _nbr_handles);
 
 		nbr_conn++;
 
@@ -346,8 +348,7 @@ static void _on_disconnection(struct bt_conn* conn, u8_t reason)
 	ref = _get_conn_ref(conn);
 
 	bt_conn_unref(link[ref].conn_ref);
-	k_free(link[ref].handles);
-  k_free(link[ref].params);
+	k_free(link[ref].attrs);
 	link[ref].isReady	= false;
 	link[ref].conn_ref = NULL;
 	nbr_conn--;
@@ -411,13 +412,12 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
 {
 	uint16_t nbr_handles = 0;
 
-  for(int i = 0; i < nbr_attrs; i++)
-  {
-      (attr_disc_list[i].type == IBLEC_DISCOVER_CHRC) ? nbr_handles += 2 :
-                                                        nbr_handles += 1 ;
+  for(int i = 0; i < nbr_attrs; i++) {
+      nbr_handles += (attr_disc_list[i].type == IBLEC_DISCOVER_CHRC) ? 2 : 1;
   }
 
   _nbr_handles = nbr_handles;
+	_nbr_attr_disc = nbr_attrs;
 	_attr_disc_list = attr_disc_list;
 }
 
@@ -429,9 +429,9 @@ int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params)
 	params->read_params.single.offset = params->offset;
 	params->read_params.single.handle = params->handle;
 	params->read_params.handle_count 	= 1;
-	memcpy(&link[conn].params[params->handle].read_params, params, sizeof(iBleC_read_params_t));
+	memcpy(&link[conn].attrs[params->handle].read_params, params, sizeof(iBleC_read_params_t));
 
-	error = bt_gatt_read(link[conn].conn_ref, &link[conn].params[params->handle].read_params.read_params);
+	error = bt_gatt_read(link[conn].conn_ref, &link[conn].attrs[params->handle].read_params.read_params);
   if(error) {
     iPrint("/!\\ Read request failed: error %d\n", error);
     return error;
@@ -449,9 +449,9 @@ int iBleC_write(iBleC_conn_t conn, iBleC_write_params_t* params)
 	params->write_params.offset = params->offset;
 	params->write_params.data 	= params->data;
 	params->write_params.length = params->length;
-	memcpy(&link[conn].params[params->handle].write_params, params, sizeof(iBleC_write_params_t));
+	memcpy(&link[conn].attrs[params->handle].write_params, params, sizeof(iBleC_write_params_t));
 
-	error = bt_gatt_write(link[conn].conn_ref, &link[conn].params[params->handle].write_params.write_params);
+	error = bt_gatt_write(link[conn].conn_ref, &link[conn].attrs[params->handle].write_params.write_params);
 	if(error) {
     iPrint("/!\\ Write request failed: error %d\n", error);
     return error;
@@ -468,9 +468,9 @@ int iBleC_subscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
 	params->subscribe_params.value 				=	BT_GATT_CCC_NOTIFY;
 	params->subscribe_params.value_handle = params->value_handle;
 	params->subscribe_params.ccc_handle 	= params->ccc_handle;
-	memcpy(&link[conn].params[params->handle].notify_params, params, sizeof(iBleC_notify_params_t));
+	memcpy(&link[conn].attrs[params->ccc_handle].notify_params, params, sizeof(iBleC_notify_params_t));
 
-	error = bt_gatt_subscribe(link[conn].conn_ref, &link[conn].params[params->handle].notify_params.subscribe_params);
+	error = bt_gatt_subscribe(link[conn].conn_ref, &link[conn].attrs[params->ccc_handle].notify_params.subscribe_params);
 	if(error) {
 		iPrint("/!\\ Notify request failed: error %d\n", error);
 		return error;
@@ -487,9 +487,9 @@ int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
 	params->subscribe_params.value 				=	BT_GATT_CCC_INDICATE;
 	params->subscribe_params.value_handle = params->value_handle;
 	params->subscribe_params.ccc_handle 	= params->ccc_handle;
-	memcpy(&link[conn].params[params->handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
+	memcpy(&link[conn].attrs[params->ccc_handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
 
-	error = bt_gatt_subscribe(link[conn].conn_ref, &link[conn].params[params->handle].indicate_params.subscribe_params);
+	error = bt_gatt_subscribe(link[conn].conn_ref, &link[conn].attrs[params->ccc_handle].indicate_params.subscribe_params);
 	if(error) {
 		iPrint("/!\\ Indicate request failed: error %d\n", error);
 		return error;
@@ -506,9 +506,9 @@ int iBleC_unsubscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
 	params->subscribe_params.value 				=	BT_GATT_CCC_NOTIFY;
 	params->subscribe_params.value_handle = params->value_handle;
 	params->subscribe_params.ccc_handle 	= params->ccc_handle;
-	memcpy(&link[conn].params[params->handle].notify_params, params, sizeof(iBleC_notify_params_t));
+	memcpy(&link[conn].attrs[params->ccc_handle].notify_params, params, sizeof(iBleC_notify_params_t));
 
-	error = bt_gatt_unsubscribe(link[conn].conn_ref, &link[conn].params[params->handle].notify_params.subscribe_params);
+	error = bt_gatt_unsubscribe(link[conn].conn_ref, &link[conn].attrs[params->ccc_handle].notify_params.subscribe_params);
 	if(error) {
 		iPrint("/!\\ Notify request failed: error %d\n", error);
 		return error;
@@ -525,9 +525,9 @@ int iBleC_unsubscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* param
 	params->subscribe_params.value 				=	BT_GATT_CCC_INDICATE;
 	params->subscribe_params.value_handle = params->value_handle;
 	params->subscribe_params.ccc_handle 	= params->ccc_handle;
-	memcpy(&link[conn].params[params->handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
+	memcpy(&link[conn].attrs[params->ccc_handle].indicate_params, params, sizeof(iBleC_indicate_params_t));
 
-	error = bt_gatt_unsubscribe(link[conn].conn_ref, &link[conn].params[params->handle].indicate_params.subscribe_params);
+	error = bt_gatt_unsubscribe(link[conn].conn_ref, &link[conn].attrs[params->ccc_handle].indicate_params.subscribe_params);
 	if(error) {
 		iPrint("/!\\ Indicate request failed: error %d\n", error);
 		return error;
@@ -536,14 +536,52 @@ int iBleC_unsubscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* param
 	return 0;
 }
 
-uint16_t iBleC_get_svc_handle(uint16_t svc_uuid)
+uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
 {
+  for(int i = 0; i < _nbr_handles; i++)
+  {
+    if(link[conn].attrs[i].type == IBLEC_DISCOVER_SVC && link[conn].attrs[i].uuid16 == svc_uuid) {
+      return i;
+     }
+  }
 
+  return 0xFFFF;
 }
 
-uint16_t iBleC_get_chrc_handle(uint16_t svc_uuid, uint16_t chrc_uuid)
+uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
 {
+  for(int i = 0; i < _nbr_handles; i++)
+  {
+    if(link[conn].attrs[i].type == IBLEC_DISCOVER_SVC && link[conn].attrs[i].uuid16 == svc_uuid)
+    {
+      for(int y = i; y < _nbr_handles; y++)
+      {
+        if(link[conn].attrs[y].type == IBLEC_DISCOVER_CHRC && link[conn].attrs[y].uuid16 == chrc_uuid) {
+          return y;
+        }
+      }
+    }
+  }
+  return 0xFFFF;
+}
 
+uint16_t iBleC_get_chrc_val_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
+{
+	return iBleC_get_chrc_decl_handle(conn, svc_uuid, chrc_uuid) + 1;
+}
+
+uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid, uint16_t desc_uuid)
+{
+  uint16_t chrc_handle = iBleC_get_chrc_decl_handle(conn, svc_uuid, chrc_uuid);
+
+  for(int i = chrc_handle; i <= _nbr_handles; i++)
+  {
+    if(link[conn].attrs[i].type == IBLEC_DISCOVER_DESC && link[conn].attrs[i].uuid16 == desc_uuid) {
+      return i;
+    }
+  }
+
+  return 0xFFFF;
 }
 
 #endif	// CONFIG_BLUETOOTH_CENTRAL

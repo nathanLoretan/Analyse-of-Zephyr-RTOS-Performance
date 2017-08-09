@@ -1,5 +1,5 @@
-PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
-# PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
+# PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
+PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
 
 # Add all configuration variables as C define
 # PINNING =
@@ -9,13 +9,13 @@ PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
 # PROJ_FLAGS += $(PINNING)
 
 # ifeq ($(sys),zephyr)
-# 	include $(PROJ_DIR)/zephyr.mk
+# 	include $(PROJ_DIR)/zephyr
 # else
-# 	include $(PROJ_DIR)/baremetal.mk
+# 	include $(PROJ_DIR)/baremetal
 # endif
 
 ifeq ($(sys),baremetal)
-	include $(PROJ_DIR)/baremetal.mk
+	include $(PROJ_DIR)/baremetal
 else
-	include $(PROJ_DIR)/zephyr.mk
+	include $(PROJ_DIR)/zephyr
 endif

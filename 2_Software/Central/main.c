@@ -17,110 +17,108 @@
 DEFINE_IBLEC_SCAN_PARAMS(scan_params, IBLEC_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
 DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
 
-// if 128bit uuid. octect 12-13
+//TODO: if 128bit uuid. octect 12-13
 
 // iBleC_attr_disc_t attr_disc_array[] =
 // {
 // 	{
 // 		.uuid16			= 0x1805,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_SVC,
+// 		.type 	= IBLE_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A08,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2902,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_DESC,
+// 		.type 	= IBLE_DISCOVER_DESC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A09,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2902,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_DESC,
+// 		.type 	= IBLE_DISCOVER_DESC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A0A,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x180D,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type	= IBLE_DISCOVER_SVC,
+// 		.type	= IBLE_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A21,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A37,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // 	{
 // 		.uuid16			= 0x180F,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type	= IBLE_DISCOVER_SVC,
+// 		.type	= IBLE_DISCOVER_SVC,
 // 	},
 // 	{
 // 		.uuid16			= 0x2A19,
 // 		.uuid_type 	= UUID_16,
-// 		.disc_type 	= IBLE_DISCOVER_CHRC,
+// 		.type 	= IBLE_DISCOVER_CHRC,
 // 	},
 // };
 
-//TODO access correctly to the handler
-
 iBleC_attr_disc_t attr_disc_list[] =
 {
-	// {
-	// 	.uuid16			= 0x1800,
-	// 	.uuid_type 	= UUID_16,
-	// 	.disc_type 	= IBLEC_DISCOVER_SVC,
-	// },
-	// {
-	// 	.uuid16			= 0x2A00,
-	// 	.uuid_type 	= UUID_16,
-	// 	.disc_type 	= IBLEC_DISCOVER_CHRC,
-	// },
-	// {
-	// 	.uuid16			= 0x2A01,
-	// 	.uuid_type 	= UUID_16,
-	// 	.disc_type 	= IBLEC_DISCOVER_CHRC,
-	// },
-	// {
-	// 	.uuid16			= 0x2A04,
-	// 	.uuid_type 	= UUID_16,
-	// 	.disc_type 	= IBLEC_DISCOVER_CHRC,
-	// },
-	// {
-	// 	.uuid16			= 0x1801,
-	// 	.uuid_type 	= UUID_16,
-	// 	.disc_type 	= IBLEC_DISCOVER_SVC,
-	// },
+	{
+		.uuid16			= 0x1800,
+		.uuid_type 	= UUID_16,
+		.type 			= IBLEC_DISCOVER_SVC,
+	},
+	{
+		.uuid16			= 0x2A00,
+		.uuid_type 	= UUID_16,
+		.type 			= IBLEC_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2A01,
+		.uuid_type 	= UUID_16,
+		.type 			= IBLEC_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x2A04,
+		.uuid_type 	= UUID_16,
+		.type 			= IBLEC_DISCOVER_CHRC,
+	},
+	{
+		.uuid16			= 0x1801,
+		.uuid_type 	= UUID_16,
+		.type 			= IBLEC_DISCOVER_SVC,
+	},
 	{
 		.uuid16			= 0x1805,
 		.uuid_type 	= UUID_16,
-		.disc_type 	= IBLEC_DISCOVER_SVC,
+		.type 			= IBLEC_DISCOVER_SVC,
 	},
 	{
 		.uuid16			= 0x2A2B,
 		.uuid_type 	= UUID_16,
-		.disc_type 	= IBLEC_DISCOVER_CHRC,
+		.type 			= IBLEC_DISCOVER_CHRC,
 	},
 	{
 		.uuid16			= 0x2902,
 		.uuid_type 	= UUID_16,
-		.disc_type 	= IBLEC_DISCOVER_CHRC,
+		.type 			= IBLEC_DISCOVER_DESC,
 	},
 };
 
@@ -160,34 +158,40 @@ int main()
 		if(link[0].conn_ref != NOT_CONNECTED && link[0].isReady && !enabled)
 		{
 			// enabled = true;
+			// iPrint("0x%x, %x\n", 0x1805, iBleC_get_svc_handle(0, 0x1805));
+			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_decl_handle(0, 0x1805, 0x2A2B));
+			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902));
+			// iPrint("0x%x, %x\n", 0x2A00, iBleC_get_chrc_decl_handle(0, 0x1800, 0x2A00));
 
-			// iBleC_notify_params_t notify_params;
-			// notify_params.handler				= notify_rsp;
-			// notify_params.value_handle	= 0x000B;
-			// notify_params.ccc_handle		= 0x000C;
-			// iBleC_subscribe_notify(0, &notify_params);
+			enabled = true;
+			iBleC_notify_params_t notify_params;
+			notify_params.handler				= notify_rsp;
+			notify_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			notify_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
+			iBleC_subscribe_notify(0, &notify_params);
 
+			// // enabled = true;
 			// iBleC_indicate_params_t indicate_params;
 			// indicate_params.handler				= indicate_rsp;
-			// indicate_params.value_handle	= 0x000B;
-			// indicate_params.ccc_handle		= 0x000C;
+			// indicate_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// indicate_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
 			// iBleC_subscribe_indicate(0, &indicate_params);
 
 			// iBleC_read_params_t read_params;
 			// read_params.handler = read_rsp;
-			// read_params.handle = 0x000B;
+			// read_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
 			// read_params.offset = 0;
 			// iBleC_read(0, &read_params);
 
-			static int val = 0;
-			val++;
-			iBleC_write_params_t write_params;
-			write_params.handler = write_rsp;
-			write_params.handle = 0x000B;
-			write_params.offset = 0;
-			write_params.data 	= &val;
-			write_params.length = 4;
-			iBleC_write(0, &write_params);
+			// static int val = 0;
+			// val++;
+			// iBleC_write_params_t write_params;
+			// write_params.handler = write_rsp;
+			// write_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// write_params.offset = 0;
+			// write_params.data 	= &val;
+			// write_params.length = 4;
+			// iBleC_write(0, &write_params);
 		}
 		// else
 		else if(!enabled)
