@@ -6,7 +6,7 @@ SDK_ROOT 			:= $(PROJ_DIR)/nordic_components
 PROJECT_BASE 	:= $(PROJ_DIR)
 
 $(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \
-  LINKER_SCRIPT  := $(PROJ_DIR)/Configuration/Measurement/Nordic/nRF52840.ld
+  LINKER_SCRIPT  := $(PROJ_DIR)/Environment/Measurement/Nordic/nRF52840.ld
 
 # Source files common to all targets
 SRC_FILES += \
@@ -134,7 +134,7 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/toolchain/gcc \
 	$(SDK_ROOT)/components/toolchain/cmsis/include \
 	$(PROJECT_BASE) \
-	$(PROJECT_BASE)/Configuration/Measurement/Nordic/ \
+	$(PROJECT_BASE)/Environment/Measurement/Nordic/ \
 
 # Libraries common to all targets
 LIB_FILES += \
@@ -158,9 +158,10 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
 
-# Add all configuration variables as C define
+# Add all Environment variables as C define
 #CFLAGS += $(PROJ_FLAGS) -DBAREMETALE_USED
 CFLAGS += -DBAREMETALE_USED
+CFLAGS += -DMEASUREMENT_CONFIG
 
 # C++ flags common to all targets
 CXXFLAGS += \

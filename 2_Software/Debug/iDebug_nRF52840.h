@@ -1,9 +1,11 @@
 #ifndef __DEBUG_NRF52840__
 #define __DEBUG_NRF52840__
 
+#if ENABLE_MEASUREMENT
+
 #include "../configuration.h"
-#include "../nordic_components/components/device/nrf52840.h"
-#include "../nordic_components/components/device/nrf52840_bitfields.h"
+#include "../components/components/device/nrf52840.h"
+#include "../components/components/device/nrf52840_bitfields.h"
 
 // #include "/home/nathanloretan/Desktop/Bachelor/2_Software/Debug/iDebug_nRF52840.h"
 
@@ -134,5 +136,84 @@ do {                        \
 } while(0)
 
 void iDebug_init();
+
+else  // !ENABLE_MEASUREMENT
+
+#define RADIO_STATE_DISABLED    0
+#define RADIO_STATE_RXRU        1
+#define RADIO_STATE_RXIDLE      2
+#define RADIO_STATE_RX          3
+#define RADIO_STATE_RXDISABLE   4
+#define RADIO_STATE_TXRU        9
+#define RADIO_STATE_TXIDLE      10
+#define RADIO_STATE_TX          11
+#define RADIO_STATE_TXDISABLE   12
+
+#define DEBUG_PIN_SET(_pin, _port, _flag)
+
+#define DEBUG_PIN_TOGGLE(_pin, _port)
+
+#define DEBUG_START_PIN
+#define DEBUG_START_PORT
+#define DEBUG_START()
+
+#define EXT_INT_LATENCY_PIN
+#define EXT_INT_LATENCY_PORT
+#define EXT_INT_LATENCY()
+
+#define BLE_ERROR_PIN
+#define BLE_ERROR_PORT
+#define BLE_ERROR(_flag)
+
+#define BLE_CONN_EVT_PIN
+#define BLE_CONN_EVT_PORT
+#define BLE_CONN_EVT(_flag)
+
+#define BLE_INDICATE_PIN
+#define BLE_INDICATE_PORT
+#define BLE_INDICATE(_flag)
+
+#define BLE_INDICATE_RSP_PIN
+#define BLE_INDICATE_RSP_PORT
+#define BLE_INDICATE_RSP()
+
+#define BLE_NOTIFY_PIN
+#define BLE_NOTIFY_PORT
+#define BLE_NOTIFY(_flag)
+
+#define BLE_READ_PIN
+#define BLE_READ_PORT
+#define BLE_READ()
+
+#define BLE_WRITE_PIN
+#define BLE_WRITE_PORT
+#define BLE_WRITE()
+
+#define BLE_RECV_PIN
+#define BLE_RECV_PORT
+#define BLE_RECV(_flag)
+
+#define RADIO_TX_PIN
+#define RADIO_TX_PORT
+#define RADIO_TX()
+
+#define RADIO_RX_PIN
+#define RADIO_RX_PORT
+#define RADIO_RX()
+
+#define RADIO_RTX_PIN
+#define RADIO_RTX_PORT
+#define RADIO_RTX()
+
+#define RADIO_CRCOK_PIN
+#define RADIO_CRCOK_PORT
+#define RADIO_CRCOK(_flag)
+
+#define DEBUG_HOST()
+#define DEBUG_RADIO_SM()
+
+#define iDebug_init()
+
+#endif  // ENABLE_MEASUREMENT
 
 #endif // __DEBUG_NRF52840__

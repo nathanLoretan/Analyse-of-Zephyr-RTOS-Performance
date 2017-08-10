@@ -1,4 +1,4 @@
-PROJECT_NAME     := Central
+PROJECT_NAME     := Test
 TARGETS          := nrf52840_xxaa
 OUTPUT_DIRECTORY := outdir/nrf52840_xxaa
 
@@ -6,7 +6,7 @@ SDK_ROOT 			:= $(PROJ_DIR)/nordic_components
 PROJECT_BASE 	:= $(PROJ_DIR)
 
 $(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \
-  LINKER_SCRIPT  := $(PROJ_DIR)/Configuration/Central/Nordic/nRF52840.ld
+  LINKER_SCRIPT  := $(PROJ_DIR)/Environment/Test/Nordic/nRF52840.ld
 
 # Source files common to all targets
 SRC_FILES += \
@@ -62,12 +62,17 @@ SRC_FILES += \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleP.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleC.c \
+	$(PROJECT_BASE)/AL/BareMetal/iI2c.c \
+	$(PROJECT_BASE)/AL/BareMetal/iSpi.c \
 	$(PROJECT_BASE)/AL/BareMetal/iGpio.c \
 	$(PROJECT_BASE)/AL/BareMetal/iTimer.c \
 	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
 	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \
 	$(PROJECT_BASE)/Debug/iDebug_nRF52840.c \
-  $(PROJECT_BASE)/Central/main.c
+	$(PROJECT_BASE)/Drivers/acc.c \
+	$(PROJECT_BASE)/Drivers/adc.c \
+	$(PROJECT_BASE)/Drivers/swg.c \
+	$(PROJECT_BASE)/Test/main.c
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -129,7 +134,7 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/toolchain/gcc \
 	$(SDK_ROOT)/components/toolchain/cmsis/include \
 	$(PROJECT_BASE) \
-	$(PROJECT_BASE)/Configuration/Central/Nordic/	\
+	$(PROJECT_BASE)/Test/Peripheral/Nordic/ \
 
 # Libraries common to all targets
 LIB_FILES += \
@@ -153,9 +158,10 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
 
-# Add all configuration variables as C define
+# Add all Environment variables as C define
 #CFLAGS += $(PROJ_FLAGS) -DBAREMETALE_USED
 CFLAGS += -DBAREMETALE_USED
+CFLAGS += -DTEST_CONFIG
 
 # C++ flags common to all targets
 CXXFLAGS += \

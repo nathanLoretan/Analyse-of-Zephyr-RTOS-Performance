@@ -1,32 +1,20 @@
 PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
 # PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
 
-# ifeq ($(sys),baremetal)
-# 	include $(PROJ_DIR)/Configuration/Central/Nordic/baremetal.mk
-# else
-# 	include $(PROJ_DIR)/Configuration/Central/Zephyr/zephyr.mk
-# endif
-#
-# ifeq ($(sys),baremetal)
-# 	include $(PROJ_DIR)/Configuration/Peripheral/Nordic/baremetal.mk
-# else
-# 	include $(PROJ_DIR)/Configuration/Peripheral/Zephyr/zephyr.mk
-# endif
-
 # .PHONY: central e-peripheral peripheral baremetal zephyr
 
 ifeq ($(sys),baremetal)
 
 	ifeq ($(app),central)
-		include $(PROJ_DIR)/Configuration/Central/Nordic/baremetal.mk
+		include $(PROJ_DIR)/Environment/Central/Nordic/baremetal.mk
 	endif
 
 	ifeq ($(app), e-peripheral)
-		include $(PROJ_DIR)/Configuration/E-Peripheral/Nordic/baremetal.mk
+		include $(PROJ_DIR)/Environment/E-Peripheral/Nordic/baremetal.mk
 	endif
 
 	ifeq ($(app), peripheral)
-		include $(PROJ_DIR)/Configuration/Peripheral/Nordic/baremetal.mk
+		include $(PROJ_DIR)/Environment/Peripheral/Nordic/baremetal.mk
 	endif
 
 endif
@@ -34,15 +22,22 @@ endif
 ifeq ($(sys),zephyr)
 
 	ifeq ($(app),central)
-		include $(PROJ_DIR)/Configuration/Central/Zephyr/zephyr.mk
+		include $(PROJ_DIR)/Environment/Central/Zephyr/zephyr.mk
 	endif
 
 	ifeq ($(app), e-peripheral)
-		include $(PROJ_DIR)/Configuration/E-Peripheral/Zephyr/zephyr.mk
+		include $(PROJ_DIR)/Environment/E-Peripheral/Zephyr/zephyr.mk
 	endif
 
 	ifeq ($(app), peripheral)
-		include $(PROJ_DIR)/Configuration/Peripheral/Zephyr/zephyr.mk
+		include $(PROJ_DIR)/Environment/Peripheral/Zephyr/zephyr.mk
 	endif
 
 endif
+
+# include $(PROJ_DIR)/Environment/Central/Nordic/baremetal.mk
+# include $(PROJ_DIR)/Environment/E-Peripheral/Nordic/baremetal.mk
+# include $(PROJ_DIR)/Environment/Peripheral/Nordic/baremetal.mk
+# include $(PROJ_DIR)/Environment/Central/Zephyr/zephyr.mk
+# include $(PROJ_DIR)/Environment/E-Peripheral/Zephyr/zephyr.mk
+# include $(PROJ_DIR)/Environment/Peripheral/Zephyr/zephyr.mk

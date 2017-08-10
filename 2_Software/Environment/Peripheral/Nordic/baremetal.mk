@@ -1,12 +1,12 @@
-PROJECT_NAME     := E-Peripheral
-TARGETS          := nrf52832_xxaa
-OUTPUT_DIRECTORY := outdir/nrf52832_xxaa
+PROJECT_NAME     := Peripheral
+TARGETS          := nrf52840_xxaa
+OUTPUT_DIRECTORY := outdir/nrf52840_xxaa
 
 SDK_ROOT 			:= $(PROJ_DIR)/nordic_components
 PROJECT_BASE 	:= $(PROJ_DIR)
 
-$(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
-  LINKER_SCRIPT  := $(PROJ_DIR)/Configuration/E-Peripheral/Nordic/nRF52832.ld
+$(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \
+  LINKER_SCRIPT  := $(PROJ_DIR)/Environment/Peripheral/Nordic/nRF52840.ld
 
 # Source files common to all targets
 SRC_FILES += \
@@ -54,18 +54,25 @@ SRC_FILES += \
 	$(SDK_ROOT)/components/ble/peer_manager/gatts_cache_manager.c \
 	$(SDK_ROOT)/components/ble/peer_manager/security_dispatcher.c \
 	$(SDK_ROOT)/components/ble/peer_manager/security_manager.c \
-	$(SDK_ROOT)/components/toolchain/system_nrf52.c \
-	$(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52.S \
+	$(SDK_ROOT)/components/toolchain/system_nrf52840.c \
+	$(SDK_ROOT)/components/toolchain/gcc/gcc_startup_nrf52840.S \
 	$(SDK_ROOT)/components/softdevice/common/softdevice_handler/softdevice_handler.c \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
 	$(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleP.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleC.c \
+	$(PROJECT_BASE)/AL/BareMetal/iI2c.c \
+	$(PROJECT_BASE)/AL/BareMetal/iSpi.c \
+	$(PROJECT_BASE)/AL/BareMetal/iGpio.c \
 	$(PROJECT_BASE)/AL/BareMetal/iTimer.c \
 	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
 	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \
-  $(PROJECT_BASE)/E-Peripheral/main.c
+	$(PROJECT_BASE)/Debug/iDebug_nRF52840.c \
+	$(PROJECT_BASE)/Drivers/acc.c \
+	$(PROJECT_BASE)/Drivers/adc.c \
+	$(PROJECT_BASE)/Drivers/swg.c \
+	$(PROJECT_BASE)/Peripheral/main.c
 
 # Include folders common to all targets
 INC_FOLDERS += \
@@ -119,38 +126,27 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/ble/nrf_ble_gatt \
 	$(SDK_ROOT)/components/ble/peer_manager \
 	$(SDK_ROOT)/components/ble/ble_advertising \
-	$(SDK_ROOT)/components/softdevice/s132/headers \
-	$(SDK_ROOT)/components/softdevice/s132/headers/nrf52 \
+	$(SDK_ROOT)/components/softdevice/s140/headers \
+	$(SDK_ROOT)/components/softdevice/s140/headers/nrf52 \
 	$(SDK_ROOT)/components/softdevice/common/softdevice_handler \
 	$(SDK_ROOT)/external/segger_rtt \
 	$(SDK_ROOT)/components/toolchain \
 	$(SDK_ROOT)/components/toolchain/gcc \
 	$(SDK_ROOT)/components/toolchain/cmsis/include \
 	$(PROJECT_BASE) \
-	$(PROJECT_BASE)/Configuration/E-Peripheral/Nordic/ \
+	$(PROJECT_BASE)/Environment/Peripheral/Nordic/ \
 
 # Libraries common to all targets
 LIB_FILES += \
 
 # C flags common to all targets
 CFLAGS += -DBLE_STACK_SUPPORT_REQD
-CFLAGS += -DBOARD_PCA10040
+CFLAGS += -DNRF_LOG_USES_RTT=1
+CFLAGS += -DBOARD_PCA10056
 CFLAGS += -DCONFIG_GPIO_AS_PINRESET
-CFLAGS += -DNRF52
-CFLAGS += -DNRF52832_XXAA
-CFLAGS += -DNRF52_PAN_12
-CFLAGS += -DNRF52_PAN_15
-CFLAGS += -DNRF52_PAN_20
-CFLAGS += -DNRF52_PAN_31
-CFLAGS += -DNRF52_PAN_36
-CFLAGS += -DNRF52_PAN_51
-CFLAGS += -DNRF52_PAN_54
-CFLAGS += -DNRF52_PAN_55
-CFLAGS += -DNRF52_PAN_58
-CFLAGS += -DNRF52_PAN_64
-CFLAGS += -DNRF52_PAN_74
+CFLAGS += -DNRF52840_XXAA
 CFLAGS += -DNRF_SD_BLE_API_VERSION=5
-CFLAGS += -DS132
+CFLAGS += -DS140
 CFLAGS += -DSOFTDEVICE_PRESENT
 CFLAGS += -DSWI_DISABLE0
 CFLAGS += -mcpu=cortex-m4
@@ -162,8 +158,10 @@ CFLAGS += -mfloat-abi=hard -mfpu=fpv4-sp-d16
 CFLAGS += -ffunction-sections -fdata-sections -fno-strict-aliasing
 CFLAGS += -fno-builtin --short-enums
 
-# Add all configuration variables as C define
+# Add all Environment variables as C define
+#CFLAGS += $(PROJ_FLAGS) -DBAREMETALE_USED
 CFLAGS += -DBAREMETALE_USED
+CFLAGS += -DPERIPHERAL_CONFIG
 
 # C++ flags common to all targets
 CXXFLAGS += \
@@ -171,23 +169,11 @@ CXXFLAGS += \
 # Assembler flags common to all targets
 ASMFLAGS += -x assembler-with-cpp
 ASMFLAGS += -DBLE_STACK_SUPPORT_REQD
-ASMFLAGS += -DBOARD_PCA10040
+ASMFLAGS += -DBOARD_PCA10056
 ASMFLAGS += -DCONFIG_GPIO_AS_PINRESET
-ASMFLAGS += -DNRF52
-ASMFLAGS += -DNRF52832_XXAA
-ASMFLAGS += -DNRF52_PAN_12
-ASMFLAGS += -DNRF52_PAN_15
-ASMFLAGS += -DNRF52_PAN_20
-ASMFLAGS += -DNRF52_PAN_31
-ASMFLAGS += -DNRF52_PAN_36
-ASMFLAGS += -DNRF52_PAN_51
-ASMFLAGS += -DNRF52_PAN_54
-ASMFLAGS += -DNRF52_PAN_55
-ASMFLAGS += -DNRF52_PAN_58
-ASMFLAGS += -DNRF52_PAN_64
-ASMFLAGS += -DNRF52_PAN_74
+ASMFLAGS += -DNRF52840_XXAA
 ASMFLAGS += -DNRF_SD_BLE_API_VERSION=5
-ASMFLAGS += -DS132
+ASMFLAGS += -DS140
 ASMFLAGS += -DSOFTDEVICE_PRESENT
 ASMFLAGS += -DSWI_DISABLE0
 
@@ -203,12 +189,12 @@ LDFLAGS += --specs=nano.specs -lc -lnosys
 .PHONY: $(TARGETS) default all clean help flash flash_softdevice
 
 # Default target - first one defined
-default: nrf52832_xxaa
+default: nrf52840_xxaa
 
 # Print all targets that can be built
 help:
 	@echo following targets are available:
-	@echo 	nrf52832_xxaa
+	@echo 	nrf52840_xxaa
 
 TEMPLATE_PATH := $(SDK_ROOT)/components/toolchain/gcc
 
@@ -218,10 +204,10 @@ $(foreach target, $(TARGETS), $(call define_target, $(target)))
 
 # Create the output directory if it doesn't exist
 $(OUTPUT_DIRECTORY):
-	@mkdir -p  $(OUTPUT_DIRECTORY)
+	@mkdir -p $(OUTPUT_DIRECTORY)
 
 # Flash the program
-flash: $(OUTPUT_DIRECTORY)/nrf52832_xxaa.hex
+flash: $(OUTPUT_DIRECTORY)/nrf52840_xxaa.hex
 	@echo Flashing: $<
 	nrfjprog --program $< -f nrf52 --sectorerase
 	nrfjprog --reset -f nrf52
@@ -229,8 +215,8 @@ flash: $(OUTPUT_DIRECTORY)/nrf52832_xxaa.hex
 # Flash softdevice
 flash_softdevice:
 	@mkdir -p $(OUTPUT_DIRECTORY)#
-	@echo Flashing: s132_nrf52_4.0.2_softdevice.hex
-	nrfjprog --program $(SDK_ROOT)/components/softdevice/s132/hex/hex/s132_nrf52_4.0.2_softdevice.hex -f nrf52 --sectorerase
+	@echo Flashing: s140_nrf52840_5.0.0-2.alpha_softdevice.hex
+	nrfjprog --program $(SDK_ROOT)/components/softdevice/s140/hex/s140_nrf52840_5.0.0-2.alpha_softdevice.hex -f nrf52 --sectorerase
 	nrfjprog --reset -f nrf52
 
 erase:

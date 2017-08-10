@@ -1,3 +1,5 @@
+#if ENABLE_MEASUREMENT
+
 #include "iDebug_nRF52840.h"
 
 #define DEBUG_PIN_INIT(_pin, _port)   _port->DIRSET |= (1 << _pin)
@@ -98,3 +100,5 @@ void iDebug_init()
   DEBUG_START();
   iPrint("[INIT] DEBUG initialized\n");
 }
+
+#endif  // ENABLE_MEASUREMENT

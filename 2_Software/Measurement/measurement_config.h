@@ -1,0 +1,4 @@
+#ifndef __MEASUREMENT_CONFIG_H__
+#define __MEASUREMENT_CONFIG_H__
+
+#endif  // __MEASUREMENT_CONFIG_H__
