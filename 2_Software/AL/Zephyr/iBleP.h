@@ -1,4 +1,4 @@
-#if CONFIG_BLUETOOTH_PERIPHERAL
+#if CONFIG_BT_PERIPHERAL
 
 #ifndef __IBLEP__
 #define __IBLEP__
@@ -168,4 +168,4 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 
 #endif	// __IBLEP__
 
-#endif  // CONFIG_BLUETOOTH_PERIPHERAL
+#endif  // CONFIG_BT_PERIPHERAL

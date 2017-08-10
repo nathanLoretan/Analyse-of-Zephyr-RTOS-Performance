@@ -1,4 +1,4 @@
-#if CONFIG_BLUETOOTH_PERIPHERAL
+#if CONFIG_BT_PERIPHERAL
 
 #include "iBleP.h"
 
@@ -13,7 +13,7 @@ struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 ssize_t iBleP_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
                           void *buf, u16_t buf_length, u16_t offset)
 {
-  BLE_READ();
+  // BLE_READ();
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
@@ -227,14 +227,14 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 {
   int error;
 
-  BLE_ERROR(0);
+  // BLE_ERROR(0);
 
-  BLE_NOTIFY(1);
+  // BLE_NOTIFY(1);
   error = bt_gatt_notify(NULL, iBleP_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
-  BLE_NOTIFY(0);
+  // BLE_NOTIFY(0);
 
   if(error) {
-    BLE_ERROR(1);
+    // BLE_ERROR(1);
   }
 
   return error;
@@ -242,7 +242,7 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 
 static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
-  BLE_INDICATE_RSP();
+  // BLE_INDICATE_RSP();
 	k_mutex_unlock(&indicate_mutex);
 }
 
@@ -258,17 +258,17 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
 	ind_params.data = buf;
 	ind_params.len 	= buf_length;
 
-  BLE_ERROR(0);
+  // BLE_ERROR(0);
 
-  BLE_INDICATE(1);
+  // BLE_INDICATE(1);
 	error = bt_gatt_indicate(NULL, &ind_params);
-  BLE_INDICATE(0);
+  // BLE_INDICATE(0);
 
   if(error) {
-    BLE_ERROR(1);
+    // BLE_ERROR(1);
   }
 
   return error;
 }
 
-#endif  // CONFIG_BLUETOOTH_PERIPHERAL
+#endif  // CONFIG_BT_PERIPHERAL

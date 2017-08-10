@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include "Debug/iDebug_nRF52840.h"
-
 #ifdef 	ZEPHYR_USED
   #include "AL/Zephyr/zephyr_interface.h"
 #endif
@@ -15,11 +13,16 @@
   #include "AL/BareMetal/nrf5x_interface.h"
 #endif
 
+// #ifdef ENABLE_DEBUG
+//   #include "Debug/iDebug_nRF52840.h"
+// #endif
+
 //------------------------------------------------------------------------------
 #define ENABLE_ACC        0
 #define ENABLE_ADC        0
 #define ENABLE_SWG        0
 #define ENABLE_BLE        1
+#define ENABLE_DEBUG      1
 #define POWER_MEASUREMENT 0
 
 // Externa. Interrupt-----------------------------------------------------------
@@ -64,6 +67,5 @@
 #define FREQ_STEP2                10000
 #define FREQ_1TO2                 10000
 #define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP) <= FREQ_1TO2) ? (_freq + FREQ_STEP) : (_freq + FREQ_STEP2);
-
 
 #endif  // __CONFIGURATION_H__

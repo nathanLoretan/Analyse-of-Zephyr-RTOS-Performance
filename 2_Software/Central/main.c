@@ -12,78 +12,17 @@
 DEFINE_IBLEC_SCAN_PARAMS(scan_params, IBLEC_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
 DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
 
-//TODO: if 128bit uuid. octect 12-13
-
-// iBleC_attr_disc_t attr_disc_array[] =
-// {
-// 	{
-// 		.uuid16			= 0x1805,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_SVC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A08,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2902,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_DESC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A09,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2902,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_DESC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A0A,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// 	{
-// 		.uuid16			= 0x180D,
-// 		.uuid_type 	= UUID_16,
-// 		.type	= IBLEP_DISCOVER_SVC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A21,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A37,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// 	{
-// 		.uuid16			= 0x180F,
-// 		.uuid_type 	= UUID_16,
-// 		.type	= IBLEP_DISCOVER_SVC,
-// 	},
-// 	{
-// 		.uuid16			= 0x2A19,
-// 		.uuid_type 	= UUID_16,
-// 		.type 	= IBLEP_DISCOVER_CHRC,
-// 	},
-// };
-
 #define UUID_SVC    0xAAAA
 #define UUID_CHRC   0xBBBB
 #define UUID_BASE   0x34, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBleC_attr_disc_t attr_disc_list[] =
 {
-ADD_SVC_TO_DISCOVER_UUID16(0x1805),
-ADD_CHRC_TO_DISCOVER_UUID16(0x2A2B),
-ADD_DESC_TO_DISCOVER_UUID16(0x2902),
-ADD_SVC_TO_DISCOVER_UUID128(UUID_SVC, UUID_BASE),
-ADD_CHRC_TO_DISCOVER_UUID128(UUID_CHRC, UUID_BASE),
+	ADD_SVC_TO_DISCOVER_UUID16(0x1805),
+	ADD_CHRC_TO_DISCOVER_UUID16(0x2A2B),
+	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
+	ADD_SVC_TO_DISCOVER_UUID128(UUID_SVC, UUID_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(UUID_CHRC, UUID_BASE),
 };
 
 

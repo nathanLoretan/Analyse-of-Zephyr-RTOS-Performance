@@ -1,14 +1,15 @@
 PROJECT_BASE	= 	$(PROJ_DIR)
-BOARD					?= 	nrf52840_pca10056
-CONF_FILE 		= 	$(PROJECT_BASE)/AL/Zephyr/zephyr.config
 SOURCE_DIR 		= 	$(PROJECT_BASE)
-#KBUILD_CFLAGS += 	$(PROJ_FLAGS) -DZEPHYR_USED
+BOARD					?= 	nrf52_pca10040
 KBUILD_CFLAGS += 	-DZEPHYR_USED
+
+CONF_FILE 		= 	$(PROJECT_BASE)/AL/Zephyr/zephyr.config
 
 obj-y += Drivers/
 obj-y += Debug/
 obj-y += AL/Zephyr/
-obj-y += Peripheral_Emulator/
+
+obj-y += E-Peripheral/
 # obj-y += Central/
 # obj-y += Peripheral/
 # obj-y += Test/

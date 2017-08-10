@@ -31,6 +31,8 @@
 #define ACC_MODE_LOW_POWER							0x01
 #define ACC_MODE_NORMAL									0x02
 
+iEventQueue_t acc_EventQueue;
+
 typedef enum {
 	ACC_EVENT_INT1 = 0,
 	ACC_EVENT_INT2,
@@ -50,7 +52,6 @@ typedef struct {
     uint16_t z;
 } sample_t;
 
-iEventQueue_t acc_EventQueue;
 
 void acc_init();
 acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples);

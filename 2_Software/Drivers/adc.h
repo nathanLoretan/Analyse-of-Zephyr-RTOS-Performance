@@ -24,6 +24,8 @@
 #define	ADC_CONVERSION_CONTINUOUS			0x00
 #define	ADC_CONVERSION_SINGLE_CYCLE		0x02
 
+iEventQueue_t adc_EventQueue;
+
 typedef enum {
 	ADC_EVENT_DATA = 0,
 	ADC_EVENT_SLEEP,
@@ -34,8 +36,6 @@ typedef enum {
 	ADC_NO_ERROR = 0,
 	ADC_ERROR_NO_DATA_AVAILABLE
 } adc_error_t ;
-
-iEventQueue_t adc_EventQueue;
 
 void adc_init();
 void adc_sleep();

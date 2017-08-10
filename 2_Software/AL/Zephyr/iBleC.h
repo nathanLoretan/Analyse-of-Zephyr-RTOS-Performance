@@ -1,4 +1,4 @@
-#if CONFIG_BLUETOOTH_CENTRAL
+#if CONFIG_BT_CENTRAL
 
 #ifndef __IBLEC__
 #define __IBLEC__
@@ -26,7 +26,7 @@
 #define NOT_CONNECTED			NULL
 #define NOT_HANDLE_FOUND	0xFFFF
 
-#define	IBLEC_MAX_CONN 		CONFIG_BLUETOOTH_MAX_CONN
+#define	IBLEC_MAX_CONN 		CONFIG_BT_MAX_CONN
 
 typedef uint16_t									iBleC_conn_t;
 typedef struct bt_le_scan_param 	iBleC_scan_params_t;
@@ -201,7 +201,7 @@ struct {
 	struct bt_conn*	conn_ref;
 	iBleC_attr_t* attrs;
 	volatile bool isReady;
-} link[CONFIG_BLUETOOTH_MAX_CONN];
+} link[CONFIG_BT_MAX_CONN];
 
 #define IBLEC_READ_HANDLER(handler, params)\
 	void handler(iBleC_conn_t conn, iBleC_read_params_t* params)
@@ -230,4 +230,4 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
 #endif	// __IBLEC__
 
-#endif	// CONFIG_BLUETOOTH_CENTRAL
+#endif	// CONFIG_BT_CENTRAL

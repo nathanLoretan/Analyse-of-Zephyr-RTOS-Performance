@@ -597,14 +597,14 @@ int iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	BLE_ERROR(0);
+	// BLE_ERROR(0);
 
-	BLE_NOTIFY(1);
+	// BLE_NOTIFY(1);
 	error = sd_ble_gatts_hvx(connection, &hvx_params);
-	BLE_NOTIFY(0);
+	// BLE_NOTIFY(0);
 
 	if(error) {
-		BLE_ERROR(1);
+		// BLE_ERROR(1);
 	}
 
 	return error;
@@ -621,14 +621,14 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	BLE_ERROR(0);
+	// BLE_ERROR(0);
 
-	BLE_INDICATE(1);
+	// BLE_INDICATE(1);
 	error = sd_ble_gatts_hvx(connection, &hvx_params);
-	BLE_INDICATE(0);
+	// BLE_INDICATE(0);
 
 	if(error) {
-		BLE_ERROR(1);
+		// BLE_ERROR(1);
 	}
 
 	return error;

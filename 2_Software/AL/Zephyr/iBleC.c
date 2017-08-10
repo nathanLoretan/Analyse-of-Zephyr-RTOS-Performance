@@ -1,4 +1,4 @@
-#if	CONFIG_BLUETOOTH_CENTRAL
+#if	CONFIG_BT_CENTRAL
 
 #include "iBleC.h"
 
@@ -18,7 +18,7 @@ static struct bt_gatt_discover_params discover_params;
 
 static int _get_conn_ref(struct bt_conn *conn)
 {
-	for(int i = 0; i < CONFIG_BLUETOOTH_MAX_CONN; i++)
+	for(int i = 0; i < CONFIG_BT_MAX_CONN; i++)
 	{
 		if(link[i].conn_ref == conn)
 			return i;
@@ -29,7 +29,7 @@ static int _get_conn_ref(struct bt_conn *conn)
 
 static int _get_conn_space()
 {
-	for(int i = 0; i < CONFIG_BLUETOOTH_MAX_CONN; i++)
+	for(int i = 0; i < CONFIG_BT_MAX_CONN; i++)
 	{
 		if(link[i].conn_ref == NULL)
 			return i;
@@ -79,7 +79,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	struct net_buf_simple complete_local_name;
 
 	// Disable the scan if the maximum number of connection is reached
-	if(nbr_conn >= CONFIG_BLUETOOTH_MAX_CONN)
+	if(nbr_conn >= CONFIG_BT_MAX_CONN)
 	{
 		error = bt_le_scan_stop();
 		if(error) {
@@ -594,4 +594,4 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
   return 0xFFFF;
 }
 
-#endif	// CONFIG_BLUETOOTH_CENTRAL
+#endif	// CONFIG_BT_CENTRAL
