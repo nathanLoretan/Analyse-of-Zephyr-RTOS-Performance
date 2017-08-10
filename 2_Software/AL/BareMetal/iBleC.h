@@ -32,16 +32,19 @@
 #define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
 #define TOTAL_LINK_COUNT          CENTRAL_LINK_COUNT + PERIPHERAL_LINK_COUNT    /**< Total number of links used by the application. */
 
-#define NOT_CONNECTED	BLE_CONN_HANDLE_INVALID
+#define NOT_CONNECTED			BLE_CONN_HANDLE_INVALID
+#define NOT_HANDLE_FOUND	0xFFFF
+
+#define	IBLEC_MAX_CONN 		TOTAL_LINK_COUNT
 
 typedef uint16_t 								iBleC_conn_t;
 typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
 typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
 
 typedef enum {
-	IBLEC_DISCOVER_SVC,
-	IBLEC_DISCOVER_DESC,
-	IBLEC_DISCOVER_CHRC,
+	IBLEC_ATTR_SVC,
+	IBLEC_ATTR_DESC,
+	IBLEC_ATTR_CHRC,
 } iBleC_attr_type_t;
 
 typedef enum {
@@ -57,6 +60,71 @@ typedef struct {
 	iBleC_uuid_type_t uuid_type;
 	iBleC_attr_type_t type;
 } iBleC_attr_disc_t;
+
+#define ADD_SVC_TO_DISCOVER_UUID16(_uuid)\
+	{\
+		.uuid16 		= _uuid,\
+		.uuid_type 	= UUID_16,\
+		.type				= IBLEC_ATTR_SVC\
+	}
+
+#define ADD_CHRC_TO_DISCOVER_UUID16(_uuid)\
+	{\
+		.uuid16 		= _uuid,\
+		.uuid_type 	= UUID_16,\
+		.type				= IBLEC_ATTR_CHRC\
+	}
+
+#define ADD_DESC_TO_DISCOVER_UUID16(_uuid)\
+	{\
+		.uuid16 		= _uuid,\
+		.uuid_type 	= UUID_16,\
+		.type				= IBLEC_ATTR_DESC\
+	}
+
+#define ADD_SVC_TO_DISCOVER_UUID128(_uuid, _base...)\
+	{\
+		.uuid128 		= DEFINE_IBLEC_UUID128(_uuid, _base),\
+		.uuid_type 	= UUID_128,\
+		.type				= IBLEC_ATTR_SVC\
+	}
+
+#define ADD_CHRC_TO_DISCOVER_UUID128(_uuid, _base...)\
+	{\
+		.uuid128 		= DEFINE_IBLEC_UUID128(_uuid, _base),\
+		.uuid_type 	= UUID_128,\
+		.type				= IBLEC_ATTR_CHRC\
+	}
+
+#define ADD_DESC_TO_DISCOVER_UUID128(_uuid, _base...)\
+	{\
+		.uuid128 		= DEFINE_IBLEC_UUID128(_uuid, _base),\
+		.uuid_type 	= UUID_128,\
+		.type				= IBLEC_ATTR_DESC\
+	}
+
+//The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
+#define DEFINE_IBLEC_UUID128(_uuid, _base...)		 {BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
+																									BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
+																									BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0)}
+
+#define BYTE1(b1, ...)    b1
+#define BYTE2(b1, ...)    BYTE1(__VA_ARGS__, N)   // Keep only the last bits
+#define BYTE3(b1, ...)    BYTE2(__VA_ARGS__, N)   // Keep only the 2 last bits
+#define BYTE4(b1, ...)    BYTE3(__VA_ARGS__, N)   // Keep only the 3 last bits
+#define BYTE5(b1, ...)    BYTE4(__VA_ARGS__, N)   // Keep only the 4 last bits
+#define BYTE6(b1, ...)    BYTE5(__VA_ARGS__, N)   // Keep only the 5 last bits
+#define BYTE7(b1, ...)    BYTE6(__VA_ARGS__, N)   // Keep only the 6 last bits
+#define BYTE8(b1, ...)    BYTE7(__VA_ARGS__, N)   // Keep only the 7 last bits
+#define BYTE9(b1, ...)    BYTE8(__VA_ARGS__, N)   // Keep only the 8 last bits
+#define BYTE10(b1, ...)   BYTE9(__VA_ARGS__, N)   // Keep only the 9 last bits
+#define BYTE11(b1, ...)   BYTE10(__VA_ARGS__, N)  // Keep only the 10 last bits
+#define BYTE12(b1, ...)   BYTE11(__VA_ARGS__, N)  // Keep only the 11 last bits
+#define BYTE13(b1, ...)   BYTE12(__VA_ARGS__, N)  // Keep only the 12 last bits
+#define BYTE14(b1, ...)   BYTE13(__VA_ARGS__, N)  // Keep only the 13 last bits
+#define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
+#define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
+
 
 // Interval and Windows in 0,625 Unit
 #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)\

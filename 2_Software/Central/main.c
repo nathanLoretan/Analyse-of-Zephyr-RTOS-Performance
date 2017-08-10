@@ -1,11 +1,6 @@
 #include "../configuration.h"
 #include "../Debug/iDebug_nRF52840.h"
 
-// #define MSEC_TO_UNITS(_time, _unit)           	(_time*1000)/_unit
-// #define UNIT_1_25_MS                          	1250
-// #define UNIT_10_MS                            	10000
-// #define UNIT_0_625_MS                         	625
-
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
 
@@ -78,48 +73,17 @@ DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAV
 // 	},
 // };
 
+#define UUID_SVC    0xAAAA
+#define UUID_CHRC   0xBBBB
+#define UUID_BASE   0x34, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
 iBleC_attr_disc_t attr_disc_list[] =
 {
-	{
-		.uuid16			= 0x1800,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_SVC,
-	},
-	{
-		.uuid16			= 0x2A00,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_CHRC,
-	},
-	{
-		.uuid16			= 0x2A01,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_CHRC,
-	},
-	{
-		.uuid16			= 0x2A04,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_CHRC,
-	},
-	{
-		.uuid16			= 0x1801,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_SVC,
-	},
-	{
-		.uuid16			= 0x1805,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_SVC,
-	},
-	{
-		.uuid16			= 0x2A2B,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_CHRC,
-	},
-	{
-		.uuid16			= 0x2902,
-		.uuid_type 	= UUID_16,
-		.type 			= IBLEC_DISCOVER_DESC,
-	},
+ADD_SVC_TO_DISCOVER_UUID16(0x1805),
+ADD_CHRC_TO_DISCOVER_UUID16(0x2A2B),
+ADD_DESC_TO_DISCOVER_UUID16(0x2902),
+ADD_SVC_TO_DISCOVER_UUID128(UUID_SVC, UUID_BASE),
+ADD_CHRC_TO_DISCOVER_UUID128(UUID_CHRC, UUID_BASE),
 };
 
 
@@ -160,17 +124,18 @@ int main()
 			// enabled = true;
 			// iPrint("0x%x, %x\n", 0x1805, iBleC_get_svc_handle(0, 0x1805));
 			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_decl_handle(0, 0x1805, 0x2A2B));
-			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902));
+			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B));
+			// iPrint("0x%x, %x\n", 0x2902, iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902));
 			// iPrint("0x%x, %x\n", 0x2A00, iBleC_get_chrc_decl_handle(0, 0x1800, 0x2A00));
 
-			enabled = true;
-			iBleC_notify_params_t notify_params;
-			notify_params.handler				= notify_rsp;
-			notify_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
-			notify_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
-			iBleC_subscribe_notify(0, &notify_params);
+			// enabled = true;
+			// iBleC_notify_params_t notify_params;
+			// notify_params.handler				= notify_rsp;
+			// notify_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// notify_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
+			// iBleC_subscribe_notify(0, &notify_params);
 
-			// // enabled = true;
+			// enabled = true;
 			// iBleC_indicate_params_t indicate_params;
 			// indicate_params.handler				= indicate_rsp;
 			// indicate_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
@@ -187,15 +152,13 @@ int main()
 			// val++;
 			// iBleC_write_params_t write_params;
 			// write_params.handler = write_rsp;
-			// write_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// write_params.handle	= iBleC_get_chrc_val_handle(0, UUID_SVC, UUID_CHRC);
+			// // write_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
 			// write_params.offset = 0;
 			// write_params.data 	= &val;
 			// write_params.length = 4;
 			// iBleC_write(0, &write_params);
 		}
-		// else
-		else if(!enabled)
-			iPrint("No device connected\n");
   }
 
   iPrint("-> Exit\n");

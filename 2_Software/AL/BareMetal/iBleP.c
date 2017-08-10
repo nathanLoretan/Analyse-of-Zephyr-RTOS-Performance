@@ -474,7 +474,7 @@ static uint32_t iBleP_svc_char_add(iBleP_svc_t* svc, iBleP_chrc_t* chrc, uint8_t
 
 	// Add read/write properties to the characteristic
 	ble_gatts_char_md_t chrc_md = {0};
-	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_BROADCAST) 					? 1 : 0;
+	chrc_md.char_props.broadcast 			= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_BROADCAST) 						? 1 : 0;
 	chrc_md.char_props.read 					= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_READ) 								? 1 : 0;
 	chrc_md.char_props.write_wo_resp 	= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE_WITHOUT_RESP) 	? 1 : 0;
 	chrc_md.char_props.write 					= (chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE)						 		? 1 : 0;
