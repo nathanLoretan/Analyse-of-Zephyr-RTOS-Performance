@@ -18,7 +18,7 @@ acc_init():void
 acc_sleep():void 
 acc_wakeup():void 
 acc_isSleeping():bool 
-acc_getXYZ(samples:sample_t*, nbr_samples:uint8_t):acc_error_t 
+acc_getXYZ(samples:acc_sample_t*, nbr_samples:uint8_t):acc_error_t 
 </panel_attributes>
     <additional_attributes/>
   </element>

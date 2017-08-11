@@ -2,7 +2,7 @@
 
 #include "iBleC.h"
 
-static uint8_t nbr_conn = 0;
+static uint8_t _nbr_conn = 0;
 static struct bt_conn* new_conn;
 
 static iBleC_conn_params_t* _conn_params;
@@ -79,8 +79,11 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	struct net_buf_simple complete_local_name;
 
 	// Disable the scan if the maximum number of connection is reached
-	if(nbr_conn >= CONFIG_BT_MAX_CONN)
+	if(_nbr_conn >= CONFIG_BT_MAX_CONN)
 	{
+		iPrint("/!\\ Maximum number of %d connections\n", CONFIG_BT_MAX_CONN);
+		iPrint("-> Scanning stopped\n");
+
 		error = bt_le_scan_stop();
 		if(error) {
 			iPrint("/!\\ Stop LE scan failed: error %d\n", error);
@@ -101,7 +104,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	char complete_local_name_str[complete_local_name.len+1];
 	memset(complete_local_name_str, 0, complete_local_name.len+1);
 	memcpy(complete_local_name_str, complete_local_name.data, complete_local_name.len);
-	// iPrint("-> Device found %s, %d, %d\n", complete_local_name_str, device_name.len, sizeof(IBLEP_PERIPHERAL_NAME));
+	// iPrint("-> Device found %s\n", complete_local_name_str);
 
 	// Control the size of the peripheral's name, the \0 is not include in the device's name
 	if(complete_local_name.len != sizeof(IBLE_PERIPHERAL_NAME)-1) {
@@ -150,7 +153,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 			memcpy(&link[ref].attrs[handle].uuid16, &BT_UUID_128(params->uuid)->val[12], 2);
 		}
 
-		iPrint("SVC  0x%04x, Handle: 0x%04x\n", link[ref].attrs[handle].uuid16 , handle);
+		iPrint("Device %d SVC  0x%04x, Handle: 0x%04x\n", ref, link[ref].attrs[handle].uuid16 , handle);
 	}
 	else if(params->type == BT_GATT_DISCOVER_CHARACTERISTIC && attr != NULL)
 	{
@@ -165,7 +168,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 			memcpy(&link[ref].attrs[handle].uuid16, &BT_UUID_128(params->uuid)->val[12], 2);
 		}
 
-		iPrint("CHRC 0x%04x, Handle: 0x%04x\n", link[ref].attrs[handle].uuid16 , handle);
+		iPrint("Device %d CHRC 0x%04x, Handle: 0x%04x\n", ref, link[ref].attrs[handle].uuid16 , handle);
 	}
 	else if(params->type == BT_GATT_DISCOVER_DESCRIPTOR && attr != NULL)
 	{
@@ -173,7 +176,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 		link[ref].attrs[handle].type   = IBLEC_ATTR_DESC;
 		link[ref].attrs[handle].uuid16 = BT_UUID_16(params->uuid)->val;
 
-		iPrint("DESC 0x%04x, Handle: 0x%04x\n", link[ref].attrs[handle].uuid16, handle);
+		iPrint("Device %d DESC 0x%04x, Handle: 0x%04x\n", ref, link[ref].attrs[handle].uuid16, handle);
 	}
 
 	_disc_ref++;
@@ -181,6 +184,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	{
 		link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
+		iBleC_scan_start(NULL);
 		return BT_GATT_ITER_STOP;
 	}
 
@@ -218,11 +222,11 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
+		iBleC_scan_start(NULL);
 		return BT_GATT_ITER_STOP;
 	}
 
 	return BT_GATT_ITER_STOP;
-	// return BT_GATT_ITER_CONTINUE;
 }
 
 static void _start_discovery(struct bt_conn* conn)
@@ -254,6 +258,7 @@ static void _start_discovery(struct bt_conn* conn)
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
+		iBleC_scan_start(NULL);
 		return;
 	}
 }
@@ -318,6 +323,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 	if(conn_err) {
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
+		iBleC_scan_start(NULL);
 	}
 	else if(new_conn == conn)
 	{
@@ -326,7 +332,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		link[ref].conn_ref 	= conn;
 		link[ref].isReady 	= false;
 		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t*) * _nbr_handles);
-		nbr_conn++;
+		_nbr_conn++;
 
 		struct bt_conn_info info;
 		error = bt_conn_get_info(conn, &info);
@@ -341,36 +347,48 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 
 		_start_discovery(link[ref].conn_ref);
-
-		iBleC_scan_start(NULL);
 	}
 	else {
 		iPrint("-> Connection to %d failed: error connection reference\n", ref);
+		iBleC_scan_start(NULL);
 	}
 }
 
 static void _on_disconnection(struct bt_conn* conn, u8_t reason)
 {
 	// int error;
-	uint8_t ref;
+	uint8_t ref = _get_conn_ref(conn);
 
-	// Search which device is disconnected
-	ref = _get_conn_ref(conn);
 
 	bt_conn_unref(link[ref].conn_ref);
 	k_free(link[ref].attrs);
 	link[ref].isReady	= false;
 	link[ref].conn_ref = NULL;
-	nbr_conn--;
+	_nbr_conn--;
 
 	iPrint("-> Peripheral %d disconnected: 0x%x\n", ref, reason);
-	iBleC_scan_start(NULL);
+
+	if(_nbr_conn >= CONFIG_BT_MAX_CONN-1) {
+    iBleC_scan_start(NULL);
+	}
+}
+
+static void _on_conn_parameters_update(struct bt_conn *conn,
+                                        u16_t interval, u16_t latency,
+                                        u16_t timeout)
+{
+  iPrint("\n-> Connection Parameters Update\n");
+  iPrint("-------------------------------\n");
+  iPrint("Connection Interval: %u[us]\n", interval * UNIT_1_25_MS);
+  iPrint("Connection Slave Latency: %u\n", latency);
+  iPrint("Connection Timeout: %u[ms]\n", timeout * UNIT_10_MS / 1000);
 }
 
 static struct bt_conn_cb connection_callback =
 {
 	.connected 		    = _on_connection,
 	.disconnected     = _on_disconnection,
+	.le_param_updated = _on_conn_parameters_update,
 };
 
 int iBleC_init(iBleC_conn_params_t* conn_params)

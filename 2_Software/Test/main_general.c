@@ -296,7 +296,7 @@ void bluetooth_test()
 
 void acc_test()
 {
-  sample_t samples[ACC_SAMPLE_NBR_MAX];
+  acc_sample_t samples[ACC_SAMPLE_NBR_MAX];
 
   acc_init();
 

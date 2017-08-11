@@ -2,7 +2,7 @@
 #define __CENTRAL_CONFIG_H__
 
 // Measurement------------------------------------------------------------------
-#define ENABLE_MEASUREMENT  1
+#define ENABLE_MEASUREMENT  0
 #define POWER_MEASUREMENT   0
 
 // Serial Configuration---------------------------------------------------------
@@ -14,7 +14,7 @@
 
 // Drivers----------------------------------------------------------------------
 #define ENABLE_SWG        0
-#define ENABLE_BLE        0
+#define ENABLE_BLE        1
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
@@ -23,8 +23,8 @@
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
 
-#define CONN_MIN_INTERVAL		MSEC_TO_UNITS(30, UNIT_1_25_MS)
-#define CONN_MAX_INTERVAL		MSEC_TO_UNITS(50, UNIT_1_25_MS)
+#define CONN_MIN_INTERVAL		MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
+#define CONN_MAX_INTERVAL		MSEC_TO_UNITS(8.75, UNIT_1_25_MS)
 #define CONN_TIMOUT					MSEC_TO_UNITS(4000, UNIT_10_MS)
 #define SLAVE_LATENCY				0
 

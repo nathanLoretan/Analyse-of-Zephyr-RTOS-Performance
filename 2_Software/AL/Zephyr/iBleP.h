@@ -152,11 +152,11 @@ typedef struct bt_gatt_attr		 						iBleP_cccd_config_t;
 #define IBLEP_ATTR_CONFIG(_uuid, _perm, _write_handler, _p_data)  		BT_GATT_DESCRIPTOR(_uuid, _perm, iBleP_read_handler, _write_handler, _p_data)
 
 typedef enum {
-	BLE_EVENT_CONNECTED = 0,
-	BLE_EVENT_DISCONNECTED,
-} bleEvent_t;
+	BLEP_EVENT_CONNECTED = 0,
+	BLEP_EVENT_DISCONNECTED,
+} blePEvent_t;
 
-iEventQueue_t ble_EventQueue;
+iEventQueue_t bleP_EventQueue;
 
 int	iBleP_init();
 volatile bool iBleP_isConnected();

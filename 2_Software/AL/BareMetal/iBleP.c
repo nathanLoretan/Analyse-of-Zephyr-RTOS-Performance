@@ -24,10 +24,14 @@ static nrf_ble_gatt_t gatt_module;
 #define SEC_PARAM_MAX_KEY_SIZE          16
 #define SEC_PARAM_IO_CAPABILITIES       BLE_GAP_IO_CAPS_NONE
 
-#define CONN_MIN_INTERVAL     10        // [ms] ranges from 7.5ms to 4s
-#define CONN_MAX_INTERVAL     15        // [ms] ranges from 7.5ms to 4s
-#define CONN_TIMEOUT          20000     // [ms]
-#define SLAVE_LATENCY         0
+#define DEFAULT_CONN_MIN_INTERVAL     10        // [ms] ranges from 7.5ms to 4s
+#define DEFAULT_CONN_MAX_INTERVAL     15        // [ms] ranges from 7.5ms to 4s
+#define DEFAULT_CONN_TIMEOUT          20000     // [ms]
+#define DEFAULT_SLAVE_LATENCY         0
+
+#define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
+#define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s
+#define ADV_TIMEOUT            IBLEP_ADV_TIMEOUT_NONE     // [ms]
 
 // iTimer element only used by the system
 extern void iTimer_init();
@@ -49,7 +53,7 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 	{
 		case BLE_GAP_EVT_CONNECTED: 		connection = ble_evt->evt.gap_evt.conn_handle;
 																		isConnected = true;
-																		iEventQueue_add(&ble_EventQueue, BLE_EVENT_CONNECTED);
+																		iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
 
 																		iPrint("\n-> Central connected\n");
 																		iPrint("--------------------\n");
@@ -61,7 +65,7 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 		case BLE_GAP_EVT_DISCONNECTED: 	connection = BLE_CONN_HANDLE_INVALID;
 																		isConnected = false;
-																		iEventQueue_add(&ble_EventQueue, BLE_EVENT_DISCONNECTED);
+																		iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
 
 																		iPrint("-> Central disconnected\n");
 
@@ -313,10 +317,10 @@ int iBleP_init()
 		return error;
 	}
 
-	gap_conn_params.min_conn_interval = MSEC_TO_UNITS(CONN_MIN_INTERVAL, UNIT_1_25_MS);
-	gap_conn_params.max_conn_interval = MSEC_TO_UNITS(CONN_MAX_INTERVAL, UNIT_1_25_MS);
-	gap_conn_params.slave_latency     = SLAVE_LATENCY;
-	gap_conn_params.conn_sup_timeout  = MSEC_TO_UNITS(CONN_TIMEOUT, UNIT_10_MS);
+	gap_conn_params.min_conn_interval = MSEC_TO_UNITS(DEFAULT_CONN_MIN_INTERVAL, UNIT_1_25_MS);
+	gap_conn_params.max_conn_interval = MSEC_TO_UNITS(DEFAULT_CONN_MAX_INTERVAL, UNIT_1_25_MS);
+	gap_conn_params.slave_latency     = DEFAULT_SLAVE_LATENCY;
+	gap_conn_params.conn_sup_timeout  = MSEC_TO_UNITS(DEFAULT_CONN_TIMEOUT, UNIT_10_MS);
 	error = sd_ble_gap_ppcp_set(&gap_conn_params);
 	if(error) {
 		iPrint("/!\\ GAP init failed: error %d\n", error);
@@ -393,7 +397,7 @@ int iBleP_init()
 		return error;
 	}
 
-	iEventQueue_init(&ble_EventQueue);
+	iEventQueue_init(&bleP_EventQueue);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 
@@ -597,14 +601,14 @@ int iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	// BLE_ERROR(0);
+	BLE_ERROR(0);
 
-	// BLE_NOTIFY(1);
+	BLE_NOTIFY(1);
 	error = sd_ble_gatts_hvx(connection, &hvx_params);
-	// BLE_NOTIFY(0);
+	BLE_NOTIFY(0);
 
 	if(error) {
-		// BLE_ERROR(1);
+		BLE_ERROR(1);
 	}
 
 	return error;
@@ -621,14 +625,14 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
 	hvx_params.p_len  = (uint16_t*) &buf_length;
 	hvx_params.p_data = buf;
 
-	// BLE_ERROR(0);
+	BLE_ERROR(0);
 
-	// BLE_INDICATE(1);
+	BLE_INDICATE(1);
 	error = sd_ble_gatts_hvx(connection, &hvx_params);
-	// BLE_INDICATE(0);
+	BLE_INDICATE(0);
 
 	if(error) {
-		// BLE_ERROR(1);
+		BLE_ERROR(1);
 	}
 
 	return error;

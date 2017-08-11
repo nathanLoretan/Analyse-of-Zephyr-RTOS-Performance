@@ -28,14 +28,10 @@
 #define IBLEC_SCAN_PASSIVE	0
 #define IBLEC_SCAN_ACTIVE		1
 
-#define CENTRAL_LINK_COUNT        8                                             /**< Number of central links used by the application. When changing this number remember to adjust the RAM settings*/
-#define PERIPHERAL_LINK_COUNT     0                                             /**< Number of peripheral links used by the application. When changing this number remember to adjust the RAM settings*/
-#define TOTAL_LINK_COUNT          CENTRAL_LINK_COUNT + PERIPHERAL_LINK_COUNT    /**< Total number of links used by the application. */
+#define	IBLEC_MAX_CONN 		NRF_BLE_CENTRAL_LINK_COUNT +  NRF_BLE_PERIPHERAL_LINK_COUNT
 
-#define NOT_CONNECTED			BLE_CONN_HANDLE_INVALID
-#define NOT_HANDLE_FOUND	0xFFFF
-
-#define	IBLEC_MAX_CONN 		TOTAL_LINK_COUNT
+#define IBLEC_NOT_CONNECTED			BLE_CONN_HANDLE_INVALID
+#define IBLEC_NOT_HANDLE_FOUND	0xFFFF
 
 typedef uint16_t 								iBleC_conn_t;
 typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
@@ -211,7 +207,7 @@ struct {
 	uint16_t			conn_ref;
 	iBleC_attr_t* attrs;
 	volatile bool isReady;
-} link[TOTAL_LINK_COUNT];
+} link[IBLEC_MAX_CONN];
 
 #define IBLEC_READ_HANDLER(handler, params) \
 	void handler(iBleC_conn_t conn,iBleC_read_params_t* params)

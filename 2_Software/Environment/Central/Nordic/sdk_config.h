@@ -71,6 +71,18 @@
 // <h> BLE_CONFIGURATION
 //==========================================================
 
+//==========================================================
+// <o> NRF_BLE_CENTRAL_LINK_COUNT - Number of central links
+#ifndef NRF_BLE_CENTRAL_LINK_COUNT
+#define NRF_BLE_CENTRAL_LINK_COUNT 0
+#endif
+
+// <o> NRF_BLE_PERIPHERAL_LINK_COUNT - Number of peripheral links
+#ifndef NRF_BLE_PERIPHERAL_LINK_COUNT
+#define NRF_BLE_PERIPHERAL_LINK_COUNT 8
+#endif
+
+
 // <e> BLE_ADVERTISING_ENABLED  - ble_advertising - Advertising module
 //==========================================================
 #ifndef BLE_ADVERTISING_ENABLED

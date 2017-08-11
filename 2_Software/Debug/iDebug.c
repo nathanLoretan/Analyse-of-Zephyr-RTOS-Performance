@@ -1,6 +1,6 @@
-#if ENABLE_MEASUREMENT
+#include "iDebug.h"
 
-#include "iDebug_nRF52840.h"
+#if ENABLE_MEASUREMENT
 
 #define DEBUG_PIN_INIT(_pin, _port)   _port->DIRSET |= (1 << _pin)
 
@@ -47,8 +47,6 @@ void iDebug_init()
                   DEBUG_START_PORT);
   DEBUG_PIN_INIT( EXT_INT_LATENCY_PIN,
                   EXT_INT_LATENCY_PORT);
-  DEBUG_PIN_INIT( BLE_CONN_EVT_PIN,
-                  BLE_CONN_EVT_PORT);
   DEBUG_PIN_INIT( RADIO_TX_PIN,
                   RADIO_TX_PORT);
   DEBUG_PIN_INIT( RADIO_RX_PIN,
@@ -63,42 +61,39 @@ void iDebug_init()
                   BLE_NOTIFY_PORT);
   DEBUG_PIN_INIT( BLE_INDICATE_PIN,
                   BLE_INDICATE_PORT);
-  DEBUG_PIN_INIT( BLE_INDICATE_RSP_PIN,
-                  BLE_INDICATE_RSP_PORT);
-  DEBUG_PIN_INIT( BLE_READ_PIN,
-                  BLE_READ_PORT);
-  DEBUG_PIN_INIT( BLE_WRITE_PIN,
-                  BLE_WRITE_PORT);
-  DEBUG_PIN_INIT( BLE_RECV_PIN,
-                  BLE_RECV_PORT);
 
   iDebug_gpiote_config(CRCOK, RADIO_CRCOK_PIN, (RADIO_CRCOK_PORT == NRF_P0) ? 0 : 1, NONE);
-  iDebug_gpiote_config(TX, RADIO_TX_PIN, (RADIO_TX_PORT == NRF_P0) ? 0 : 1, NONE);
-  iDebug_gpiote_config(RX, RADIO_RX_PIN, (RADIO_RX_PORT == NRF_P0) ? 0 : 1, NONE);
-  iDebug_gpiote_config(RTX, RADIO_RTX_PIN, (RADIO_RTX_PORT == NRF_P0) ? 0 : 1, NONE);
+  iDebug_gpiote_config(TX,    RADIO_TX_PIN,    (RADIO_TX_PORT == NRF_P0)    ? 0 : 1, NONE);
+  iDebug_gpiote_config(RX,    RADIO_RX_PIN,    (RADIO_RX_PORT == NRF_P0)    ? 0 : 1, NONE);
+  iDebug_gpiote_config(RTX,   RADIO_RTX_PIN,   (RADIO_RTX_PORT == NRF_P0)   ? 0 : 1, NONE);
 
 
 #ifdef 	ZEPHYR_USED
-  // iDebug_ppi_config(19, -1, &NRF_RADIO->EVENTS_CRCOK, &NRF_GPIOTE->TASKS_SET[CRCOK], NULL);
+  iDebug_ppi_config(19, -1, &NRF_RADIO->EVENTS_CRCOK,   &NRF_GPIOTE->TASKS_SET[CRCOK], NULL);
   iDebug_ppi_config(18, -1, &NRF_RADIO->EVENTS_TXREADY, &NRF_GPIOTE->TASKS_SET[TX], &NRF_GPIOTE->TASKS_CLR[RX]);
   iDebug_ppi_config(17, -1, &NRF_RADIO->EVENTS_RXREADY, &NRF_GPIOTE->TASKS_SET[RX], &NRF_GPIOTE->TASKS_CLR[TX]);
 #endif
 
-#ifdef BAREMETALE_USED
-  iDebug_ppi_config(12, -1, &NRF_RADIO->EVENTS_CRCOK, &NRF_GPIOTE->TASKS_SET[CRCOK], NULL);
+#ifdef BAREMETALE_USED  // Channel 19 - 17 used by the softdevice
+  iDebug_ppi_config(12, -1, &NRF_RADIO->EVENTS_CRCOK,   &NRF_GPIOTE->TASKS_SET[CRCOK], NULL);
   iDebug_ppi_config(11, -1, &NRF_RADIO->EVENTS_TXREADY, &NRF_GPIOTE->TASKS_SET[TX], &NRF_GPIOTE->TASKS_CLR[RX]);
   iDebug_ppi_config(10, -1, &NRF_RADIO->EVENTS_RXREADY, &NRF_GPIOTE->TASKS_SET[RX], &NRF_GPIOTE->TASKS_CLR[TX]);
 #endif
 
-  iDebug_ppi_config(16, -1, &NRF_RADIO->EVENTS_END, &NRF_GPIOTE->TASKS_CLR[RTX], NULL);
-
-  iDebug_ppi_config(15, -1, &NRF_RADIO->EVENTS_ADDRESS, &NRF_GPIOTE->TASKS_SET[RTX],  &NRF_GPIOTE->TASKS_CLR[CRCOK]);
-
+  iDebug_ppi_config(16, -1, &NRF_RADIO->EVENTS_END,      &NRF_GPIOTE->TASKS_CLR[RTX], NULL);
+  iDebug_ppi_config(15, -1, &NRF_RADIO->EVENTS_ADDRESS,  &NRF_GPIOTE->TASKS_SET[RTX], &NRF_GPIOTE->TASKS_CLR[CRCOK]);
   iDebug_ppi_config(14, -1, &NRF_RADIO->EVENTS_DISABLED, &NRF_GPIOTE->TASKS_CLR[RX],  &NRF_GPIOTE->TASKS_CLR[TX]);
-  iDebug_ppi_config(13, -1, &NRF_RADIO->EVENTS_DISABLED, &NRF_GPIOTE->TASKS_CLR[RTX],  &NRF_GPIOTE->TASKS_CLR[CRCOK]);
+  iDebug_ppi_config(13, -1, &NRF_RADIO->EVENTS_DISABLED, &NRF_GPIOTE->TASKS_CLR[RTX], &NRF_GPIOTE->TASKS_CLR[CRCOK]);
 
   DEBUG_START();
   iPrint("[INIT] DEBUG initialized\n");
+}
+
+#else // !ENABLE_MEASUREMENT
+
+void iDebug_init()
+{
+  iPrint("/!\\ DEBUG not enabled\n");
 }
 
 #endif  // ENABLE_MEASUREMENT

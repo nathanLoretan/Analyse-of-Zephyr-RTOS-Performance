@@ -2,7 +2,7 @@
 #include "../Drivers/acc.h"
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
-#include "../Debug/iDebug_nRF52840.h"
+#include "../Debug/iDebug.h"
 
 // static volatile uint32_t a = 0;
 

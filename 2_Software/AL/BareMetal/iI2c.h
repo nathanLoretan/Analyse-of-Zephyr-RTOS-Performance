@@ -14,8 +14,11 @@
 
 #define II2C_DEFAULT_IRQ_PRIORITY		TWI_DEFAULT_CONFIG_IRQ_PRIORITY
 
-#define II2C_CREATE_DATA(_tx_data, _bytes...)										memcpy(_tx_data, (uint8_t[]) {_bytes}, sizeof( (uint8_t[]) {_bytes}))
-#define II2C_CONVERT_DATA(_data_conv, _data, _data_length)			memcpy(_data_conv, _data, _data_length)
+#define II2C_CREATE_DATA(_tx_data, _bytes...)\
+	memcpy(_tx_data, (uint8_t[]) {_bytes}, sizeof( (uint8_t[]) {_bytes}))
+	
+#define II2C_CONVERT_DATA(_data_conv, _data, _data_length)\
+	memcpy(_data_conv, _data, _data_length)
 
 typedef enum {
 	I2C0 = 0,

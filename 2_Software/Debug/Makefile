@@ -1,2 +1,2 @@
 # Used with Zephyr
-obj-y += iDebug_nRF52840.o
+obj-y += iDebug.o

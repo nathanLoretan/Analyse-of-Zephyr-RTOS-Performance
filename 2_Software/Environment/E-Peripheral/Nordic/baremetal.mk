@@ -2,7 +2,7 @@ PROJECT_NAME     := E-Peripheral
 TARGETS          := nrf52832_xxaa
 OUTPUT_DIRECTORY := outdir/nrf52832_xxaa
 
-SDK_ROOT 			:= $(PROJ_DIR)/nordic_components
+SDK_ROOT 			:= $(PROJ_DIR)/components
 PROJECT_BASE 	:= $(PROJ_DIR)
 
 $(OUTPUT_DIRECTORY)/nrf52832_xxaa.out: \
@@ -62,6 +62,7 @@ SRC_FILES += \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleP.c \
 	$(PROJECT_BASE)/AL/BareMetal/iBleC.c \
+	$(PROJECT_BASE)/AL/BareMetal/iGpio.c \
 	$(PROJECT_BASE)/AL/BareMetal/iTimer.c \
 	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
 	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \

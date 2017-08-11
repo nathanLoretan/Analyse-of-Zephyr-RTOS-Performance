@@ -2,7 +2,7 @@ PROJECT_NAME     := Peripheral
 TARGETS          := nrf52840_xxaa
 OUTPUT_DIRECTORY := outdir/nrf52840_xxaa
 
-SDK_ROOT 			:= $(PROJ_DIR)/nordic_components
+SDK_ROOT 			:= $(PROJ_DIR)/components
 PROJECT_BASE 	:= $(PROJ_DIR)
 
 $(OUTPUT_DIRECTORY)/nrf52840_xxaa.out: \
@@ -68,7 +68,7 @@ SRC_FILES += \
 	$(PROJECT_BASE)/AL/BareMetal/iTimer.c \
 	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
 	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \
-	$(PROJECT_BASE)/Debug/iDebug_nRF52840.c \
+	$(PROJECT_BASE)/Debug/iDebug.c \
 	$(PROJECT_BASE)/Drivers/acc.c \
 	$(PROJECT_BASE)/Drivers/adc.c \
 	$(PROJECT_BASE)/Drivers/swg.c \

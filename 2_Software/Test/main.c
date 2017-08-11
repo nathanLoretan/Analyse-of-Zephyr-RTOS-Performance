@@ -2,7 +2,7 @@
 #include "../Drivers/acc.h"
 #include "../Drivers/adc.h"
 #include "../Drivers/swg.h"
-#include "../Debug/iDebug_nRF52840.h"
+#include "../Debug/iDebug.h"
 
 void bluetooth_init();
 void bluetooth_test();

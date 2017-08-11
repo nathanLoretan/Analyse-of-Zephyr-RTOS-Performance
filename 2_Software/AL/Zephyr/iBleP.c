@@ -46,7 +46,7 @@ static void iBleP_connected(struct bt_conn *conn, u8_t error)
     }
 
 		isConnected = true;
-    iEventQueue_add(&ble_EventQueue, BLE_EVENT_CONNECTED);
+    iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
 
 		iPrint("\n-> Central connected\n");
     iPrint("--------------------\n");
@@ -72,7 +72,7 @@ static void iBleP_disconnected(struct bt_conn *conn, u8_t reason)
   }
 
 	isConnected = false;
-  iEventQueue_add(&ble_EventQueue, BLE_EVENT_DISCONNECTED);
+  iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
@@ -110,7 +110,7 @@ int iBleP_init()
 	// Initialize the mutex for the indication
 	k_mutex_init(&indicate_mutex);
 
-  iEventQueue_init(&ble_EventQueue);
+  iEventQueue_init(&bleP_EventQueue);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
@@ -227,14 +227,14 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 {
   int error;
 
-  // BLE_ERROR(0);
+  BLE_ERROR(0);
 
-  // BLE_NOTIFY(1);
+  BLE_NOTIFY(1);
   error = bt_gatt_notify(NULL, iBleP_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
-  // BLE_NOTIFY(0);
+  BLE_NOTIFY(0);
 
   if(error) {
-    // BLE_ERROR(1);
+    BLE_ERROR(1);
   }
 
   return error;
@@ -242,7 +242,6 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 
 static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
-  // BLE_INDICATE_RSP();
 	k_mutex_unlock(&indicate_mutex);
 }
 
@@ -258,14 +257,14 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
 	ind_params.data = buf;
 	ind_params.len 	= buf_length;
 
-  // BLE_ERROR(0);
+  BLE_ERROR(0);
 
-  // BLE_INDICATE(1);
+  BLE_INDICATE(1);
 	error = bt_gatt_indicate(NULL, &ind_params);
-  // BLE_INDICATE(0);
+  BLE_INDICATE(0);
 
   if(error) {
-    // BLE_ERROR(1);
+    BLE_ERROR(1);
   }
 
   return error;

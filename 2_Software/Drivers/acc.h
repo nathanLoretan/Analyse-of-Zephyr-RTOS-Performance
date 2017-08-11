@@ -50,11 +50,11 @@ typedef struct {
     uint16_t x;
     uint16_t y;
     uint16_t z;
-} sample_t;
+} acc_sample_t;
 
 
 void acc_init();
-acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples);
+acc_error_t acc_getXYZ(acc_sample_t* samples, uint8_t nbr_samples);
 void acc_sleep();
 void acc_wakeup();
 bool acc_isSleeping();

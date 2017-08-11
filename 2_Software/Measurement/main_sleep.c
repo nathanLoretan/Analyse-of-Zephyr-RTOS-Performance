@@ -1,8 +1,4 @@
 #include "../configuration.h"
-#include "../Drivers/acc.h"
-#include "../Drivers/adc.h"
-#include "../Drivers/swg.h"
-#include "../Debug/iDebug_nRF52840.h"
 
 int main()
 {

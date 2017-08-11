@@ -3,71 +3,66 @@
 typedef enum {
 	ACC_EVENT_INT1 = 0,
 	ACC_EVENT_INT2,
-	ACC_EVENT_SLEEP,
-	ACC_EVENT_WAKEUP
 } eAccEvent_t;
 
 typedef enum {
-	EADC_EVENT_DATA = 0,
-	EADC_EVENT_SLEEP,
-	EADC_EVENT_WAKEUP
+	ADC_EVENT_DATA = 0,
 } adcEvent_t;
 
 typedef struct {
     uint16_t x;
     uint16_t y;
     uint16_t z;
-} sample_t;
+} acc_sample_t;
 
-iEventQueue_t eAdcEventQueue;
+iEventQueue_t eAdc_EventQueue;
 iEventQueue_t eAcc_EventQueue;
 
-static sample_t eAcc_sample;
-static uint8_t	eAcc_click = 0;
-static uint32_t eAdcmeasurement;
+static acc_sample_t eAcc_sample;
+static uint8_t			eAcc_click = 0;
+static uint32_t 		eAdc_measurement;
 
-#define EADC_DATA_TIMER		1000
-#define ACC_DATA_TIMER		2000
-#define ACC_CLICK_TIMER		3000
+iGpio_t led_connected;
+iGpio_t led_started;
 
 // BLE--------------------------------------------------------------------------
-#define ACC_UUID_SVC     0x0ACC
-#define ACC_UUID_CHRC1   0x1ACC
-#define ACC_UUID_CHRC2   0x2ACC
-#define ACC_UUID_BASE    0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+#define ACC_SVC     			0x0ACC
+#define ACC_CHRC_DATA   	0x1ACC
+#define ACC_CHRC_CLICK  	0x2ACC
+#define ACC_BASE    			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBleP_svc_t eAcc_svc;
 size_t 			eAcc_nbr_chrcs = 2;
 DEFINE_IBLEP_SVC_CONFIG(eAcc_config)
 {
-  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(ACC_UUID_SVC, ACC_UUID_BASE)),
+  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(ACC_SVC, ACC_BASE)),
   DEFINE_IBLEP_CHRCS
   (
-    DEFINE_IBLEP_CHRC (  // AXIS X Y Z
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_UUID_CHRC1, ACC_UUID_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &eAcc_sample)
+    DEFINE_IBLEP_CHRC (
+      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_DATA, ACC_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
+      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_DATA, ACC_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &eAcc_sample)
     ),
-    DEFINE_IBLEP_CHRC (  // CLICK
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_UUID_CHRC2, ACC_UUID_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, NULL)
+    DEFINE_IBLEP_CHRC (
+      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_CLICK, ACC_BASE), IBLEP_CHRC_PERM_NOTIFY),
+      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_CLICK, ACC_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, NULL)
     ),
   )
 };
 
-#define EADC_UUID_SVC     0x0ADC
-#define EADC_UUID_CHRC1   0x1ADC
-#define EADC_UUID_BASE    0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+#define ADC_SVC     		0x0ADC
+#define ADC_CHRC_DATA   0x1ADC
+#define ADC_BASE   			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
-iBleP_svc_t eAdcsvc;
-size_t 			eAdcnbr_chrcs = 1;
-DEFINE_IBLEP_SVC_CONFIG(eAdcconfig)
+iBleP_svc_t eAdc_svc;
+size_t 			eAdc_nbr_chrcs = 1;
+DEFINE_IBLEP_SVC_CONFIG(eAdc_config)
 {
-  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(EADC_UUID_SVC, EADC_UUID_BASE)),
+  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(ADC_SVC, ADC_BASE)),
   DEFINE_IBLEP_CHRCS
   (
-    DEFINE_IBLEP_CHRC (  // A/D Converter measurements
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(EADC_UUID_CHRC1, EADC_UUID_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(EADC_UUID_CHRC1, EADC_UUID_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &eAdcmeasurement)
+    DEFINE_IBLEP_CHRC (
+      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ADC_CHRC_DATA, ADC_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
+      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ADC_CHRC_DATA, ADC_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &eAdc_measurement)
     ),
   )
 };
@@ -96,10 +91,10 @@ ITIMER_HANDLER(on_eAcc_click_timer)
 	iEventQueue_add(&eAcc_EventQueue, ACC_EVENT_INT2);
 }
 
-static iTimer_t eAdcdata_timer;
-ITIMER_HANDLER(on_eAdcdata_timer)
+static iTimer_t eAdc_data_timer;
+ITIMER_HANDLER(on_eAdc_data_timer)
 {
-	iEventQueue_add(&eAdcEventQueue, EADC_EVENT_DATA);
+	iEventQueue_add(&eAdc_EventQueue, ADC_EVENT_DATA);
 }
 
 // Threads----------------------------------------------------------------------
@@ -108,20 +103,22 @@ ITHREAD_HANDLER(ble)
   while(1)
   {
     // Wait for event
-    while(iEventQueue_isEmpty(&ble_EventQueue)) { iThread_sleep(); }
+    while(iEventQueue_isEmpty(&bleP_EventQueue)) { iThread_sleep(); }
 
-    switch(iEventQueue_get(&ble_EventQueue))
+    switch(iEventQueue_get(&bleP_EventQueue))
 		{
-			case BLE_EVENT_CONNECTED:
+			case BLEP_EVENT_CONNECTED:
 			{
-				iTimer_start(&eAdcdata_timer,  	on_eAdcdata_timer,  EADC_DATA_TIMER);
+				iGpio_write(&led_connected, 0);
+				iTimer_start(&eAdc_data_timer,  on_eAdc_data_timer,  ADC_DATA_TIMER);
 				iTimer_start(&eAcc_data_timer,  on_eAcc_data_timer,  ACC_DATA_TIMER);
 				iTimer_start(&eAcc_click_timer, on_eAcc_click_timer, ACC_CLICK_TIMER);
 			} break;
 
-			case BLE_EVENT_DISCONNECTED:
+			case BLEP_EVENT_DISCONNECTED:
 			{
-				iTimer_stop(&eAdcdata_timer);
+				iGpio_write(&led_connected, 1);
+				iTimer_stop(&eAdc_data_timer);
 				iTimer_stop(&eAcc_data_timer);
 				iTimer_stop(&eAcc_click_timer);
 			} break;
@@ -166,14 +163,14 @@ ITHREAD_HANDLER(adc)
   while(1)
   {
     // Wait for event
-    while(iEventQueue_isEmpty(&eAdcEventQueue)) { iThread_sleep(); }
+    while(iEventQueue_isEmpty(&eAdc_EventQueue)) { iThread_sleep(); }
 
-    switch(iEventQueue_get(&eAdcEventQueue))
+    switch(iEventQueue_get(&eAdc_EventQueue))
 		{
-			case EADC_EVENT_DATA:
+			case ADC_EVENT_DATA:
 			{
-				eAdcmeasurement++;
-				iBleP_svc_notify(&eAdcsvc, 1, (uint8_t*) &eAdcmeasurement, sizeof(eAdcmeasurement));
+				eAdc_measurement++;
+				iBleP_svc_notify(&eAdc_svc, 1, (uint8_t*) &eAdc_measurement, sizeof(eAdc_measurement));
 			} break;
 
 			default: // NOTHING
@@ -184,7 +181,7 @@ ITHREAD_HANDLER(adc)
 
 DEFINE_ITHREAD(ble_thread, 	4096, 0);
 DEFINE_ITHREAD(eAcc_thread, 4096, 0);
-DEFINE_ITHREAD(eAdcthread, 	4096, 0);
+DEFINE_ITHREAD(eAdc_thread, 4096, 0);
 
 // -----------------------------------------------------------------------------
 void ble_init();
@@ -193,7 +190,7 @@ void sys_init();
 int main()
 {
   iThread_run(&eAcc_thread, acc);
-  iThread_run(&eAdcthread, 	adc);
+  iThread_run(&eAdc_thread, adc);
 	iThread_run(&ble_thread, 	ble);
 
   ble_init();
@@ -212,15 +209,21 @@ void ble_init()
 {
   iBleP_init();
   iBleP_svc_init(&eAcc_svc, eAcc_config, eAcc_nbr_chrcs);
-  iBleP_svc_init(&eAdcsvc, eAdcconfig, eAdcnbr_chrcs);
+  iBleP_svc_init(&eAdc_svc, eAdc_config, eAdc_nbr_chrcs);
   iBleP_adv_start(advdata, sizeof(advdata)/sizeof(iBleP_advdata_t), scanrsp, sizeof(scanrsp)/sizeof(iBleP_advdata_t));
 }
 
 void sys_init()
 {
 	// ADC Init
-	iEventQueue_init(&eAdcEventQueue);
+	iEventQueue_init(&eAdc_EventQueue);
 
 	// ACC Init
 	iEventQueue_init(&eAcc_EventQueue);
+
+	iGpio_init(&led_started, 	 LED_STARTED, 	IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+	iGpio_init(&led_connected, LED_CONNECTED, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+
+	iGpio_write(&led_started, 0);
+	iGpio_write(&led_connected, 1);
 }

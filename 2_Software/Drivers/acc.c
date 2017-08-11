@@ -374,10 +374,10 @@ static acc_fifo_status_t acc_getFifoStatus()
 	return acc_fifo_status;
 }
 
-acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
+acc_error_t acc_getXYZ(acc_sample_t* samples, uint8_t nbr_samples)
 {
   // uint8_t tx_buf[1];
-  // uint8_t rx_buf[sizeof(sample_t) * nbr_samples];
+  // uint8_t rx_buf[sizeof(acc_sample_t) * nbr_samples];
   //
 	// // Check the status register
 	// acc_status_t acc_status	= acc_getStatus();
@@ -391,8 +391,8 @@ acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
   //   return ACC_ERROR_NO_DATA_AVAILABLE;
   // }
   //
-  // iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(sample_t) * nbr_samples);
-  // II2C_CONVERT_DATA(samples, rx_buf, sizeof(sample_t) * nbr_samples);
+  // iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(acc_sample_t) * nbr_samples);
+  // II2C_CONVERT_DATA(samples, rx_buf, sizeof(acc_sample_t) * nbr_samples);
   //
   // acc_fifo_status = acc_getFifoStatus();
   // if(acc_fifo_status.fifo_unread_samples > 0)  // If the fifo has other samples
@@ -413,7 +413,7 @@ acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
   // }
 
   uint8_t tx_buf[1];
-  uint8_t rx_buf[sizeof(sample_t) * nbr_samples];
+  uint8_t rx_buf[sizeof(acc_sample_t) * nbr_samples];
 
   // Check the fifo status register
   acc_fifo_status_t acc_fifo_status = acc_getFifoStatus();
@@ -426,8 +426,8 @@ acc_error_t acc_getXYZ(sample_t* samples, uint8_t nbr_samples)
   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
 
   // Read measurements
-  iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(sample_t) * nbr_samples);
-  II2C_CONVERT_DATA(samples, rx_buf, sizeof(sample_t) * nbr_samples);
+  iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(acc_sample_t) * nbr_samples);
+  II2C_CONVERT_DATA(samples, rx_buf, sizeof(acc_sample_t) * nbr_samples);
 
   // Start fulling fifo
   II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);

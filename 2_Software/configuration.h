@@ -13,28 +13,30 @@
   #include "AL/BareMetal/nrf5x_interface.h"
 #endif
 
-#ifdef ENABLE_MEASUREMENT
-  #include "Debug/iDebug_nRF52840.h"
-#endif
-
 #ifdef CENTRAL_CONFIG
   #include "Central/central_config.h"
 #endif
 
 #ifdef EPERIPHERAL_CONFIG
-  #include "E-Perpiheral/ePeripheral_config.h"
+  #include "E-Peripheral/ePeripheral_config.h"
 #endif
 
 #ifdef PERIPHERAL_CONFIG
   #include "Peripheral/peripheral_config.h"
 #endif
 
-#ifdef MEASURMENT_CONFIG
+#ifdef MEASUREMENT_CONFIG
   #include "Measurement/measurement_config.h"
 #endif
 
 #ifdef TEST_CONFIG
   #include "Test/test_config.h"
+#endif
+
+#ifdef ENABLE_MEASUREMENT
+  #include "Debug/iDebug.h"
+#else
+  #include "Debug/iDebug_noDebug.h"
 #endif
 
 #endif  // __CONFIGURATION_H__

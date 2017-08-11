@@ -1,6 +1,15 @@
 #ifndef __EPERIPHERAL_CONFIG_H__
 #define __EPERIPHERAL_CONFIG_H__
 
+// Indication Leds--------------------------------------------------------------
+#define LED_CONNECTED         18
+#define LED_STARTED           17
+
+// Data rate--------------------------------------------------------------------
+#define ADC_DATA_TIMER		1000
+#define ACC_DATA_TIMER		2000
+#define ACC_CLICK_TIMER		3000
+
 // BLE Configuration------------------------------------------------------------
 #define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
 #define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s

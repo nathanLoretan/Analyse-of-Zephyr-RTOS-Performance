@@ -22,7 +22,7 @@ int main()
     iEvent_t accEvent = iEventQueue_get(&acc_EventQueue);
     if(accEvent == ACC_EVENT_INT1)  // data ready
     {
-      sample_t samples[ACC_FIFO];
+      acc_sample_t samples[ACC_FIFO];
 
       acc_getXYZ(samples, ACC_FIFO);
 

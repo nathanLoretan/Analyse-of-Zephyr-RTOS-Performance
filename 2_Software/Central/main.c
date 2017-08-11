@@ -1,21 +1,118 @@
 #include "../configuration.h"
 
+// BLE--------------------------------------------------------------------------
+#if ENABLE_BLE
 DEFINE_IBLEC_SCAN_PARAMS(scan_params, IBLEC_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
 DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
 
-#define UUID_SVC    0xAAAA
-#define UUID_CHRC   0xBBBB
-#define UUID_BASE   0x34, 0x12, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+#define ADC_SVC     		0x0ADC
+#define ADC_CHRC_DATA   0x1ADC
+#define ADC_BASE    		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
+#define ACC_SVC     		0x0ACC
+#define ACC_CHRC_DATA   0x1ACC
+#define ACC_CHRC_CLICK  0x2ACC
+#define ACC_BASE    	 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
 
 iBleC_attr_disc_t attr_disc_list[] =
 {
-	ADD_SVC_TO_DISCOVER_UUID16(0x1805),
-	ADD_CHRC_TO_DISCOVER_UUID16(0x2A2B),
+	ADD_SVC_TO_DISCOVER_UUID128(ACC_SVC, ACC_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_DATA, ACC_BASE),
 	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
-	ADD_SVC_TO_DISCOVER_UUID128(UUID_SVC, UUID_BASE),
-	ADD_CHRC_TO_DISCOVER_UUID128(UUID_CHRC, UUID_BASE),
-};
+	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_CLICK, ACC_BASE),
+	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
 
+	ADD_SVC_TO_DISCOVER_UUID128(ADC_SVC, ADC_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(ADC_CHRC_DATA, ADC_BASE),
+	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
+};
+#endif  // ENABLE_BLE
+
+// Interrupts-------------------------------------------------------------------
+#if ENABLE_SWG
+
+typedef enum {
+	SWG_EVENT_FREQ = 0,
+} swgEvent_t;
+
+iEventQueue_t swg_EventQueue;
+
+iTimer_t newInterval_timer;
+ITIMER_HANDLER(on_newInterval)
+{
+  iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
+}
+
+iGpio_t interrupt;
+IGPIO_HANDLER(on_interrupt, pin)
+{
+  EXT_INT_LATENCY();
+}
+#endif  // ENABLE_SWG
+
+// Threads----------------------------------------------------------------------
+#if ENABLE_BLE
+DEFINE_ITHREAD(ble_thread, 4096, 0);
+ITHREAD_HANDLER(ble)
+{
+  while(1)
+  {
+    // Wait for event
+    // while(iEventQueue_isEmpty(&bleC_EventQueue)) { iThread_sleep(); }
+		//
+    // switch(iEventQueue_get(&bleC_EventQueue))
+		// {
+		// 	case :
+		//   {
+		//
+		//   } break;
+		//
+		// 	case :
+		// 	{
+		//
+		// 	} break;
+		//
+		// 	default: // NOTHING
+		// 	break;
+  	// }
+  }
+}
+#endif  // ENABLE_BLE
+
+#if ENABLE_SWG
+DEFINE_ITHREAD(swg_thread, 4096, 0);
+ITHREAD_HANDLER(swg)
+{
+  static float ext_int_freq = EXT_INT_FREQ;
+
+  while(1)
+  {
+    // Wait for event
+    while(iEventQueue_isEmpty(&swg_EventQueue)) { iThread_sleep(); }
+
+    switch(iEventQueue_get(&swg_EventQueue))
+		{
+	    case SWG_EVENT_FREQ:
+	    {
+		      CHANGE_FREQUENCY(ext_int_freq);
+
+		      iGpio_disable_interrupt(&interrupt);
+		      swg_set_frequency(ext_int_freq);
+		      iGpio_enable_interrupt(&interrupt);
+
+		      iPrint("Interrupt frequency: %d\n", (int) ext_int_freq);
+
+	    } break;
+
+			default: // NOTHING
+			break;
+		}
+  }
+}
+#endif  // ENABLE_SWG
+
+//------------------------------------------------------------------------------
 
 IBLEC_WRITE_HANDLER(write_rsp, params)
 {
@@ -37,20 +134,28 @@ IBLEC_INDICATE_HANDLER(indicate_rsp, params)
 	iPrint("INDICATE %u\n", *((uint8_t*) params->data));
 }
 
-void bluetooth_init();
+void sys_init();
+void ble_init();
 
 int main()
 {
 	iDebug_init();
-	bluetooth_init();
+
+	#if ENABLE_BLE
+	  ble_init();
+	#endif  // ENABLE_BLE
+
+	#if ENABLE_SWG
+	  sys_init();
+	#endif	// ENABLE_SWG
 
   while(1)
   {
-		static bool enabled = false;
-		iSleep_ms(1000);
-
-		if(link[0].conn_ref != NOT_CONNECTED && link[0].isReady && !enabled)
-		{
+		// static bool enabled = false;
+		// iSleep_ms(1000);
+		//
+		// if(link[0].conn_ref != IBLEC_NOT_CONNECTED && link[0].isReady && !enabled)
+		// {
 			// enabled = true;
 			// iPrint("0x%x, %x\n", 0x1805, iBleC_get_svc_handle(0, 0x1805));
 			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_decl_handle(0, 0x1805, 0x2A2B));
@@ -88,14 +193,15 @@ int main()
 			// write_params.data 	= &val;
 			// write_params.length = 4;
 			// iBleC_write(0, &write_params);
-		}
+		// }
   }
 
   iPrint("-> Exit\n");
   return 0;
 }
 
-void bluetooth_init()
+#if ENABLE_BLE
+void ble_init()
 {
   iPrint("\nInitialize Bluetooth\n");
   iPrint("--------------------\n");
@@ -103,4 +209,32 @@ void bluetooth_init()
 	iBleC_init(&conn_params);
 	iBleC_discovery_init(attr_disc_list, sizeof(attr_disc_list) / sizeof(iBleC_attr_disc_t));
 	iBleC_scan_start(&scan_params);
+
+	iThread_run(&ble_thread, ble);
 }
+#endif	// ENABLE_BLE
+
+#if ENABLE_SWG
+void sys_init()
+{
+	iPrint("\nInitialize ExtBoard\n");
+	iPrint("-------------------\n");
+
+	iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
+	swg_init(EXT_INT_FREQ);
+	iEventQueue_init(&swg_EventQueue);
+	iThread_run(&swg_thread, swg);
+
+	iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
+	iGpio_enable_interrupt(&interrupt);
+
+	#if ENABLE_BLE
+		swg_sleep();
+	#endif	// !ENABLE_BLE
+
+	#if !ENABLE_BLE && !POWER_MEASUREMENT
+		iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
+	#endif	// !ENABLE_BLE && !POWER_MEASUREMENT
+
+}
+#endif  // ENABLE_SWG
