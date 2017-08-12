@@ -328,6 +328,18 @@ static void _on_disconnection(uint16_t conn_handle)
   }
 }
 
+static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t const* conn_params)
+ {
+   int ref = _get_conn_ref(conn_handle);
+
+  iPrint("\n-> Connection %d Parameters Update\n", ref);
+  iPrint("---------------------------------------\n");
+  iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
+  iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
+ }
+
 static void _on_ble_evt(ble_evt_t const* ble_evt)
 {
 	int error;
@@ -359,14 +371,8 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       // For readibility.
       uint16_t const conn_handle                = ble_evt->evt.gap_evt.conn_handle;
       ble_gap_conn_params_t const* conn_params  = &ble_evt->evt.gap_evt.params.connected.conn_params;
-      int ref = _get_conn_ref(conn_handle);
 
-			iPrint("\n-> Connection %d Parameters Update\n", ref);
-			iPrint("---------------------------------------\n");
-			iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
-			iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
-			iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
-			iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
+      _on_conn_params_update(conn_handle, conn_params);
 		} break;
 
 		// case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:

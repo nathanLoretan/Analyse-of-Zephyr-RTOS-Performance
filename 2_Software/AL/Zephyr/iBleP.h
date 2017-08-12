@@ -75,18 +75,6 @@
 
 #define IBLEP_ADV_TIMEOUT_NONE										0
 
-#define IBLEP_SLAVE_LATENCY_MAX							   0x01F3
-
-#define IBLEP_CONN_TIMEOUT_NONE							   0xFFFF
-#define IBLEP_CONN_TIMEOUT_MIN								   0x000A
-#define IBLEP_CONN_TIMEOUT_MAX								   0x0C80
-
-#define IBLEP_CONN_INT_MIN            				   0x0006
-#define IBLEP_CONN_INT_MAX            			     0x0C80
-
-#define IBLEP_ADV_INT_MIN             				   0x0020
-#define IBLEP_ADV_INT_MAX             				   0x4000
-
 // Read and Write handler
 typedef ssize_t (*iBleP_read_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, u16_t len, u16_t offset);
 ssize_t iBleP_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset);

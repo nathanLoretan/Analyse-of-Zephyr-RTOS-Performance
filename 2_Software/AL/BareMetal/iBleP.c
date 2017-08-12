@@ -2,10 +2,10 @@
 
 // The default address set is BLE_GAP_ADDR_TYPE_RANDOM_STATIC
 
-static volatile bool isConnected = false;
-static uint16_t	connection;
+static volatile bool _isConnected = false;
+static uint16_t	_conn_ref;
 static ble_gap_adv_params_t _adv_params;
-static nrf_ble_gatt_t gatt_module;
+static nrf_ble_gatt_t _gatt_module;
 
 // GAP init
 #define CONN_CFG_TAG						1
@@ -29,10 +29,6 @@ static nrf_ble_gatt_t gatt_module;
 #define DEFAULT_CONN_TIMEOUT          20000     // [ms]
 #define DEFAULT_SLAVE_LATENCY         0
 
-#define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
-#define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s
-#define ADV_TIMEOUT            IBLEP_ADV_TIMEOUT_NONE     // [ms]
-
 // iTimer element only used by the system
 extern void iTimer_init();
 
@@ -42,88 +38,149 @@ typedef struct iBleP_writeHandler_list {
 	struct iBleP_writeHandler_list* 	next;
 }	iBleP_writeHandler_list_t;
 
-static iBleP_writeHandler_list_t* writeHandler_list = NULL;
+static iBleP_writeHandler_list_t* _writeHandler_list = NULL;
+
+static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t const* conn_params)
+{
+	_isConnected = true;
+	_conn_ref = ble_evt->evt.gap_evt.conn_handle;
+	iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
+
+	iPrint("\n-> Central connected\n");
+	iPrint("--------------------\n");
+	iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
+  iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
+  iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
+}
+
+static void _on_disconnection(uint16_t conn_handle)
+{
+	_conn_ref = BLE_CONN_HANDLE_INVALID;
+	_isConnected = false;
+	iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
+
+	iPrint("-> Central disconnected\n");
+
+	error = sd_ble_gap_adv_start(&_adv_params, CONN_CFG_TAG);
+	if(error) {
+		iPrint("/!\\ Advertising failed to restart: error %d\n", error);
+		return;
+	}
+	iPrint("-> Advertising started\n");
+}
+
+static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t const* conn_params)
+ {
+	iPrint("\n-> Connection Parameters Update\n");
+	iPrint("-------------------------------\n");
+	iPrint("Connection Interval Min: %u[us]\n", conn_params->min_conn_interval * UNIT_1_25_MS);
+	iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
+	iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
+	iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
+ }
+
+static void on_gattc_timeout(uint16_t conn_handle)
+{
+	iPrint("-> GATT Client Timeout\n");
+	error = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
+																BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+ if(error) {
+		iPrint("/!\\ disconnect failed : error %d\n", error);
+		return;
+	}
+}
+
+static void on_gatts_timeout(uint16_t conn_handle)
+{
+	iPrint("-> GATT Server Timeout\n");
+	error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+	if(error) {
+		iPrint("/!\\ disconnect failed : error %d\n", error);
+		return;
+	}
+}
+
+static void on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
+{
+	iPrint("\n-> MTU Parameters Update\n");
+	iPrint("------------------------\n");
+
+	if(exchange_mtu_request->client_rx_mtu > NRF_BLE_GATT_MAX_MTU_SIZE) {
+	iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
+	}
+	else {
+		iPrint("Connection MTU: %u[Bytes]\n", exchange_mtu_request->client_rx_mtu);
+	}
+
+	error = sd_ble_gatts_exchange_mtu_reply(conn_handle, NRF_BLE_GATT_MAX_MTU_SIZE);
+	if(error) {
+		iPrint("/!\\ MTU exchange failed : error %d\n", error);
+		return;
+	}
+}
 
 // Event handlers
-static void on_ble_evt(ble_evt_t* ble_evt)
+static void _on_ble_evt(ble_evt_t* ble_evt)
 {
 	int error;
 
 	switch (ble_evt->header.evt_id)
 	{
-		case BLE_GAP_EVT_CONNECTED: 		connection = ble_evt->evt.gap_evt.conn_handle;
-																		isConnected = true;
-																		iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
+		case BLE_GAP_EVT_CONNECTED:
+		{
+			// For readibility.
+			ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
+			ble_gap_conn_params_t  const* conn_params = &gap_evt->params.connected.conn_params;
 
-																		iPrint("\n-> Central connected\n");
-																		iPrint("--------------------\n");
-																    iPrint("Connection Interval Min: %u[us]\n", ble_evt->evt.gap_evt.params.connected.conn_params.min_conn_interval * UNIT_1_25_MS);
-																		iPrint("Connection Interval Max: %u[us]\n", ble_evt->evt.gap_evt.params.connected.conn_params.max_conn_interval * UNIT_1_25_MS);
-																    iPrint("Connection Slave Latency: %u\n", ble_evt->evt.gap_evt.params.connected.conn_params.slave_latency);
-																    iPrint("Connection Timeout: %u[ms]\n", ble_evt->evt.gap_evt.params.connected.conn_params.conn_sup_timeout * UNIT_10_MS / 1000);
-		break;
+			_on_connection(gap_evt, conn_params);
+		} break;
 
-		case BLE_GAP_EVT_DISCONNECTED: 	connection = BLE_CONN_HANDLE_INVALID;
-																		isConnected = false;
-																		iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
+		case BLE_GAP_EVT_DISCONNECTED:
+		{
+			// For readibility.
+			uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
 
-																		iPrint("-> Central disconnected\n");
+			_on_disconnection(conn_handle);
 
-																		error = sd_ble_gap_adv_start(&_adv_params, CONN_CFG_TAG);
-																		if(error) {
-																			iPrint("/!\\ Advertising failed to restart: error %d\n", error);
-																			return;
-																		}
-
-																		iPrint("-> Advertising started\n");
-		break;
+		} break;
 
 		case BLE_GAP_EVT_CONN_PARAM_UPDATE:
+		{
+			// For readibility.
+			uint16_t const conn_handle                = ble_evt->evt.gap_evt.conn_handle;
+			ble_gap_conn_params_t const* conn_params  = &ble_evt->evt.gap_evt.params.connected.conn_params;
 
-																		iPrint("\n-> Connection Parameters Update\n");
-																		iPrint("-------------------------------\n");
-																		iPrint("Connection Interval Min: %u[us]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.min_conn_interval * UNIT_1_25_MS);
-																		iPrint("Connection Interval Max: %u[us]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.max_conn_interval * UNIT_1_25_MS);
-																		iPrint("Connection Slave Latency: %u\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.slave_latency);
-																		iPrint("Connection Timeout: %u[ms]\n", ble_evt->evt.gap_evt.params.conn_param_update.conn_params.conn_sup_timeout * UNIT_10_MS / 1000);
-		break;
+			_on_conn_params_update(conn_handle, conn_params);
 
-		case BLE_GATTC_EVT_TIMEOUT: 		// Disconnect on GATT Client timeout event.
-																		iPrint("-> GATT Client Timeout\n");
-																		error = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
-																																	BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-																	 if(error) {
-																			iPrint("/!\\ disconnect failed : error %d\n", error);
-																			return;
-																		}
-		break;
+		} break;
 
-		case BLE_GATTS_EVT_TIMEOUT: 		// Disconnect on GATT Server timeout event.
-																		iPrint("-> GATT Server Timeout\n");
-																		error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-																		if(error) {
-																			iPrint("/!\\ disconnect failed : error %d\n", error);
-																			return;
-																		}
-		break;
+		case BLE_GATTC_EVT_TIMEOUT:
+		{
+			// For readibility.
+			uint16_t const conn_handle = ble_evt->evt.gattc_evt.conn_handle;
+
+			on_gattc_timeout(conn_handle);
+
+		} break;
+
+		case BLE_GATTS_EVT_TIMEOUT:
+		{
+			// For readibility.
+			uint16_t const conn_handle = ble_evt->evt.gatts_evt.conn_handle;
+
+			on_gatts_timeout(conn_handle);
+
+		} break;
 
 		case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+		{
+			// For readibility.
+			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
+			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = ble_evt->evt.gatts_evt.params.exchange_mtu_request;
 
-																		iPrint("\n-> MTU Parameters Update\n");
-																		iPrint("------------------------\n");
+			on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
 
-																		if(ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu > NRF_BLE_GATT_MAX_MTU_SIZE) {
-																		iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
-																		}
-																		else {
-																			iPrint("Connection MTU: %u[Bytes]\n", ble_evt->evt.gatts_evt.params.exchange_mtu_request.client_rx_mtu);
-																		}
-
-																		error = sd_ble_gatts_exchange_mtu_reply(ble_evt->evt.gatts_evt.conn_handle, NRF_BLE_GATT_MAX_MTU_SIZE);
-																		if(error) {
-																			iPrint("/!\\ MTU exchange failed : error %d\n", error);
-																			return;
-																		}
 		break;
 
 		default:	// NOTHING
@@ -131,12 +188,12 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 	}
 }
 
-static void on_ble_svc_evt(ble_evt_t* ble_evt)
+static void _on_ble_svc_evt(ble_evt_t* ble_evt)
 {
 	switch (ble_evt->header.evt_id)
 	{
 		case BLE_GATTS_EVT_WRITE:		{
-																	iBleP_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+																	iBleP_writeHandler_list_t** nextWriteHandler = &_writeHandler_list;
 																	void *buf					= (void*) ble_evt->evt.gatts_evt.params.write.data;
 																	size_t offset			= ble_evt->evt.gatts_evt.params.write.offset;
 																	uint16_t handle		= ble_evt->evt.gatts_evt.params.write.handle;
@@ -158,7 +215,7 @@ static void on_ble_svc_evt(ble_evt_t* ble_evt)
 	}
 }
 
-static void on_ble_pm_evt(pm_evt_t const * pm_evt)
+static void _on_ble_pm_evt(pm_evt_t const * pm_evt)
 {
 		switch(pm_evt->evt_id)
     {
@@ -173,13 +230,13 @@ static void on_ble_pm_evt(pm_evt_t const * pm_evt)
     }
 }
 
-static void on_connection_params_evt(ble_conn_params_evt_t * evt)
+static void _on_connection_params_evt(ble_conn_params_evt_t * evt)
 {
 	int error;
 
 	if (evt->evt_type == BLE_CONN_PARAMS_EVT_FAILED)
 	 {
-		error = sd_ble_gap_disconnect(connection, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
+		error = sd_ble_gap_disconnect(_conn_ref, BLE_HCI_CONN_INTERVAL_UNACCEPTABLE);
 		if(error) {
 			iPrint("/!\\ disconnect failed : error %d\n", error);
 			return;
@@ -187,12 +244,12 @@ static void on_connection_params_evt(ble_conn_params_evt_t * evt)
 	}
 }
 
-static void on_connection_params_error(uint32_t error)
+static void _on_connection_params_error(uint32_t error)
 {
 	iPrint("/!\\ Connection error %lu\n", error);
 }
 
-static void ble_evt_dispatch(ble_evt_t* ble_evt)
+static void _ble_evt_dispatch(ble_evt_t* ble_evt)
 {
 	// Forward BLE events to the Connection State module.
 	// This must be called before any event handler that uses this module.
@@ -201,12 +258,12 @@ static void ble_evt_dispatch(ble_evt_t* ble_evt)
 	// Forward BLE events to the Peer Manager
 	pm_on_ble_evt(ble_evt);
 
-	on_ble_evt(ble_evt);
-	on_ble_svc_evt(ble_evt);
-  nrf_ble_gatt_on_ble_evt(&gatt_module, ble_evt);
+	_on_ble_evt(ble_evt);
+	_on_ble_svc_evt(ble_evt);
+  nrf_ble_gatt_on_ble_evt(&_gatt_module, ble_evt);
 }
 
-static void sys_evt_dispatch(uint32_t sys_evt)
+static void _sys_evt_dispatch(uint32_t sys_evt)
 {
 	// Forward Softdevice events to the fstorage module
 	fs_sys_event_handler(sys_evt);
@@ -217,7 +274,7 @@ static void sys_evt_dispatch(uint32_t sys_evt)
 int iBleP_init()
 {
 	int error;
-	connection = BLE_CONN_HANDLE_INVALID;
+	_conn_ref = BLE_CONN_HANDLE_INVALID;
 
 	// Soft Device and BLE event init	--------------------------------------------
 	ble_cfg_t ble_cfg;
@@ -293,13 +350,13 @@ int iBleP_init()
 	}
 
 	// Subscribe for BLE events.
-	error = softdevice_ble_evt_handler_set(ble_evt_dispatch);
+	error = softdevice_ble_evt_handler_set(_ble_evt_dispatch);
 	if(error) {
 			iPrint("/!\\ fail to subscribe for BLE events: error %d\n", error);
 			return error;
 		}
 
-	error = softdevice_sys_evt_handler_set(sys_evt_dispatch);
+	error = softdevice_sys_evt_handler_set(_sys_evt_dispatch);
 	if(error) {
 		iPrint("/!\\ fail to subscribe for BLE events: error %d\n", error);
 		return error;
@@ -335,7 +392,7 @@ int iBleP_init()
 	}
 
 	// GATT init -----------------------------------------------------------------
-	error = nrf_ble_gatt_init(&gatt_module, NULL);
+	error = nrf_ble_gatt_init(&_gatt_module, NULL);
 	if(error) {
 		iPrint("/!\\ GATT init failed: error %d\n", error);
 		return error;
@@ -350,8 +407,8 @@ int iBleP_init()
 	cp_init.max_conn_params_update_count   = MAX_CONN_PARAMS_UPDATE_COUNT;
 	cp_init.start_on_notify_cccd_handle    = BLE_GATT_HANDLE_INVALID;
 	cp_init.disconnect_on_fail             = false;
-	cp_init.evt_handler                    = on_connection_params_evt;
-	cp_init.error_handler                  = on_connection_params_error;
+	cp_init.evt_handler                    = _on_connection_params_evt;
+	cp_init.error_handler                  = _on_connection_params_error;
 
 	error = ble_conn_params_init(&cp_init);
 	if(error) {
@@ -391,7 +448,7 @@ int iBleP_init()
 		return error;
 	}
 
-  error = pm_register(on_ble_pm_evt);
+  error = pm_register(_on_ble_pm_evt);
 	if(error) {
 		iPrint("/!\\ Peer manager register failed: error %d\n", error);
 		return error;
@@ -406,7 +463,7 @@ int iBleP_init()
 
 volatile bool iBleP_isConnected()
 {
-	return isConnected;
+	return _isConnected;
 }
 
 // https://devzone.nordicsemi.com/blogs/782/bluetooth-smart-and-the-nordics-softdevices-part-1/
@@ -533,7 +590,7 @@ static uint32_t iBleP_svc_char_add(iBleP_svc_t* svc, iBleP_chrc_t* chrc, uint8_t
 	// Store where to notify a write request
 	if(chrc->chrc_config.perm & IBLEP_CHRC_PERM_WRITE)
 	{
-		iBleP_writeHandler_list_t** nextWriteHandler = &writeHandler_list;
+		iBleP_writeHandler_list_t** nextWriteHandler = &_writeHandler_list;
 
 		// Search the last element of the list
 		while(*nextWriteHandler != NULL)  {
@@ -604,7 +661,7 @@ int iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 	BLE_ERROR(0);
 
 	BLE_NOTIFY(1);
-	error = sd_ble_gatts_hvx(connection, &hvx_params);
+	error = sd_ble_gatts_hvx(_conn_ref, &hvx_params);
 	BLE_NOTIFY(0);
 
 	if(error) {
@@ -628,7 +685,7 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
 	BLE_ERROR(0);
 
 	BLE_INDICATE(1);
-	error = sd_ble_gatts_hvx(connection, &hvx_params);
+	error = sd_ble_gatts_hvx(_conn_ref, &hvx_params);
 	BLE_INDICATE(0);
 
 	if(error) {
