@@ -2,23 +2,23 @@
 
 #include "iBleP.h"
 
-volatile static bool isConnected = false;
-static struct bt_conn* 									default_conn;
-static struct k_mutex 									indicate_mutex;
-static struct bt_gatt_indicate_params 	ind_params;
+volatile static bool _isConnected = false;
+static struct bt_conn* 									_default_conn;
+static struct k_mutex 									_indicate_mutex;
+static struct bt_gatt_indicate_params 	_indicate_params;
 
 void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
 struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
 
-ssize_t iBleP_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
-                          void *buf, u16_t buf_length, u16_t offset)
+ssize_t on_read_rsq(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
+                           void *buf, u16_t buf_length, u16_t offset)
 {
   // BLE_READ();
   return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
 
 
-static void iBleP_mtu_request(struct bt_conn* conn, u8_t err,
+static void _on_mtu_request(struct bt_conn* conn, u8_t err,
                              struct bt_gatt_exchange_params* params)
 {
   iPrint("\n-> MTU Parameters Update\n");
@@ -27,17 +27,17 @@ static void iBleP_mtu_request(struct bt_conn* conn, u8_t err,
 }
 
 static struct bt_gatt_exchange_params mtu_req = {
-  .func = iBleP_mtu_request,
+  .func = _on_mtu_request,
 };
 
-static void iBleP_connected(struct bt_conn *conn, u8_t error)
+static void _on_connection(struct bt_conn *conn, u8_t error)
 {
 	if (error) {
 		iPrint("-> Connection failed: %u\n", error);
 	}
 	else
   {
-		default_conn = bt_conn_ref(conn);
+		_default_conn = bt_conn_ref(conn);
 
     struct bt_conn_info info;
     error = bt_conn_get_info(conn, &info);
@@ -45,7 +45,7 @@ static void iBleP_connected(struct bt_conn *conn, u8_t error)
       iPrint("/!\\ Bluetooth get connection information failed: error %d\n", error);
     }
 
-		isConnected = true;
+		_isConnected = true;
     iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
 
 		iPrint("\n-> Central connected\n");
@@ -63,20 +63,20 @@ static void iBleP_connected(struct bt_conn *conn, u8_t error)
 	}
 }
 
-static void iBleP_disconnected(struct bt_conn *conn, u8_t reason)
+static void _on_disconnection(struct bt_conn *conn, u8_t reason)
 {
-  if(default_conn)
+  if(_default_conn)
   {
-    bt_conn_unref(default_conn);
-    default_conn = NULL;
+    bt_conn_unref(_default_conn);
+    _default_conn = NULL;
   }
 
-	isConnected = false;
+	_isConnected = false;
   iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
 	iPrint("-> Central disconnected: %u\n", reason);
 }
 
-static void iBleP_conn_parameters_update(struct bt_conn *conn,
+static void _on_conn_params_update(struct bt_conn *conn,
                                         u16_t interval, u16_t latency,
                                         u16_t timeout)
 {
@@ -89,9 +89,9 @@ static void iBleP_conn_parameters_update(struct bt_conn *conn,
 
 static struct bt_conn_cb connection_callback =
 {
-	.connected 		    = iBleP_connected,
-	.disconnected     = iBleP_disconnected,
-  .le_param_updated = iBleP_conn_parameters_update,
+	.connected 		    = _on_connection,
+	.disconnected     = _on_disconnection,
+  .le_param_updated = _on_conn_params_update,
 };
 
 int iBleP_init()
@@ -108,7 +108,7 @@ int iBleP_init()
 	bt_conn_cb_register(&connection_callback);
 
 	// Initialize the mutex for the indication
-	k_mutex_init(&indicate_mutex);
+	k_mutex_init(&_indicate_mutex);
 
   iEventQueue_init(&bleP_EventQueue);
 
@@ -118,7 +118,7 @@ int iBleP_init()
 
 volatile bool iBleP_isConnected()
 {
-	return isConnected;
+	return _isConnected;
 }
 
 static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
@@ -242,7 +242,7 @@ int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t bu
 
 static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
-	k_mutex_unlock(&indicate_mutex);
+	k_mutex_unlock(&_indicate_mutex);
 }
 
 int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
@@ -250,17 +250,17 @@ int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_
   int error;
 
 	// Avoid to rewrite the indication parameters
-	k_mutex_lock(&indicate_mutex, K_FOREVER);
+	k_mutex_lock(&_indicate_mutex, K_FOREVER);
 
-	ind_params.attr = iBleP_get_chrc_handle(svc, chrc_nbr);
-	ind_params.func = on_indicate_event;
-	ind_params.data = buf;
-	ind_params.len 	= buf_length;
+	_indicate_params.attr = iBleP_get_chrc_handle(svc, chrc_nbr);
+	_indicate_params.func = on_indicate_event;
+	_indicate_params.data = buf;
+	_indicate_params.len 	= buf_length;
 
   BLE_ERROR(0);
 
   BLE_INDICATE(1);
-	error = bt_gatt_indicate(NULL, &ind_params);
+	error = bt_gatt_indicate(NULL, &_indicate_params);
   BLE_INDICATE(0);
 
   if(error) {

@@ -329,8 +329,8 @@ static void _on_disconnection(uint16_t conn_handle)
 }
 
 static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t const* conn_params)
- {
-   int ref = _get_conn_ref(conn_handle);
+{
+  int ref = _get_conn_ref(conn_handle);
 
   iPrint("\n-> Connection %d Parameters Update\n", ref);
   iPrint("---------------------------------------\n");
@@ -338,7 +338,48 @@ static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t c
   iPrint("Connection Interval Max: %u[us]\n", conn_params->max_conn_interval * UNIT_1_25_MS);
   iPrint("Connection Slave Latency: %u\n", conn_params->slave_latency);
   iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
- }
+}
+
+static void _on_gattc_timeout(uint16_t conn_handle)
+{
+	iPrint("-> GATT Client Timeout\n");
+
+  error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+  if(error) {
+		iPrint("/!\\ disconnect failed : error %d\n", error);
+		return;
+	}
+}
+
+static void _on_gatts_timeout(uint16_t conn_handle)
+{
+	iPrint("-> GATT Server Timeout\n");
+
+  error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+	if(error) {
+		iPrint("/!\\ disconnect failed : error %d\n", error);
+		return;
+	}
+}
+
+static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
+{
+	iPrint("\n-> MTU Parameters Update\n");
+	iPrint("------------------------\n");
+
+	if(exchange_mtu_request->client_rx_mtu > NRF_BLE_GATT_MAX_MTU_SIZE) {
+	iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
+	}
+	else {
+		iPrint("Connection MTU: %u[Bytes]\n", exchange_mtu_request->client_rx_mtu);
+	}
+
+	error = sd_ble_gatts_exchange_mtu_reply(conn_handle, NRF_BLE_GATT_MAX_MTU_SIZE);
+	if(error) {
+		iPrint("/!\\ MTU exchange failed : error %d\n", error);
+		return;
+	}
+}
 
 static void _on_ble_evt(ble_evt_t const* ble_evt)
 {
@@ -384,29 +425,32 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 		// 	}
 		// } break;
 
-		case BLE_GATTC_EVT_TIMEOUT:
-    {
-      // Disconnect on GATT Client timeout event.
-  		iPrint("-> GATT Client Timeout\n");
-  		error = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
-                                    BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
-      if(error) {
-  			iPrint("/!\\ disconnect failed : error %d\n", error);
-  			return;
-      }
+    case BLE_GATTC_EVT_TIMEOUT:
+		{
+			// For readibility.
+			uint16_t const conn_handle = ble_evt->evt.gattc_evt.conn_handle;
+
+			_on_gattc_timeout(conn_handle);
+
 		} break;
 
 		case BLE_GATTS_EVT_TIMEOUT:
-    {
-      // Disconnect on GATT Server timeout event.
-  		iPrint("-> GATT Server Timeout\n");
-  		error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle,
-                                    BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+		{
+			// For readibility.
+			uint16_t const conn_handle = ble_evt->evt.gatts_evt.conn_handle;
 
-  		if(error) {
-  			iPrint("/!\\ disconnect failed : error %d\n", error);
-  			return;
-			}
+			_on_gatts_timeout(conn_handle);
+
+		} break;
+
+		case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
+		{
+			// For readibility.
+			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
+			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = ble_evt->evt.gatts_evt.params.exchange_mtu_request;
+
+			_on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
+
 		} break;
 
     case BLE_GATTC_EVT_PRIM_SRVC_DISC_RSP:

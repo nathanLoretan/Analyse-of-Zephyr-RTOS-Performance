@@ -1,15 +1,15 @@
 #include "iSpi.h"
 
 #if CONFIG_SPI_0
-	static struct device* spi0;
+	static struct device* _spi0;
 #endif	// CONFIG_SPI_0
 
 #if CONFIG_SPI_1
-	static struct device* spi1;
+	static struct device* _spi1;
 #endif	// CONFIG_SPI_1
 
 #if CONFIG_SPI_2
-	static struct device* spi2;
+	static struct device* _spi2;
 #endif	// CONFIG_SPI_2
 
 int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order)
@@ -20,7 +20,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 	switch(id)
 	{
 	#if CONFIG_SPI_0
-		case SPI0: 	{
+		case _spi0: 	{
 									struct spi_config config =
 									{
 										.max_sys_freq	=	freq,
@@ -29,25 +29,25 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 																		SPI_WORD(8)					// [4:11] word_size     - Size of a data frame in bits.
 									};
 
-									spi0	= device_get_binding(CONFIG_SPI_0_NAME);
-									if(spi0 == NULL) {
-										iPrint("/!\\ Could not find SPI0 driver\n");
+									_spi0	= device_get_binding(CONFIG_SPI_0_NAME);
+									if(_spi0 == NULL) {
+										iPrint("/!\\ Could not find _spi0 driver\n");
 										return -1;
 									}
 
-									error = spi_configure(spi0, &config);
+									error = spi_configure(_spi0, &config);
 									if(error) {
-										iPrint("/!\\ SPI0 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi0 configuration failed: error %d\n", error);
 										return error;
 									}
 
-									iPrint("[INIT] SPI0 initialized\n");
+									iPrint("[INIT] _spi0 initialized\n");
 								}
 		break;
 	#endif	// CONFIG_SPI_0
 
 	#if CONFIG_SPI_1
-		case SPI1:	{
+		case _spi1:	{
 									struct spi_config config =
 									{
 										.max_sys_freq	=	freq,
@@ -56,25 +56,25 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 																		SPI_WORD(8)				// [4:11] word_size     - Size of a data frame in bits.
 									};
 
-									spi1	= device_get_binding(CONFIG_SPI_1_NAME);
-									if(spi1 == NULL) {
-										iPrint("/!\\ Could not find SPI1 driver\n");
+									_spi1	= device_get_binding(CONFIG_SPI_1_NAME);
+									if(_spi1 == NULL) {
+										iPrint("/!\\ Could not find _spi1 driver\n");
 										return -1;
 									}
 
-									error = spi_configure(spi1, &config);
+									error = spi_configure(_spi1, &config);
 									if(error) {
-										iPrint("/!\\ SPI1 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi1 configuration failed: error %d\n", error);
 										return error;
 									}
 
-									iPrint("[INIT] SPI1 initialized\n");
+									iPrint("[INIT] _spi1 initialized\n");
 								}
 		break;
 	#endif	// CONFIG_SPI_1
 
 	#if CONFIG_SPI_2
-		case SPI2:	{
+		case _spi2:	{
 									struct spi_config config =
 									{
 										.max_sys_freq	=	freq,
@@ -83,19 +83,19 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 																		SPI_WORD(8)				// [4:11] word_size     - Size of a data frame in bits.
 									};
 
-									spi2	= device_get_binding(CONFIG_SPI_2_NAME);
-									if(spi2 == NULL) {
-										iPrint("/!\\ Could not find SPI2 driver\n");
+									_spi2	= device_get_binding(CONFIG_SPI_2_NAME);
+									if(_spi2 == NULL) {
+										iPrint("/!\\ Could not find _spi2 driver\n");
 										return -1;
 									}
 
-									error = spi_configure(spi2, &config);
+									error = spi_configure(_spi2, &config);
 									if(error) {
-										iPrint("/!\\ SPI2 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi2 configuration failed: error %d\n", error);
 										return error;
 									}
 
-									iPrint("[INIT] SPI2 initialized\n");
+									iPrint("[INIT] _spi2 initialized\n");
 								}
 		break;
 	#endif	// CONFIG_SPI_2
@@ -135,13 +135,13 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	switch(id)
 	{
 	#if CONFIG_SPI_0
-			case SPI0: 		error = spi_slave_select(spi0, slave);
+			case _spi0: 		error = spi_slave_select(_spi0, slave);
 										if(error) {
-											iPrint("/!\\ SPI0 slave select failed: error %d\n", error);
+											iPrint("/!\\ _spi0 slave select failed: error %d\n", error);
 											return error;
 										}
 
-										error = spi_transceive(spi0, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
+										error = spi_transceive(_spi0, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
 										if(error) {
 											return error;
 										}
@@ -149,13 +149,13 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	#endif	// CONFIG_SPI_0
 
 	#if CONFIG_SPI_1
-		case SPI1:		error = spi_slave_select(spi1, slave);
+		case _spi1:		error = spi_slave_select(_spi1, slave);
 									if(error) {
-										iPrint("/!\\ SPI1 slave select failed: error %d\n", error);
+										iPrint("/!\\ _spi1 slave select failed: error %d\n", error);
 										return error;
 									}
 
-									error = spi_transceive(spi1, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
+									error = spi_transceive(_spi1, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
 									if(error) {
 										return error;
 									}
@@ -163,13 +163,13 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	#endif	// CONFIG_SPI_1
 
 	#if CONFIG_SPI_2
-		case SPI2:		error = spi_slave_select(spi2, slave);
+		case _spi2:		error = spi_slave_select(_spi2, slave);
 									if(error) {
-										iPrint("/!\\ SPI2 slave select failed: error %d\n", error);
+										iPrint("/!\\ _spi2 slave select failed: error %d\n", error);
 										return error;
 									}
 
-									error = spi_transceive(spi2, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
+									error = spi_transceive(_spi2, (void*) tx_buf, trx_buf_length, (void*) rx_buf, trx_buf_length);
 									if(error) {
 										return error;
 									}
@@ -197,35 +197,35 @@ int iSPI_read(iSpi_id_t id, iSpi_slave_t slave, uint8_t* rx_data, size_t rx_data
 	switch(id)
 	{
 	#if CONFIG_SPI_0
-		case SPI0: 	error = spi_slave_select(spi0, slave);
+		case _spi0: 	error = spi_slave_select(_spi0, slave);
 								if(error) {
-									iPrint("/!\\ SPI0 slave select failed: error %d\n", error);
+									iPrint("/!\\ _spi0 slave select failed: error %d\n", error);
 									return error;
 								}
 
-								return spi_read(spi0, (void*) rx_data, rx_data_length);
+								return spi_read(_spi0, (void*) rx_data, rx_data_length);
 		break;
 	#endif	// CONFIG_SPI_0
 
 	#if CONFIG_SPI_1
-		case SPI1:	error = spi_slave_select(spi1, slave);
+		case _spi1:	error = spi_slave_select(_spi1, slave);
 								if(error) {
-									iPrint("/!\\ SPI1 slave select failed: error %d\n", error);
+									iPrint("/!\\ _spi1 slave select failed: error %d\n", error);
 									return error;
 								}
 
-								return spi_read(spi1, (void*) rx_data, rx_data_length);
+								return spi_read(_spi1, (void*) rx_data, rx_data_length);
 		break;
 	#endif	// CONFIG_SPI_1
 
 	#if CONFIG_SPI_2
-		case SPI2:	error = spi_slave_select(spi2, slave);
+		case _spi2:	error = spi_slave_select(_spi2, slave);
 								if(error) {
-									iPrint("/!\\ SPI2 slave select failed: error %d\n", error);
+									iPrint("/!\\ _spi2 slave select failed: error %d\n", error);
 									return error;
 								}
 
-								return spi_read(spi2, (void*) rx_data, rx_data_length);
+								return spi_read(_spi2, (void*) rx_data, rx_data_length);
 		break;
 	#endif	// CONFIG_SPI_2
 
@@ -247,35 +247,35 @@ int iSPI_write(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_dat
 	switch(id)
 	{
 	#if CONFIG_SPI_0
-		case SPI0: 		error = spi_slave_select(spi0, slave);
+		case _spi0: 		error = spi_slave_select(_spi0, slave);
 									if(error) {
-										iPrint("/!\\ SPI0 slave select failed: error %d\n", error);
+										iPrint("/!\\ _spi0 slave select failed: error %d\n", error);
 										return error;
 									}
 
-									return spi_write(spi0, (void*) tx_data, tx_data_length);
+									return spi_write(_spi0, (void*) tx_data, tx_data_length);
 		break;
 	#endif	// CONFIG_SPI_0
 
 	#if CONFIG_SPI_1
-		case SPI1:		error = spi_slave_select(spi1, slave);
+		case _spi1:		error = spi_slave_select(_spi1, slave);
 									if(error) {
-										iPrint("/!\\ SPI1 slave select failed: error %d\n", error);
+										iPrint("/!\\ _spi1 slave select failed: error %d\n", error);
 										return error;
 									}
 
-									return spi_write(spi1, (void*) tx_data, tx_data_length);
+									return spi_write(_spi1, (void*) tx_data, tx_data_length);
 		break;
 	#endif	// CONFIG_SPI_1
 
 	#if CONFIG_SPI_2
-		case SPI2:		error = spi_slave_select(spi2, slave);
+		case _spi2:		error = spi_slave_select(_spi2, slave);
 									if(error) {
-										iPrint("/!\\ SPI2 slave select failed: error %d\n", error);
+										iPrint("/!\\ _spi2 slave select failed: error %d\n", error);
 										return error;
 									}
 
-									return spi_write(spi2, (void*) tx_data, tx_data_length);
+									return spi_write(_spi2, (void*) tx_data, tx_data_length);
 		break;
 	#endif	// CONFIG_SPI_2
 

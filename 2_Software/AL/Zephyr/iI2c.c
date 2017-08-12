@@ -1,11 +1,11 @@
 #include "iI2c.h"
 
 #if CONFIG_I2C_0
-	static struct device* i2c0;
+	static struct device* _i2c0;
 #endif	// CONFIG_I2C_0
 
 #if CONFIG_I2C_1
-	static struct device* i2c1;
+	static struct device* _i2c1;
 #endif	// CONFIG_I2C_1
 
 int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq)
@@ -16,36 +16,36 @@ int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq)
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 	i2c0 = device_get_binding(CONFIG_I2C_0_NAME);
-								if(i2c0 == NULL) {
-									iPrint("/!\\ Could not find I2C0 driver\n");
+		case _i2c0: 	_i2c0 = device_get_binding(CONFIG_I2C_0_NAME);
+								if(_i2c0 == NULL) {
+									iPrint("/!\\ Could not find _i2c0 driver\n");
 									return -1;
 								}
 
-								error = i2c_configure(i2c0, freq | I2C_MODE_MASTER);
+								error = i2c_configure(_i2c0, freq | I2C_MODE_MASTER);
 								if(error) {
-									iPrint("/!\\ I2C0 configuration failed: error %d\n", error);
+									iPrint("/!\\ _i2c0 configuration failed: error %d\n", error);
 									return error;
 								}
 
-								iPrint("[INIT] I2C0 initialized\n");
+								iPrint("[INIT] _i2c0 initialized\n");
 		break;
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 	i2c1 = device_get_binding(CONFIG_I2C_1_NAME);
-								if(i2c1 == NULL) {
-									iPrint("/!\\ Could not find I2C1 driver\n");
+		case _i2c1: 	_i2c1 = device_get_binding(CONFIG_I2C_1_NAME);
+								if(_i2c1 == NULL) {
+									iPrint("/!\\ Could not find _i2c1 driver\n");
 									return -1;
 								}
 
-								error = i2c_configure(i2c1, freq | I2C_MODE_MASTER);
+								error = i2c_configure(_i2c1, freq | I2C_MODE_MASTER);
 								if(error) {
-									iPrint("/!\\ I2C1 configuration failed: error %d\n", error);
+									iPrint("/!\\ _i2c1 configuration failed: error %d\n", error);
 									return error;
 								}
 
-								iPrint("[INIT] I2C1 initialized\n");
+								iPrint("[INIT] _i2c1 initialized\n");
 		break;
 	#endif	// CONFIG_I2C_1
 
@@ -78,7 +78,7 @@ int iI2c_read(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg, 
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 		error = i2c_transfer(i2c0, &msgs[0], 2, addr_dev);
+		case _i2c0: 		error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
 									if(error) {
 										return error;
 									}
@@ -86,7 +86,7 @@ int iI2c_read(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg, 
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 		error = i2c_transfer(i2c1, &msgs[0], 2, addr_dev);
+		case _i2c1: 		error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
 									if(error) {
 										return error;
 									}
@@ -122,7 +122,7 @@ int iI2C_write(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg,
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 		error = i2c_transfer(i2c0, &msgs[0], 2, addr_dev);
+		case _i2c0: 		error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
 									if(error) {
 										return error;
 									}
@@ -130,7 +130,7 @@ int iI2C_write(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg,
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 		error = i2c_transfer(i2c1, &msgs[0], 2, addr_dev);
+		case _i2c1: 		error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
 									if(error) {
 										return error;
 									}

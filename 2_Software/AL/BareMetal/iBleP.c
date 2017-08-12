@@ -80,34 +80,35 @@ static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t c
 	iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
  }
 
-static void on_gattc_timeout(uint16_t conn_handle)
+static void _on_gattc_timeout(uint16_t conn_handle)
 {
 	iPrint("-> GATT Client Timeout\n");
-	error = sd_ble_gap_disconnect(ble_evt->evt.gattc_evt.conn_handle,
-																BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
- if(error) {
-		iPrint("/!\\ disconnect failed : error %d\n", error);
-		return;
-	}
-}
 
-static void on_gatts_timeout(uint16_t conn_handle)
-{
-	iPrint("-> GATT Server Timeout\n");
-	error = sd_ble_gap_disconnect(ble_evt->evt.gatts_evt.conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+	error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
 	if(error) {
 		iPrint("/!\\ disconnect failed : error %d\n", error);
 		return;
 	}
 }
 
-static void on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
+static void _on_gatts_timeout(uint16_t conn_handle)
+{
+	iPrint("-> GATT Server Timeout\n");
+
+	error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
+	if(error) {
+		iPrint("/!\\ disconnect failed : error %d\n", error);
+		return;
+	}
+}
+
+static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
 {
 	iPrint("\n-> MTU Parameters Update\n");
 	iPrint("------------------------\n");
 
 	if(exchange_mtu_request->client_rx_mtu > NRF_BLE_GATT_MAX_MTU_SIZE) {
-	iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
+		iPrint("Connection MTU: %u[Bytes]\n", NRF_BLE_GATT_MAX_MTU_SIZE);
 	}
 	else {
 		iPrint("Connection MTU: %u[Bytes]\n", exchange_mtu_request->client_rx_mtu);
@@ -120,7 +121,6 @@ static void on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_ex
 	}
 }
 
-// Event handlers
 static void _on_ble_evt(ble_evt_t* ble_evt)
 {
 	int error;
@@ -160,7 +160,7 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 			// For readibility.
 			uint16_t const conn_handle = ble_evt->evt.gattc_evt.conn_handle;
 
-			on_gattc_timeout(conn_handle);
+			_on_gattc_timeout(conn_handle);
 
 		} break;
 
@@ -169,7 +169,7 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 			// For readibility.
 			uint16_t const conn_handle = ble_evt->evt.gatts_evt.conn_handle;
 
-			on_gatts_timeout(conn_handle);
+			_on_gatts_timeout(conn_handle);
 
 		} break;
 
@@ -179,9 +179,9 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
 			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = ble_evt->evt.gatts_evt.params.exchange_mtu_request;
 
-			on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
+			_on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
 
-		break;
+		} break;
 
 		default:	// NOTHING
 		break;
@@ -466,8 +466,6 @@ volatile bool iBleP_isConnected()
 	return _isConnected;
 }
 
-// https://devzone.nordicsemi.com/blogs/782/bluetooth-smart-and-the-nordics-softdevices-part-1/
-// https://devzone.nordicsemi.com/question/110308/i-want-to-change-the-ble-address/
 int iBleP_adv_start(iBleP_adv_params_t params, iBleP_advdata_t* advdata, size_t advdata_size,
 									 	iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {

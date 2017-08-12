@@ -3,7 +3,7 @@
 #include "iBleC.h"
 
 static uint8_t _nbr_conn = 0;
-static struct bt_conn* new_conn;
+static struct bt_conn* _new_conn;
 
 static struct bt_le_conn_param* _conn_params;
 static struct bt_le_scan_param* _scan_params;
@@ -126,8 +126,8 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	}
 
 	// Create a connection with the new device
-	new_conn = bt_conn_create_le(peer_addr, _conn_params);
-	if(new_conn == NULL) {
+	_new_conn = bt_conn_create_le(peer_addr, _conn_params);
+	if(_new_conn == NULL) {
 		iPrint("/!\\  Connection request to %s failed\n", addr_str);
 		iBleC_scan_start(NULL);
 	}
@@ -325,7 +325,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
 		iBleC_scan_start(NULL);
 	}
-	else if(new_conn == conn)
+	else if(_new_conn == conn)
 	{
 		uint16_t ref = _get_conn_space();
 

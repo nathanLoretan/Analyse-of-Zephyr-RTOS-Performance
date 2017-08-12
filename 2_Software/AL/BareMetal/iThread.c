@@ -9,7 +9,7 @@ typedef struct iThread_list {
   struct iThread_list*  next;
 } iThread_list_t;
 
-static iThread_list_t* thread_list = NULL;
+static iThread_list_t* _thread_list = NULL;
 
 // iEventQueue element only used by the system
 extern volatile bool isEvent;
@@ -17,7 +17,7 @@ extern void iEventQueue_isEvent();
 
 void iThread_run(iThread_t* thread, iThread_handler_t handler)
 {
-  iThread_list_t** nextThread = &thread_list;
+  iThread_list_t** nextThread = &_thread_list;
 
   // Search the last element of the list
   while(*nextThread != NULL)  {
@@ -38,7 +38,7 @@ void iThreads_start()
     // Wait for an event
     while(!isEvent) { iSleep(); }
 
-    iThread_list_t* nextThread = thread_list;
+    iThread_list_t* nextThread = _thread_list;
 
     // Browse all the elements of the list
     while(nextThread != NULL)

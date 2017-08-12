@@ -77,7 +77,7 @@
 
 // Read and Write handler
 typedef ssize_t (*iBleP_read_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, u16_t len, u16_t offset);
-ssize_t iBleP_read_handler(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset);
+ssize_t on_read_rsq(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset);
 
 typedef ssize_t (*iBleP_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t len, u16_t offset, u8_t flags);
 #define IBLEP_WRITE_HANDLER(fn, attr, buf, buf_length, offset)  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)

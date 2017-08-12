@@ -7,11 +7,11 @@ typedef struct iEventQueue_list {
 	struct iEventQueue_list* 	next;
 }	iEventQueue_list_t;
 
-static iEventQueue_list_t* queueList = NULL;
+static iEventQueue_list_t* _queueList = NULL;
 
 void iEventQueue_isEvent()
 {
-	iEventQueue_list_t** nextQueue = &queueList;
+	iEventQueue_list_t** nextQueue = &_queueList;
 
 	isEvent = false;
 
@@ -25,7 +25,7 @@ void iEventQueue_isEvent()
 
 void iEventQueue_init(iEventQueue_t* queue)
 {
-	iEventQueue_list_t** nextQueue = &queueList;
+	iEventQueue_list_t** nextQueue = &_queueList;
 
 	// Search the last element of the list
 	while(*nextQueue != NULL)  {

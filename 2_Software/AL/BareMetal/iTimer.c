@@ -1,13 +1,13 @@
 #include "iTimer.h"
 
-static bool isAppTimerInit = false;
+static bool _isAppTimerInit = false;
 
 // Only used by iTimer and iBle
 void iTimer_init()
 {
 	int error;
 
-	if(!isAppTimerInit)
+	if(!_isAppTimerInit)
 	{
 
 
@@ -21,7 +21,7 @@ void iTimer_init()
 			iPrint("/!\\ APP Timer init failed: error %d\n", error);
 			return ;
 		}
-		isAppTimerInit = true;
+		_isAppTimerInit = true;
 	}
 }
 

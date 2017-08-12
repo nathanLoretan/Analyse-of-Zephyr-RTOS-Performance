@@ -2,44 +2,44 @@
 #include "nrf_mtx.h"
 
 #if SPI0_ENABLED
-	static const nrf_drv_spi_t 	spi0 = NRF_DRV_SPI_INSTANCE(0);
-	static iGpio_t 							spi0_cs[4];
-	volatile static nrf_mtx_t	 	spi0_mutex;
-	volatile static bool				spi0_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
+	static const nrf_drv_spi_t 	_spi0 = NRF_DRV_SPI_INSTANCE(0);
+	static iGpio_t 							_spi0_cs[4];
+	volatile static nrf_mtx_t	 	_spi0_mutex;
+	volatile static bool				_spi0_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
 #endif	// SPI0_ENABLED
 
 #if SPI1_ENABLED
-	static const nrf_drv_spi_t	spi1 = NRF_DRV_SPI_INSTANCE(1);
-	static iGpio_t 							spi1_cs[4];
-	volatile static nrf_mtx_t		spi1_mutex;
-	volatile static bool				spi1_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
+	static const nrf_drv_spi_t	_spi1 = NRF_DRV_SPI_INSTANCE(1);
+	static iGpio_t 							_spi1_cs[4];
+	volatile static nrf_mtx_t		_spi1_mutex;
+	volatile static bool				_spi1_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
 #endif	// SPI1_ENABLED
 
 #if SPI2_ENABLED
-	static const nrf_drv_spi_t	spi2 = NRF_DRV_SPI_INSTANCE(2);
-	static iGpio_t 							spi2_cs[4];
-	volatile static nrf_mtx_t		spi2_mutex;
-	volatile static bool				spi2_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
+	static const nrf_drv_spi_t	_spi2 = NRF_DRV_SPI_INSTANCE(2);
+	static iGpio_t 							_spi2_cs[4];
+	volatile static nrf_mtx_t		_spi2_mutex;
+	volatile static bool				_spi2_isDataReady;	// Flag used to indicate that SPI instance completed the transfer.
 #endif	// SPI2_ENABLED
 
 #if SPI0_ENABLED
-static void on_spi0_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+static void _on_spi0_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
 {
-	spi0_isDataReady = true;
+	_spi0_isDataReady = true;
 }
 #endif	// SPI0_ENABLED
 
 #if SPI1_ENABLED
-static void on_spi1_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+static void _on_spi1_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
 {
-	spi1_isDataReady = true;
+	_spi1_isDataReady = true;
 }
 #endif	// SPI1_ENABLED
 
 #if SPI2_ENABLED
-static void on_spi2_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
+static void _on_spi2_event(nrf_drv_spi_evt_t const* p_event, void* p_context)
 {
-	spi2_isDataReady = true;
+	_spi2_isDataReady = true;
 }
 #endif	// SPI2_ENABLED
 
@@ -52,7 +52,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 	switch(id)
 	{
 	#if SPI0_ENABLED
-		case SPI0:	{
+		case _spi0:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI0_SCK,
@@ -66,43 +66,43 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 										.bit_order    = order,
 									};
 
-									nrf_drv_spi_uninit(&spi0);
+									nrf_drv_spi_uninit(&_spi0);
 
-									error = nrf_drv_spi_init(&spi0, &config, on_spi0_event, NULL);
+									error = nrf_drv_spi_init(&_spi0, &config, _on_spi0_event, NULL);
 									if (error) {
-										iPrint("/!\\ SPI0 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi0 configuration failed: error %d\n", error);
 										return error;
 									}
 
 									#ifdef SPI0_CS0
-										iGpio_init(&spi0_cs[0], SPI0_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi0_cs[0], 1);
+										iGpio_init(&_spi0_cs[0], SPI0_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi0_cs[0], 1);
 									#endif
 
 									#ifdef SPI0_CS1
-										iGpio_init(&spi0_cs[1], SPI0_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi0_cs[1], 1);
+										iGpio_init(&_spi0_cs[1], SPI0_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi0_cs[1], 1);
 									#endif
 
 									#ifdef SPI0_CS2
-										iGpio_init(&spi0_cs[2], SPI0_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi0_cs[2], 1);
+										iGpio_init(&_spi0_cs[2], SPI0_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi0_cs[2], 1);
 									#endif
 
 									#ifdef SPI0_CS3
-										iGpio_init(&spi0_cs[3], SPI0_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi0_cs[3], 1);
+										iGpio_init(&_spi0_cs[3], SPI0_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi0_cs[3], 1);
 									#endif
 
-									nrf_mtx_init(&spi0_mutex);
+									nrf_mtx_init(&_spi0_mutex);
 
-									iPrint("[INIT] SPI0 initialized\n");
+									iPrint("[INIT] _spi0 initialized\n");
 								}
 		break;
 	#endif	// SPI0_ENABLED
 
 	#if SPI1_ENABLED
-		case SPI1:	{
+		case _spi1:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI1_SCK,
@@ -116,44 +116,44 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 										.bit_order    = order,
 									};
 
-									nrf_drv_spi_uninit(&spi1);
+									nrf_drv_spi_uninit(&_spi1);
 
-									error = nrf_drv_spi_init(&spi1, &config, on_spi1_event, NULL);
+									error = nrf_drv_spi_init(&_spi1, &config, _on_spi1_event, NULL);
 									if (error) {
-										iPrint("/!\\ SPI1 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi1 configuration failed: error %d\n", error);
 										return error;
 									}
 
 									// Initalize slave select
 									#ifdef SPI1_CS0
-										iGpio_init(&spi1_cs[0], SPI1_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi1_cs[0], 1);
+										iGpio_init(&_spi1_cs[0], SPI1_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi1_cs[0], 1);
 									#endif
 
 									#ifdef SPI1_CS1
-										iGpio_init(&spi1_cs[1], SPI1_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi1_cs[1], 1);
+										iGpio_init(&_spi1_cs[1], SPI1_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi1_cs[1], 1);
 									#endif
 
 									#ifdef SPI1_CS2
-										iGpio_init(&spi1_cs[2], SPI1_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi1_cs[2], 1);
+										iGpio_init(&_spi1_cs[2], SPI1_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi1_cs[2], 1);
 									#endif
 
 									#ifdef SPI1_CS3
-										iGpio_init(&spi1_cs[3], SPI1_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi1_cs[3], 1);
+										iGpio_init(&_spi1_cs[3], SPI1_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi1_cs[3], 1);
 									#endif
 
-									nrf_mtx_init(&spi1_mutex);
+									nrf_mtx_init(&_spi1_mutex);
 
-									iPrint("[INIT] SPI1 initialized\n");
+									iPrint("[INIT] _spi1 initialized\n");
 								}
 		break;
 	#endif	// SPI1_ENABLED
 
 	#if SPI2_ENABLED
-		case SPI2:	{
+		case _spi2:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI2_SCK,
@@ -167,38 +167,38 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 										.bit_order    = order,
 									};
 
-									nrf_drv_spi_uninit(&spi2);
+									nrf_drv_spi_uninit(&_spi2);
 
-									error = nrf_drv_spi_init(&spi2, &config, on_spi2_event, NULL);
+									error = nrf_drv_spi_init(&_spi2, &config, _on_spi2_event, NULL);
 									if (error) {
-										iPrint("/!\\ SPI2 configuration failed: error %d\n", error);
+										iPrint("/!\\ _spi2 configuration failed: error %d\n", error);
 										return error;
 									}
 
 									// Initalize slave select
 									#ifdef SPI2_CS0
-										iGpio_init(&spi2_cs[0], SPI2_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi2_cs[0], 1);
+										iGpio_init(&_spi2_cs[0], SPI2_CS0, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi2_cs[0], 1);
 									#endif
 
 									#ifdef SPI2_CS1
-										iGpio_init(&spi2_cs[1], SPI2_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi2_cs[1], 1);
+										iGpio_init(&_spi2_cs[1], SPI2_CS1, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi2_cs[1], 1);
 									#endif
 
 									#ifdef SPI2_CS2
-										iGpio_init(&spi2_cs[2], SPI2_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi2_cs[2], 1);
+										iGpio_init(&_spi2_cs[2], SPI2_CS2, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi2_cs[2], 1);
 									#endif
 
 									#ifdef SPI2_CS3
-										iGpio_init(&spi2_cs[3], SPI2_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
-										iGpio_write(&spi2_cs[3], 1);
+										iGpio_init(&_spi2_cs[3], SPI2_CS3, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);
+										iGpio_write(&_spi2_cs[3], 1);
 									#endif
 
-									nrf_mtx_init(&spi2_mutex);
+									nrf_mtx_init(&_spi2_mutex);
 
-									iPrint("[INIT] SPI2 initialized\n");
+									iPrint("[INIT] _spi2 initialized\n");
 								}
 		break;
 	#endif	// SPI2_ENABLED
@@ -235,83 +235,83 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	switch(id)
 	{
 	#if SPI0_ENABLED
-		case SPI0: 	// Wait if another system already send a communication
-								while(!nrf_mtx_trylock(&spi0_mutex)) {
+		case _spi0: 	// Wait if another system already send a communication
+								while(!nrf_mtx_trylock(&_spi0_mutex)) {
 									iSleep();
 								}
-								spi0_isDataReady = false;
+								_spi0_isDataReady = false;
 
 								// Enable slave
-								iGpio_write(&spi0_cs[slave], 0);
+								iGpio_write(&_spi0_cs[slave], 0);
 
-								error = nrf_drv_spi_transfer(&spi0, tx_data, tx_data_length, rx_buf, rx_buf_length);
+								error = nrf_drv_spi_transfer(&_spi0, tx_data, tx_data_length, rx_buf, rx_buf_length);
 								if (error) {
 									return error;
 								}
 
 								// Wait until the end of the transmition
-								while (!spi0_isDataReady) {
+								while (!_spi0_isDataReady) {
 									iSleep();
 								}
 
 								// Disable slave
-								iGpio_write(&spi0_cs[slave], 1);
+								iGpio_write(&_spi0_cs[slave], 1);
 
-								nrf_mtx_unlock(&spi0_mutex);
+								nrf_mtx_unlock(&_spi0_mutex);
 		break;
 	#endif	// SPI0_ENABLED
 
 	#if SPI1_ENABLED
-		case SPI1: 	// Wait if another system already send a communication
-								while(!nrf_mtx_trylock(&spi1_mutex)) {
+		case _spi1: 	// Wait if another system already send a communication
+								while(!nrf_mtx_trylock(&_spi1_mutex)) {
 									iSleep();
 								}
-								spi1_isDataReady = false;
+								_spi1_isDataReady = false;
 
 								// Enable slave
-								iGpio_write(&spi1_cs[slave], 0);
+								iGpio_write(&_spi1_cs[slave], 0);
 
-								error = nrf_drv_spi_transfer(&spi1, tx_data, tx_data_length, rx_buf, rx_buf_length);
+								error = nrf_drv_spi_transfer(&_spi1, tx_data, tx_data_length, rx_buf, rx_buf_length);
 								if (error) {
 									return error;
 								}
 
 								// Wait until the end of the transmition
-								while (!spi1_isDataReady) {
+								while (!_spi1_isDataReady) {
 									iSleep();
 								}
 
 								// Disable slave
-								iGpio_write(&spi1_cs[slave], 1);
+								iGpio_write(&_spi1_cs[slave], 1);
 
-								nrf_mtx_unlock(&spi1_mutex);
+								nrf_mtx_unlock(&_spi1_mutex);
 		break;
 	#endif	// SPI1_ENABLED
 
 	#if SPI2_ENABLED
-		case SPI2: 	// Wait if another system already send a communication
-								while(!nrf_mtx_trylock(&spi2_mutex)) {
+		case _spi2: 	// Wait if another system already send a communication
+								while(!nrf_mtx_trylock(&_spi2_mutex)) {
 									iSleep();
 								}
-								spi2_isDataReady = false;
+								_spi2_isDataReady = false;
 
 								// Enable slave
-								iGpio_write(&spi2_cs[slave], 0);
+								iGpio_write(&_spi2_cs[slave], 0);
 
-								error = nrf_drv_spi_transfer(&spi2, tx_data, tx_data_length, rx_buf, rx_buf_length);
+								error = nrf_drv_spi_transfer(&_spi2, tx_data, tx_data_length, rx_buf, rx_buf_length);
 								if (error) {
 									return error;
 								}
 
 								// Wait until the end of the transmition
-								while (!spi2_isDataReady) {
+								while (!_spi2_isDataReady) {
 									iSleep();
 								}
 
 								// Disable slave
-								iGpio_write(&spi2_cs[slave], 1);
+								iGpio_write(&_spi2_cs[slave], 1);
 
-								nrf_mtx_unlock(&spi2_mutex);
+								nrf_mtx_unlock(&_spi2_mutex);
 		break;
 	#endif	// SPI2_ENABLED
 

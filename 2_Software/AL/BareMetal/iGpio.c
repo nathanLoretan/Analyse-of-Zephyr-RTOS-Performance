@@ -1,6 +1,7 @@
 #include "iGpio.h"
 
-void iGpio_interrupt_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_edge_t edge, iGpio_pull_t pull, iGpio_handler_t handler)
+void iGpio_interrupt_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_edge_t edge,
+													iGpio_pull_t pull, iGpio_handler_t handler)
 {
 	int error;
 

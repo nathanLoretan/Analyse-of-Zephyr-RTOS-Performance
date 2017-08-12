@@ -1,7 +1,5 @@
 #include "iGpio.h"
 
-
-
 void iGpio_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_dir_t dir, iGpio_pull_t pull)
 {
 	if(pin < NRF_P0_PIN_NUM) {
