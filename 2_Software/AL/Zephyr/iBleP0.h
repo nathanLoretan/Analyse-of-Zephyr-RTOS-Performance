@@ -59,31 +59,18 @@ typedef enum {
 } iBleP_chrc_props_t
 
 typedef enum {
-	IBLEP_ATTR_PERM_NONE						= BT_GATT_PERM_NONE,
-	IBLEP_ATTR_PERM_READ						= BT_GATT_PERM_READ,
-	IBLEP_ATTR_PERM_WRITE						= BT_GATT_PERM_WRITE,
-	IBLEP_ATTR_PERM_READ_ENCRYPT		= BT_GATT_PERM_READ_ENCRYPT,
-	IBLEP_ATTR_PERM_WRITE_ENCRYPT		= BT_GATT_PERM_WRITE_ENCRYPT,
-	IBLEP_ATTR_PERM_READ_AUTHEN			= BT_GATT_PERM_READ_AUTHEN,
-	IBLEP_ATTR_PERM_WRITE_AUTHEN		= BT_GATT_PERM_WRITE_AUTHEN,
-	IBLEP_ATTR_PERM_PREPARE_WRITE		= BT_GATT_PERM_PREPARE_WRITE,
+	IBLEP_ATT_PERM_NONE						= BT_GATT_PERM_NONE,
+	IBLEP_ATT_PERM_READ						= BT_GATT_PERM_READ,
+	IBLEP_ATT_PERM_WRITE					= BT_GATT_PERM_WRITE,
+	IBLEP_ATT_PERM_READ_ENCRYPT		= BT_GATT_PERM_READ_ENCRYPT,
+	IBLEP_ATT_PERM_WRITE_ENCRYPT	= BT_GATT_PERM_WRITE_ENCRYPT,
+	IBLEP_ATT_PERM_READ_AUTHEN		= BT_GATT_PERM_READ_AUTHEN,
+	IBLEP_ATT_PERM_WRITE_AUTHEN		= BT_GATT_PERM_WRITE_AUTHEN,
+	IBLEP_ATT_PERM_PREPARE_WRITE	= BT_GATT_PERM_PREPARE_WRITE,
 } iBleP_attr_perm_t
 
-typedef ssize_t (*iBleP_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr,
-																				const void *buf, u16_t len, u16_t offset, u8_t flags);
-
-#define IBLEP_WRITE_HANDLER(fn, conn, attr, buf, buf_length, offset)\
-  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, \
-						 const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
-
-ssize_t on_read_rsq(struct bt_conn* conn, const struct bt_gatt_attr* attr,
-										void *buf, u16_t buf_length, u16_t offset);
-
-typedef struct bt_gatt_attr iBleP_attr_t;
-
-typedef struct {
-	size_t nbr_attrs;
-	struct bt_gatt_attr* 	attrs;
+typedef {
+	struct bt_gatt_attr* attrs;
 	struct bt_gatt_service svc;
 } iBleP_svc_t;
 
@@ -95,10 +82,13 @@ typedef struct {
 
 static struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX] = {};
 #define ADD_DESC_CCC() 	BT_GATT_CCC(ccc_cfg, NULL)
+	{\
+		.type = IBLEP_ATTR_DESC,\
+	}
 
 //The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
-#define UUID16(_uuid)	_uuid
-#define UUID128(_uuid, _base...)\
+#define DEFINE_IBLEP_UUID16(_uuid)	_uuid
+#define DEFINE_IBLEP_UUID128(_uuid, _base...)\
 	BT_UUID_DECLARE_128(BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
 	BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
 	BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0))
@@ -125,10 +115,35 @@ typedef struct {
 	uint16_t timeout;
 } iBleP_adv_params_t;
 
-typedef struct bt_data* iBleP_advdata_t;
+typedef struct bt_data iBleP_advdata_t;
 
 #define ADD_ADVDATA(_type, _data...)						BT_DATA_BYTES(_type, _data)
 #define ADD_ADVDATA__TEXT(_type, _data...)			BT_DATA(_type, _data, sizeof((uint8_t[]){_data}) - 1)
+
+//---------------------------------------------------------------------------------------
+
+// Read and Write handler
+typedef ssize_t (*iBleP_read_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, void *buf, u16_t len, u16_t offset);
+ssize_t on_read_rsq(struct bt_conn *connection, const struct bt_gatt_attr *chrc, void *buf, u16_t buf_length, u16_t offset);
+
+typedef ssize_t (*iBleP_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t len, u16_t offset, u8_t flags);
+#define IBLEP_WRITE_HANDLER(fn, attr, buf, buf_length, offset)  ssize_t fn(struct bt_conn *conn, const struct bt_gatt_attr *attr, const void *buf, u16_t buf_length, u16_t offset, u8_t flags)
+
+void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
+extern struct bt_gatt_ccc_cfg ccc_cfg[5];
+
+
+typedef struct bt_gatt_attr								iBleP_uuid_t;
+
+typedef struct bt_gatt_service 						iBleP_svc_t;
+typedef struct bt_gatt_attr		 						iBleP_chrc_t;
+typedef struct bt_gatt_attr								iBleP_svc_config_t;
+typedef struct bt_gatt_attr		 						iBleP_chrc_config_t;
+typedef struct bt_gatt_attr		 						iBleP_attr_config_t;
+typedef struct bt_gatt_attr		 						iBleP_cccd_config_t;
+
+#define DEFINE_IBLEP_CHRC(_chrc_cfg, _attr_cfg)						_chrc_cfg, _attr_cfg, BT_GATT_CCC(ccc_cfg, on_ccc_config_evt)
+#define DEFINE_IBLEP_CHRC_NO_CCCD(_chrc_cfg, _attr_cfg)		_chrc_cfg, _attr_cfg
 
 typedef enum {
 	BLEP_EVENT_CONNECTED = 0,
@@ -140,10 +155,10 @@ iEventQueue_t bleP_EventQueue;
 int	iBleP_init();
 volatile bool iBleP_isConnected();
 int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
-int iBleP_svc_init(iBleP_svc_t* svc);
-int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
-int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
-#define iBleP_chrc_write(_conn, _attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
+int iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_chrcs);
+int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
+int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
+#define iBleP_attr_set_data(_attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
 
 #endif	// __IBLEP__
 

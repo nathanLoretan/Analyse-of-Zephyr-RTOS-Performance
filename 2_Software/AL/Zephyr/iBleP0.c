@@ -2,17 +2,21 @@
 
 #include "iBleP.h"
 
-volatile static bool                    _isConnected = false;
+volatile static bool _isConnected = false;
 static struct bt_conn* 									_default_conn;
 static struct k_mutex 									_indicate_mutex;
 static struct bt_gatt_indicate_params 	_indicate_params;
 
-ssize_t on_read_rsq(struct bt_conn *conn, const struct bt_gatt_attr *attr,
+// void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
+// struct bt_gatt_ccc_cfg ccc_cfg[5] = {};
+
+ssize_t on_read_rsq(struct bt_conn *connection, const struct bt_gatt_attr *chrc,
                            void *buf, u16_t buf_length, u16_t offset)
 {
-  return bt_gatt_attr_read(conn, attr, buf, buf_length, offset,
-                           attr->user_data, sizeof(*attr->user_data));
+  // BLE_READ();
+  return bt_gatt_attr_read(connection, chrc, buf, buf_length, offset, chrc->user_data, sizeof(*chrc->user_data));
 }
+
 
 static void _on_mtu_request(struct bt_conn* conn, u8_t err,
                              struct bt_gatt_exchange_params* params)
@@ -117,13 +121,13 @@ volatile bool iBleP_isConnected()
 	return _isConnected;
 }
 
-static void _on_adv_timeout(struct k_timer *adv_timeout_timer)
+static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
 {
 	iPrint("-> Advertising timeout\n");
 	bt_le_adv_stop();
 }
 
-K_TIMER_DEFINE(_adv_timeout_timer, _on_adv_timeout, NULL);
+K_TIMER_DEFINE(adv_timeout_timer, on_advertise_timeout, NULL);
 
 int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size,
                     iBleP_advdata_t* scanrsp, size_t scanrsp_size)
@@ -146,41 +150,87 @@ int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t
 
 	// Define timeout to stop advertising, no timeout if 0
 	if(ADV_TIMEOUT != IBLEP_ADV_TIMEOUT_NONE) {
-		k_timer_start(&_adv_timeout_timer, K_MSEC(params->timeout), 0);
+		k_timer_start(&adv_timeout_timer, K_MSEC(params->timeout), 0);
 	}
 
 	iPrint("-> Advertising started\n");
 	return 0;
 }
 
-int iBleP_svc_init(iBleP_svc_t* svc)
+static size_t iBleP_get_nbr_attrs(iBleP_svc_config_t* svc_config, size_t nbr_chrcs)
+{
+  size_t nbr_attrs = 1; // Add the service uuid attribute
+
+	for(int i = 0; i < nbr_chrcs; i++)
+	{
+		struct bt_uuid_16* compare_uuid = (struct bt_uuid_16*) svc_config[nbr_attrs+2].uuid;
+
+		if(compare_uuid->val  == BT_UUID_GATT_CCC_VAL) {
+			nbr_attrs += 3;
+		}
+		else {
+			nbr_attrs += 2;
+		}
+	}
+
+	return nbr_attrs;
+}
+
+int iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_chrcs)
 {
 	int error;
 
+  size_t nbr_attrs = iBleP_get_nbr_attrs(svc_config, nbr_chrcs);
+
 	// Store the attributes within the service
-	svc->svc = (struct bt_gatt_service) {.attrs = svc->attrs, .attr_count = svc->nbr_attrs};
+	*svc = (struct bt_gatt_service) {.attrs = svc_config, .attr_count = nbr_attrs};
 
 	// Add the service to the GATT
-	error = bt_gatt_service_register(&svc->svc);
+	error = bt_gatt_service_register(svc);
 	if(error) {
 		iPrint("/!\\ Service init failed to initialized: error %d\n", error);
 		return error;
 	}
 
-  struct bt_uuid_128* uuid = (struct bt_uuid_128*) svc->attrs[0].user_data;
+  struct bt_uuid_128* uuid = (struct bt_uuid_128*)svc_config[0].user_data;
 
 	iPrint("[INIT] Service 0x%02x%02x initialized\n", uuid->val[13], uuid->val[12]);
 	return 0;
 }
 
-int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
+struct bt_gatt_attr* iBleP_get_chrc_handle(iBleP_svc_t* svc, uint8_t chrc_nbr)
+{
+	uint8_t attr_nbr = 0;
+
+	for(int i = 0; i < chrc_nbr; i++)
+	{
+		if(i == 0) {
+			attr_nbr += 2;
+		}
+		else
+		{
+			struct bt_uuid_16* compare_uuid = (struct bt_uuid_16*) svc->attrs[attr_nbr+1].uuid;
+
+			if(compare_uuid->val  == BT_UUID_GATT_CCC_VAL) {
+				attr_nbr += 3;
+			}
+			else {
+				attr_nbr += 2;
+			}
+		}
+	}
+
+	return &svc->attrs[attr_nbr];
+}
+
+int	iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
   int error;
 
   BLE_ERROR(0);
 
   BLE_NOTIFY(1);
-  error = bt_gatt_notify(NULL, attr, buf, buf_length);
+  error = bt_gatt_notify(NULL, iBleP_get_chrc_handle(svc, chrc_nbr), buf, buf_length);
   BLE_NOTIFY(0);
 
   if(error) {
@@ -190,19 +240,19 @@ int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
   return error;
 }
 
-static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_att* attr, u8_t err)
+static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
 	k_mutex_unlock(&_indicate_mutex);
 }
 
-int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
+int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length)
 {
   int error;
 
 	// Avoid to rewrite the indication parameters
 	k_mutex_lock(&_indicate_mutex, K_FOREVER);
 
-	_indicate_params.attr = attr;
+	_indicate_params.attr = iBleP_get_chrc_handle(svc, chrc_nbr);
 	_indicate_params.func = on_indicate_event;
 	_indicate_params.data = buf;
 	_indicate_params.len 	= buf_length;

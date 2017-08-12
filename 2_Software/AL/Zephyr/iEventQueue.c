@@ -12,13 +12,13 @@ typedef struct {
 // Therefore, a specific space memory is used to store the events to avoid this problem
 
 #define NBR_MAX_EVENTS		4096
-K_MEM_SLAB_DEFINE(eventsMemory, sizeof(fifo_data_t), NBR_MAX_EVENTS, 4);
+K_MEM_SLAB_DEFINE(_eventsMemory, sizeof(fifo_data_t), NBR_MAX_EVENTS, 4);
 
 void iEventQueue_add(iEventQueue_t* queue, iEvent_t event)
 {
 	fifo_data_t* p_data;
 
-	if(k_mem_slab_alloc(&eventsMemory, (void**) &p_data, K_NO_WAIT) != 0) {
+	if(k_mem_slab_alloc(&_eventsMemory, (void**) &p_data, K_NO_WAIT) != 0) {
      iPrint("Event Memory full\n");
 		 return;
  	}
@@ -31,6 +31,6 @@ iEvent_t iEventQueue_get(iEventQueue_t* queue)
 {
 	fifo_data_t* p_data = k_fifo_get(queue, K_NO_WAIT);
 	iEvent_t event = p_data->event;
-	k_mem_slab_free(&eventsMemory, (void**) &p_data);
+	k_mem_slab_free(&_eventsMemory, (void**) &p_data);
 	return event;
 }

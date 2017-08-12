@@ -85,7 +85,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 		iPrint("-> Scanning stopped\n");
 
 		error = bt_le_scan_stop();
-		if(error) {
+    if(error) {
 			iPrint("/!\\ Stop LE scan failed: error %d\n", error);
 		}
 		return;

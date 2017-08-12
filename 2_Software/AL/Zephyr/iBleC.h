@@ -18,7 +18,7 @@
 #define UNIT_0_625_MS                 625
 
 #define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
-#define IBLE_CENTRAL_NAME   				"ExtBoard-C"
+#define IBLE_CENTRAL_NAME   				CONFIG_BT_DEVICE_NAME
 
 #define IBLEC_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
 #define IBLEC_SCAN_ACTIVE		BT_HCI_LE_SCAN_ACTIVE
@@ -94,9 +94,10 @@ typedef struct {
 	}
 
 //The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
-#define DEFINE_IBLEC_UUID128(_uuid, _base...)		 {BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
-																									BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
-																									BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0)}
+#define DEFINE_IBLEC_UUID128(_uuid, _base...)\
+	{BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
+	BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
+	BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0)}
 
 #define BYTE1(b1, ...)    b1
 #define BYTE2(b1, ...)    BYTE1(__VA_ARGS__, N)   // Keep only the last bits

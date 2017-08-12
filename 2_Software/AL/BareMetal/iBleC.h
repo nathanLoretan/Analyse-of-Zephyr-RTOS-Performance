@@ -99,9 +99,10 @@ typedef struct {
 	}
 
 //The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
-#define DEFINE_IBLEC_UUID128(_uuid, _base...)		 {BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
-																									BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
-																									BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0)}
+#define DEFINE_IBLEC_UUID128(_uuid, _base...)\
+	{BYTE1(_base, N), BYTE2(_base, N), BYTE3(_base, N), BYTE4(_base, N), BYTE5(_base, N),\
+	BYTE6(_base, N), BYTE7(_base, N), BYTE8(_base, N), BYTE9(_base, N), BYTE10(_base, N), BYTE11(_base, N),\
+	BYTE12(_base, N), (_uuid & 0x00FF), ((_uuid & 0xFF00) >> 8), BYTE15(_base, N), BYTE16(_base, 0)}
 
 #define BYTE1(b1, ...)    b1
 #define BYTE2(b1, ...)    BYTE1(__VA_ARGS__, N)   // Keep only the last bits
@@ -120,9 +121,6 @@ typedef struct {
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
-// typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
-// typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
-
 typedef struct iBleC_scan_params_t {
 	uint6_t type;
 	uint16_t window;
@@ -136,25 +134,6 @@ typedef struct iBleC_conn_params_t {
 	uint16_t latency;
 	uint16_t timeout;
 }
-
-// // Interval and Windows in 0,625 Unit
-// #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)
-// iBleC_scan_params_t _scan_params =
-// {
-//   .active   = _type,
-//   .interval = _interval,
-//   .window   = _window,
-//   .timeout  = 0x4000
-// }
-//
-// #define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)
-// iBleC_conn_params_t _conn_params =
-// {
-// 	.min_conn_interval	= _interval_min,
-// 	.max_conn_interval	= _interval_max,
-// 	.slave_latency			= _latency,
-// 	.conn_sup_timeout		= _timeout
-// }
 
 struct iBleC_read_params_t;
 struct iBleC_write_params_t;
