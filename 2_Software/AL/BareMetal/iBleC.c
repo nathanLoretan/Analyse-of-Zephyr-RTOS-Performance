@@ -1,9 +1,5 @@
 #include "iBleC.h"
 
-// TODO:
-// - Add Peer-manager if it doesn't work
-// - ble_vs_uuids_assign
-
 // iTimer element only used by the system
 extern void iTimer_init();
 

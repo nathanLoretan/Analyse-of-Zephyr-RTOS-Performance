@@ -129,7 +129,7 @@ static void on_advertise_timeout(struct k_timer *adv_timeout_timer)
 
 K_TIMER_DEFINE(adv_timeout_timer, on_advertise_timeout, NULL);
 
-int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
+int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size,
                     iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
@@ -139,7 +139,7 @@ int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
 	// adv_params = BT_LE_ADV_CONN;
 
 	// Personalized advertising parameters
-	adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, MSEC_TO_UNITS(ADV_INTERVAL_MIN, UNIT_0_625_MS), MSEC_TO_UNITS(ADV_INTERVAL_MAX, UNIT_0_625_MS));
+	adv_params = BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONNECTABLE, params->interval, params->interval);
 
 	// Start advertising fast
 	error = bt_le_adv_start(adv_params, advdata, advdata_size, scanrsp,  scanrsp_size);
@@ -150,7 +150,7 @@ int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
 
 	// Define timeout to stop advertising, no timeout if 0
 	if(ADV_TIMEOUT != IBLEP_ADV_TIMEOUT_NONE) {
-		k_timer_start(&adv_timeout_timer, K_MSEC(ADV_TIMEOUT), 0);
+		k_timer_start(&adv_timeout_timer, K_MSEC(params->timeout), 0);
 	}
 
 	iPrint("-> Advertising started\n");

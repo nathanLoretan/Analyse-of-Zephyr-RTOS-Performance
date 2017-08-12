@@ -100,6 +100,11 @@ typedef struct {
 }	iBleP_advdata_t;
 
 typedef struct {
+	uint16_t interval;
+	uint16_t timeout;
+} iBleP_adv_params_t;
+
+typedef struct {
 	iBleP_uuid_t		uuid;
 	uint8_t				perm;
 } iBleP_chrc_config_t;
@@ -182,7 +187,7 @@ iEventQueue_t bleP_EventQueue;
 
 int iBleP_init();
 volatile bool iBleP_isConnected();
-int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
+int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
 int iBleP_svc_init(iBleP_svc_t* svc, iBleP_svc_config_t* svc_config, size_t nbr_chrcs);
 int iBleP_svc_notify(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);
 int iBleP_svc_indication(iBleP_svc_t* svc, uint8_t chrc_nbr, uint8_t* buf, size_t buf_length);

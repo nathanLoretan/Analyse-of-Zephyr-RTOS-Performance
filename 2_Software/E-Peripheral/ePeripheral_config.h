@@ -11,8 +11,7 @@
 #define ACC_CLICK_TIMER		3000
 
 // BLE Configuration------------------------------------------------------------
-#define ADV_INTERVAL_MIN       50                         // [ms] ranges from 20ms to 10.24s
-#define ADV_INTERVAL_MAX       50                         // [ms] ranges from 20ms to 10.24s
-#define ADV_TIMEOUT            IBLEP_ADV_TIMEOUT_NONE     // [ms]
+#define ADV_INTERVAL       MSEC_TO_UNITS(50, UNIT_0_625_MS)
+#define ADV_TIMEOUT        IBLEP_ADV_TIMEOUT_NONE
 
 #endif  // __EPERIPHERAL_CONFIG_H__

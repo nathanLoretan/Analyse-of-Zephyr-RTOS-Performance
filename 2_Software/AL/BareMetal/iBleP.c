@@ -38,7 +38,7 @@ extern void iTimer_init();
 
 typedef struct iBleP_writeHandler_list {
 	iBleP_attr_config_t*							attr;
-	uint16_t 												attr_handle;
+	uint16_t 													attr_handle;
 	struct iBleP_writeHandler_list* 	next;
 }	iBleP_writeHandler_list_t;
 
@@ -411,8 +411,8 @@ volatile bool iBleP_isConnected()
 
 // https://devzone.nordicsemi.com/blogs/782/bluetooth-smart-and-the-nordics-softdevices-part-1/
 // https://devzone.nordicsemi.com/question/110308/i-want-to-change-the-ble-address/
-int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
-									 iBleP_advdata_t* scanrsp, size_t scanrsp_size)
+int iBleP_adv_start(iBleP_adv_params_t params, iBleP_advdata_t* advdata, size_t advdata_size,
+									 	iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
 
@@ -455,8 +455,8 @@ int iBleP_adv_start(iBleP_advdata_t* advdata, size_t advdata_size,
 	ble_gap_adv_params_t adv_params = {0};
 	adv_params.type					= BLE_GAP_ADV_TYPE_ADV_IND;
 	adv_params.p_peer_addr	= NULL;
-	adv_params.interval			= MSEC_TO_UNITS((ADV_INTERVAL_MAX + ADV_INTERVAL_MIN)/2, UNIT_0_625_MS);
-	adv_params.timeout			= ADV_TIMEOUT/1000;
+	adv_params.interval			= params->interval;
+	adv_params.timeout			= params->timeout;
 	adv_params.fp          	= BLE_GAP_ADV_FP_ANY;
 
 	// Store the advertising parameters to restart later

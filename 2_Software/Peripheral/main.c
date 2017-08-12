@@ -49,6 +49,11 @@ DEFINE_IBLEP_SVC_CONFIG(adc_config)
   )
 };
 
+iBleP_adv_params_t adv_params = {
+	.interval = ADV_INTERVAL,
+	.timeout 	= ADV_TIMEOUT,
+};
+
 static DEFINE_IBLEP_ADV_DATA(advdata) =
 {
   IBLEP_ADV_ADD_DATA(IBLEP_DATA_FLAGS, IBLEP_FLAGS_GENERAL | IBLEP_FLAGS_NO_BREDR),
@@ -284,7 +289,8 @@ void ble_init()
   iBleP_init();
   iBleP_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
   iBleP_svc_init(&adc_svc, adc_config, adc_nbr_chrcs);
-  iBleP_adv_start(advdata, sizeof(advdata)/sizeof(iBleP_advdata_t), scanrsp, sizeof(scanrsp)/sizeof(iBleP_advdata_t));
+  iBleP_adv_start(&adv_params, advdata, sizeof(advdata)/sizeof(iBleP_advdata_t),
+                               scanrsp, sizeof(scanrsp)/sizeof(iBleP_advdata_t));
 
 	iThread_run(&ble_thread, ble);
 }
