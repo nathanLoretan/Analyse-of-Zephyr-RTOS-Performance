@@ -29,8 +29,6 @@
 #define	IBLEC_MAX_CONN 		CONFIG_BT_MAX_CONN
 
 typedef uint16_t									iBleC_conn_t;
-typedef struct bt_le_scan_param 	iBleC_scan_params_t;
-typedef struct bt_le_conn_param 	iBleC_conn_params_t;
 
 typedef enum {
 	IBLEC_ATTR_SVC 		= BT_GATT_DISCOVER_PRIMARY,
@@ -116,24 +114,41 @@ typedef struct {
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
-// Interval and Windows in 0,625 Unit
-#define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
-	iBleC_scan_params_t _scan_params =\
-	{\
-		.type       = _type,\
-		.window     = _window,\
-		.interval   = _interval,\
-		.filter_dup = BT_HCI_LE_SCAN_FILTER_DUP_DISABLE,\
-	}
+// typedef struct bt_le_scan_param 	iBleC_scan_params_t;
+// typedef struct bt_le_conn_param 	iBleC_conn_params_t;
 
-#define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)\
-	iBleC_conn_params_t _conn_params =\
-	{\
-		.interval_min	= _interval_min,\
-		.interval_max	= _interval_max,\
-		.latency			= _latency,\
-		.timeout			= _timeout,\
-	}
+typedef struct iBleC_scan_params_t {
+	uint6_t type;
+	uint16_t window;
+	uint16_t interval;
+	uint16_t timeout;
+}
+
+typedef struct iBleC_conn_params_t {
+	uint6_t interval_min;
+	uint16_t interval_max;
+	uint16_t latency;
+	uint16_t timeout;
+}
+
+// // Interval and Windows in 0,625 Unit
+// #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)
+// 	iBleC_scan_params_t _scan_params =
+// 	{
+// 		.type       = _type,
+// 		.window     = _window,
+// 		.interval   = _interval,
+// 		.filter_dup = BT_HCI_LE_SCAN_FILTER_DUP_DISABLE,
+// 	}
+//
+// #define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)
+// 	iBleC_conn_params_t _conn_params =
+// 	{
+// 		.interval_min	= _interval_min,
+// 		.interval_max	= _interval_max,
+// 		.latency			= _latency,
+// 		.timeout			= _timeout,
+// 	}
 
 struct iBleC_write_params_t;
 struct iBleC_read_params_t;

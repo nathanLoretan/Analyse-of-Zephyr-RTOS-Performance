@@ -5,8 +5,8 @@
 static uint8_t _nbr_conn = 0;
 static struct bt_conn* new_conn;
 
-static iBleC_conn_params_t* _conn_params;
-static iBleC_scan_params_t* _scan_params;
+static struct bt_le_conn_param* _conn_params;
+static struct bt_le_scan_param* _scan_params;
 static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
@@ -396,7 +396,11 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	int error;
 
 	// Save the connection parameters
-	_conn_params = conn_params;
+	_conn_params.interval_min	= conn_params->interval_min;
+	_conn_params.interval_max	= conn_params->interval_max;
+	_conn_params.latency			= conn_params->latency;
+	_conn_params.timeout			= conn_params->timeout;
+	_conn_params.filter_dup 	= BT_HCI_LE_SCAN_FILTER_DUP_DISABLE;
 
 	error = bt_enable(NULL);
 	if(error) {
@@ -417,7 +421,10 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
 
 	// Save the scan parameters
 	if(scan_params != NULL) {
-		_scan_params = scan_params;
+		 _scan_params.active   = scan_params->type,
+		 _scan_params.interval = scan_params->interval,
+		 _scan_params.window   = scan_params->window,
+		 _scan_params.timeout  = scan_params->timeout,
 	}
 
 	if(_scan_params == NULL) {

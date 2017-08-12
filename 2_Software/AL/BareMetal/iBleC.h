@@ -27,6 +27,7 @@
 
 #define IBLEC_SCAN_PASSIVE	0
 #define IBLEC_SCAN_ACTIVE		1
+#define IBLEC_SCAN_NO_TIMEOUT 	0x4000
 
 #define	IBLEC_MAX_CONN 		NRF_BLE_CENTRAL_LINK_COUNT +  NRF_BLE_PERIPHERAL_LINK_COUNT
 
@@ -34,8 +35,6 @@
 #define IBLEC_NOT_HANDLE_FOUND	0xFFFF
 
 typedef uint16_t 								iBleC_conn_t;
-typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
-typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
 
 typedef enum {
 	IBLEC_ATTR_SVC,
@@ -121,25 +120,42 @@ typedef struct {
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
+// typedef ble_gap_scan_params_t 	iBleC_scan_params_t;
+// typedef ble_gap_conn_params_t  	iBleC_conn_params_t;
 
-// Interval and Windows in 0,625 Unit
-#define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)\
-iBleC_scan_params_t _scan_params =\
-{\
-  .active   = _type,\
-  .interval = _interval,\
-  .window   = _window,\
-  .timeout  = 0x4000\
+typedef struct iBleC_scan_params_t {
+	uint6_t type;
+	uint16_t window;
+	uint16_t interval;
+	uint16_t timeout;
 }
 
-#define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)\
-iBleC_conn_params_t _conn_params =\
-{\
-	.min_conn_interval	= _interval_min,\
-	.max_conn_interval	= _interval_max,\
-	.slave_latency			= _latency,\
-	.conn_sup_timeout		= _timeout\
+typedef struct iBleC_conn_params_t {
+	uint6_t interval_min;
+	uint16_t interval_max;
+	uint16_t latency;
+	uint16_t timeout;
 }
+
+// // Interval and Windows in 0,625 Unit
+// #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)
+// iBleC_scan_params_t _scan_params =
+// {
+//   .active   = _type,
+//   .interval = _interval,
+//   .window   = _window,
+//   .timeout  = 0x4000
+// }
+//
+// #define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)
+// iBleC_conn_params_t _conn_params =
+// {
+// 	.min_conn_interval	= _interval_min,
+// 	.max_conn_interval	= _interval_max,
+// 	.slave_latency			= _latency,
+// 	.conn_sup_timeout		= _timeout
+// }
+
 struct iBleC_read_params_t;
 struct iBleC_write_params_t;
 struct iBleC_notify_params_t;

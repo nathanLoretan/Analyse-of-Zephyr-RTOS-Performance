@@ -4,7 +4,7 @@
 
 static volatile bool isConnected = false;
 static uint16_t	connection;
-static ble_gap_adv_params_t adv_params_stored;
+static ble_gap_adv_params_t _adv_params;
 static nrf_ble_gatt_t gatt_module;
 
 // GAP init
@@ -69,7 +69,7 @@ static void on_ble_evt(ble_evt_t* ble_evt)
 
 																		iPrint("-> Central disconnected\n");
 
-																		error = sd_ble_gap_adv_start(&adv_params_stored, CONN_CFG_TAG);
+																		error = sd_ble_gap_adv_start(&_adv_params, CONN_CFG_TAG);
 																		if(error) {
 																			iPrint("/!\\ Advertising failed to restart: error %d\n", error);
 																			return;
@@ -460,7 +460,7 @@ int iBleP_adv_start(iBleP_adv_params_t params, iBleP_advdata_t* advdata, size_t 
 	adv_params.fp          	= BLE_GAP_ADV_FP_ANY;
 
 	// Store the advertising parameters to restart later
-	adv_params_stored = adv_params;
+	_adv_params = adv_params;
 
 	error = sd_ble_gap_adv_start(&adv_params, CONN_CFG_TAG);
 	if(error) {

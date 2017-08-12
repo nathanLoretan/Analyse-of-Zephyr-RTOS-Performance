@@ -2,8 +2,21 @@
 
 // BLE--------------------------------------------------------------------------
 #if ENABLE_BLE
-DEFINE_IBLEC_SCAN_PARAMS(scan_params, IBLEC_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
-DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
+iBleC_scan_params_t conn_params = {
+	.type 		= IBLEC_SCAN_ACTIVE,
+	.window 	= SCAN_WINDOW,
+	.interval = SCAN_INTERVAL,
+	.timeout 	= SCAN_TIMEOUT,
+}
+
+iBleC_conn_params_t scan_params = {
+	.interval_min = CONN_MIN_INTERVAL,
+	.interval_max = CONN_MAX_INTERVAL,
+	.latency 			= SLAVE_LATENCY,
+	.timeout 			= CONN_TIMOUT,
+}
+// DEFINE_IBLEC_SCAN_PARAMS(scan_params, IBLEC_SCAN_ACTIVE, SCAN_INTERVAL, SCAN_WINDOW);
+// DEFINE_IBLEC_CONN_PARAMS(conn_params, CONN_MIN_INTERVAL, CONN_MAX_INTERVAL, SLAVE_LATENCY, CONN_TIMOUT);
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC

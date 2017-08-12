@@ -22,6 +22,7 @@
 // BLE Configuration------------------------------------------------------------
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
+#define SCAN_TIMEOUT        IBLEC_SCAN_NO_TIMEOUT
 
 #define CONN_MIN_INTERVAL		MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
 #define CONN_MAX_INTERVAL		MSEC_TO_UNITS(8.75, UNIT_1_25_MS)

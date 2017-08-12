@@ -12,8 +12,8 @@ extern void iTimer_init();
 
 static nrf_ble_gatt_t   gatt_module;
 
-static iBleC_conn_params_t* _conn_params;
-static iBleC_scan_params_t* _scan_params;
+static ble_gap_conn_params_t* _conn_params;
+static ble_gap_scan_params_t* _scan_params;
 static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
@@ -501,7 +501,10 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
   }
 
   // Save the connection parameters
-  _conn_params = conn_params;
+	_conn_params.min_conn_interval	= conn_params->interval_min;
+	_conn_params.max_conn_interval	= conn_params->interval_max;
+	_conn_params.slave_latency			= conn_params->latency;
+	_conn_params.conn_sup_timeout		= conn_params->timeout;
 
 	// Soft Device and BLE event init	--------------------------------------------
 	ble_cfg_t ble_cfg;
@@ -588,7 +591,10 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
 
   // Save the scan parameters
   if(scan_params != NULL) {
-    _scan_params = scan_params;
+    _scan_params.active   = scan_params.type;
+    _scan_params.interval = scan_params.interval;
+    _scan_params.window   = scan_params.window;
+    _scan_params.timeout  = scan_params->timeout,
   }
 
   if(_scan_params == NULL) {
