@@ -1,4 +1,5 @@
-#if CONFIG_BT_CENTRAL
+// #if CONFIG_BT_CENTRAL
+#if CONFIG_BLUETOOTH_CENTRAL
 
 #ifndef __IBLEC__
 #define __IBLEC__
@@ -247,4 +248,4 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
 #endif	// __IBLEC__
 
-#endif	// CONFIG_BT_CENTRAL
+#endif	// CONFIG_BLUETOOTH_CENTRAL

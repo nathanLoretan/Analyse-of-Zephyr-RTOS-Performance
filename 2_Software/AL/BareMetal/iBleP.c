@@ -34,7 +34,7 @@ extern void iTimer_init();
 
 typedef struct write_handler_list {
 	uint16_t 										handle;
-	iBleP_write_handler_t*			handler;
+	iBleP_write_handler_t				handler;
 	struct write_handler_list* 	next;
 }	write_handler_list_t;
 
@@ -43,7 +43,7 @@ static write_handler_list_t* _write_handler_list = NULL;
 static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t const* conn_params)
 {
 	_isConnected = true;
-	_conn_ref = ble_evt->evt.gap_evt.conn_handle;
+	_conn_ref = gap_evt->conn_handle;
 	iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_CONNECTED);
 
 	iPrint("\n-> Central connected\n");
@@ -56,6 +56,8 @@ static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t c
 
 static void _on_disconnection(uint16_t conn_handle)
 {
+	int error;
+
 	_conn_ref = BLE_CONN_HANDLE_INVALID;
 	_isConnected = false;
 	iEventQueue_add(&bleP_EventQueue, BLEP_EVENT_DISCONNECTED);
@@ -82,6 +84,8 @@ static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t c
 
 static void _on_gattc_timeout(uint16_t conn_handle)
 {
+	int error;
+
 	iPrint("-> GATT Client Timeout\n");
 
 	error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
@@ -93,6 +97,8 @@ static void _on_gattc_timeout(uint16_t conn_handle)
 
 static void _on_gatts_timeout(uint16_t conn_handle)
 {
+	int error;
+
 	iPrint("-> GATT Server Timeout\n");
 
 	error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
@@ -104,6 +110,8 @@ static void _on_gatts_timeout(uint16_t conn_handle)
 
 static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
 {
+	int error;
+
 	iPrint("\n-> MTU Parameters Update\n");
 	iPrint("------------------------\n");
 
@@ -131,15 +139,12 @@ static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* wri
 	}
 
 	if(*next_write_handler != NULL) {
-		*((*next_write_handler)->handler)(conn_handle, write->handle, write->data, write->len, write->offset);
+		(*next_write_handler)->handler(conn_handle, write->handle, write->data, write->len, write->offset);
 	}
-
 }
 
 static void _on_ble_evt(ble_evt_t* ble_evt)
 {
-	int error;
-
 	switch (ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
@@ -192,7 +197,7 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 		{
 			// For readibility.
 			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
-			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = ble_evt->evt.gatts_evt.params.exchange_mtu_request;
+			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = &ble_evt->evt.gatts_evt.params.exchange_mtu_request;
 
 			_on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
 
@@ -464,7 +469,7 @@ volatile bool iBleP_isConnected()
 	return _isConnected;
 }
 
-int iBleP_adv_start(iBleP_adv_params_t params, iBleP_advdata_t* advdata, size_t advdata_size,
+int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size,
 									 	iBleP_advdata_t* scanrsp, size_t scanrsp_size)
 {
 	int error;
@@ -542,27 +547,27 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 	// Configuring Client Characteristic Configuration Descriptor metadata and add to char_md structure
 	if(cccd != NULL)
 	{
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(cccd->read_perm);
-		BLE_GAP_CONN_SEC_MODE_SET_OPEN(cccd->write_perm);
-		cccd->vloc       	= BLE_GATTS_VLOC_STACK;
-		chrc->chrc_md.p_cccd_md	= cccd;
+		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd->ccc.read_perm);
+		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&cccd->ccc.write_perm);
+		cccd->ccc.vloc       	= BLE_GATTS_VLOC_STACK;
+		chrc->chrc_md.p_cccd_md	= &cccd->ccc;
 	}
 
 	// Configure the attributes
 	chrc->attr_md.vloc = BLE_GATTS_VLOC_USER;
 	chrc->attr_md.vlen = 1;
 
-	if((chrc->attr_config.perm & IBLEP_ATT_PERM_READ)) {
+	if((chrc->attr_perm & IBLEP_ATTR_PERM_READ)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&chrc->attr_md.read_perm);
 	}
-	if((chrc->attr_config.perm & IBLEP_ATT_PERM_WRITE)) {
+	if((chrc->attr_perm & IBLEP_ATTR_PERM_WRITE)) {
 		BLE_GAP_CONN_SEC_MODE_SET_OPEN(&chrc->attr_md.write_perm);
 	}
 
 	// Configure the Bluetooth Vendor UUID
-	if(chrc->uuid.type == UUID_128)
+	if(chrc->uuid.type == IBLEP_UUID_128)
 	{
-		error = sd_ble_uuid_vs_add(&chrc->uuid.base, &chrc->uuid.type);
+		error = sd_ble_uuid_vs_add(&chrc->uuid.base, &chrc->uuid.uuid.type);
 		if(error) {
 			iPrint("/!\\ GATT failed to add the characteristic uuid: error %d\n", error);
 			return error;
@@ -571,7 +576,7 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 
 	// Configure the characteristic value attribute
 	chrc->attr_config.p_uuid      = &chrc->uuid.uuid;
-	chrc->attr_config.p_attr_md   = &attr_md;
+	chrc->attr_config.p_attr_md   = &chrc->attr_md;
 	chrc->attr_config.max_len     = BLE_GATTS_VAR_ATTR_LEN_MAX;	// 512Bytes
 	chrc->attr_config.init_len    = 1;
 	chrc->attr_config.p_value     = (uint8_t*) chrc->data;
@@ -584,7 +589,7 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 	}
 
 	// Store where to notify a write request
-	if(chrc->attr_perm & IBLEP_CHRC_PROPS_WRITE)
+	if(chrc->attr_perm & IBLEP_ATTR_PERM_WRITE)
 	{
 		write_handler_list_t** next_write_handler = &_write_handler_list;
 
@@ -595,7 +600,7 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 
 		// Add a new element in the list
 		*next_write_handler =	(write_handler_list_t*) malloc(sizeof(write_handler_list_t));
-		(*next_write_handler)->handler 	= &chrc->write_handler;
+		(*next_write_handler)->handler 	= chrc->write_handler;
 		(*next_write_handler)->handle  	= chrc->handles.value_handle;
 		(*next_write_handler)->next 	  = NULL;
 	}
@@ -608,10 +613,10 @@ int iBleP_svc_init(iBleP_svc_t* svc)
 	int error;
 
 	// Configure Bluetooth Vendor UUID
-	if(svc->attrs[0].svc.uuid.type == UUID_128)
+	if(svc->attrs[0].svc.uuid.type == IBLEP_UUID_128)
 	{
 		error = sd_ble_uuid_vs_add(&svc->attrs[0].svc.uuid.base,
-															 &svc->attrs[0].svc.uuid.type);
+															 &svc->attrs[0].svc.uuid.uuid.type);
 		if(error) {
 			iPrint("/!\\ GATT failed to add the service uuid: error %d\n", error);
 			return error;
@@ -630,10 +635,12 @@ int iBleP_svc_init(iBleP_svc_t* svc)
 	{
 		if(svc->attrs[i].type == IBLEP_ATTR_CHRC)
 		{
-			if(i < nbr_attrs-1 && svc->attrs[i+1].type == IBLEP_ATTR_DESC)
-				error = _char_add(&svc->attrs[0].svc, &svc->attrs[i].chrc, &svc->attrs[i+1].desc);
-			else
+			if(i < svc->nbr_attrs-1 && svc->attrs[i+1].type == IBLEP_ATTR_DESC) {
+				error = _char_add(&svc->attrs[0].svc, &svc->attrs[i].chrc, &svc->attrs[i+1].cccd);
+			}
+			else {
 				error = _char_add(&svc->attrs[0].svc, &svc->attrs[i].chrc, NULL);
+			}
 
 			if(error) {
 			 return error;
@@ -693,12 +700,12 @@ int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 	return error;
 }
 
-void iBleP_chrc_write(uint16_t conn, uint16_t attr, uint8_t* buf, size_t buf_length, size_t offset)
+void iBleP_chrc_write(uint16_t conn, uint16_t attr, uint8_t const* buf, size_t buf_length, size_t offset)
 {
 	ble_gatts_value_t value = {
 		.len			= buf_length,
 		.offset		= offset,
-		.p_value	= buf,
+		.p_value	= (uint8_t*) buf,
 	};
 
 	sd_ble_gatts_value_set(conn, attr, &value);

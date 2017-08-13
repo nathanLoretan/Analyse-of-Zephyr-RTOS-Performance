@@ -12,8 +12,8 @@ extern void iTimer_init();
 
 static nrf_ble_gatt_t   gatt_module;
 
-static ble_gap_conn_params_t* _conn_params;
-static ble_gap_scan_params_t* _scan_params;
+static ble_gap_conn_params_t _conn_params;
+static ble_gap_scan_params_t _scan_params;
 static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
@@ -127,7 +127,7 @@ static void _on_device_found(ble_evt_t const* ble_evt)
   iPrint("-> Connection request to device %s\n", complete_local_name_str);
 
   // Connect to the peripheral
-  error = sd_ble_gap_connect(peer_addr, _scan_params, _conn_params, CONN_CFG_TAG);
+  error = sd_ble_gap_connect(peer_addr, &_scan_params, &_conn_params, CONN_CFG_TAG);
   if(error) {
       iPrint("/!\\ Connection request to %s failed: error 0x%04x\n", complete_local_name_str, error);
       iBleC_scan_start(NULL);
@@ -342,6 +342,8 @@ static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t c
 
 static void _on_gattc_timeout(uint16_t conn_handle)
 {
+  int error;
+
 	iPrint("-> GATT Client Timeout\n");
 
   error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
@@ -353,6 +355,8 @@ static void _on_gattc_timeout(uint16_t conn_handle)
 
 static void _on_gatts_timeout(uint16_t conn_handle)
 {
+  int error;
+
 	iPrint("-> GATT Server Timeout\n");
 
   error = sd_ble_gap_disconnect(conn_handle, BLE_HCI_REMOTE_USER_TERMINATED_CONNECTION);
@@ -364,6 +368,8 @@ static void _on_gatts_timeout(uint16_t conn_handle)
 
 static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request)
 {
+  int error;
+
 	iPrint("\n-> MTU Parameters Update\n");
 	iPrint("------------------------\n");
 
@@ -383,9 +389,7 @@ static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_e
 
 static void _on_ble_evt(ble_evt_t const* ble_evt)
 {
-	int error;
-
-	switch (ble_evt->header.evt_id)
+	switch(ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
     {
@@ -447,7 +451,7 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
 		{
 			// For readibility.
 			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
-			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = ble_evt->evt.gatts_evt.params.exchange_mtu_request;
+			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = &ble_evt->evt.gatts_evt.params.exchange_mtu_request;
 
 			_on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
 
@@ -554,7 +558,7 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	_conn_params.min_conn_interval	= conn_params->interval_min;
 	_conn_params.max_conn_interval	= conn_params->interval_max;
 	_conn_params.slave_latency			= conn_params->latency;
-	_conn_params.conn_sup_timeout		= conn_params->timeout;
+  _conn_params.conn_sup_timeout		= conn_params->timeout;
 
 	// Soft Device and BLE event init	--------------------------------------------
 	ble_cfg_t ble_cfg;
@@ -641,17 +645,13 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
 
   // Save the scan parameters
   if(scan_params != NULL) {
-    _scan_params.active   = scan_params.type;
-    _scan_params.interval = scan_params.interval;
-    _scan_params.window   = scan_params.window;
-    _scan_params.timeout  = scan_params->timeout,
+    _scan_params.active   = scan_params->type;
+    _scan_params.interval = scan_params->interval;
+    _scan_params.window   = scan_params->window;
+    _scan_params.timeout  = scan_params->timeout;
   }
 
-  if(_scan_params == NULL) {
-    return -1;
-  }
-
-  error = sd_ble_gap_scan_start(_scan_params);
+  error = sd_ble_gap_scan_start(&_scan_params);
 	if(error) {
 		iPrint("/!\\ Scan failed to start: error %d\n", error);
 		return error;
@@ -676,7 +676,7 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
       error = sd_ble_uuid_vs_add((ble_uuid128_t*) &attr_disc_list[i].uuid128, &attr_disc_list[i].uuid_type);
       if(error) {
         iPrint("/!\\ GATT failed to add UUID: error %d\n", error);
-        return ;
+        return;
       }
     }
   }

@@ -1,4 +1,4 @@
-#if CONFIG_BT_PERIPHERAL
+#if CONFIG_BLUETOOTH_PERIPHERAL
 
 #include "iBleP.h"
 
@@ -7,6 +7,9 @@ static struct bt_conn* 									_default_conn;
 static struct k_mutex 									_indicate_mutex;
 static struct bt_gatt_indicate_params 	_indicate_params;
 
+struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX] = {};
+void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value){}
+
 ssize_t on_read_rsq(struct bt_conn *conn, const struct bt_gatt_attr *attr,
                            void *buf, u16_t buf_length, u16_t offset)
 {
@@ -14,17 +17,17 @@ ssize_t on_read_rsq(struct bt_conn *conn, const struct bt_gatt_attr *attr,
                            attr->user_data, sizeof(*attr->user_data));
 }
 
-static void _on_mtu_request(struct bt_conn* conn, u8_t err,
-                             struct bt_gatt_exchange_params* params)
-{
-  iPrint("\n-> MTU Parameters Update\n");
-  iPrint("------------------------\n");
-  iPrint("Connection MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
-}
-
-static struct bt_gatt_exchange_params mtu_req = {
-  .func = _on_mtu_request,
-};
+// static void _on_mtu_request(struct bt_conn* conn, u8_t err,
+//                              struct bt_gatt_exchange_params* params)
+// {
+//   iPrint("\n-> MTU Parameters Update\n");
+//   iPrint("------------------------\n");
+//   iPrint("Connection MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
+// }
+//
+// static struct bt_gatt_exchange_params mtu_req = {
+//   .func = _on_mtu_request,
+// };
 
 static void _on_connection(struct bt_conn *conn, u8_t error)
 {
@@ -51,11 +54,11 @@ static void _on_connection(struct bt_conn *conn, u8_t error)
     iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 
     // Set the MTU for futur transmition
-    error = bt_gatt_exchange_mtu(conn, &mtu_req);
-    if(error)
-    {
-      iPrint("/!\\ MTU exchange failed: error %d\n", error);
-    }
+    // error = bt_gatt_exchange_mtu(conn, &mtu_req);
+    // if(error)
+    // {
+    //   iPrint("/!\\ MTU exchange failed: error %d\n", error);
+    // }
 	}
 }
 
@@ -180,7 +183,7 @@ int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
   BLE_ERROR(0);
 
   BLE_NOTIFY(1);
-  error = bt_gatt_notify(NULL, attr, buf, buf_length);
+  error = bt_gatt_notify(NULL, attr+1, buf, buf_length);
   BLE_NOTIFY(0);
 
   if(error) {
@@ -190,7 +193,7 @@ int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
   return error;
 }
 
-static void on_indicate_event(struct bt_conn *conn, const struct bt_gatt_att* attr, u8_t err)
+static void _on_indicate_event(struct bt_conn *conn, const struct bt_gatt_attr *attr, u8_t err)
 {
 	k_mutex_unlock(&_indicate_mutex);
 }
@@ -202,8 +205,8 @@ int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 	// Avoid to rewrite the indication parameters
 	k_mutex_lock(&_indicate_mutex, K_FOREVER);
 
-	_indicate_params.attr = attr;
-	_indicate_params.func = on_indicate_event;
+	_indicate_params.attr = attr+1;
+	_indicate_params.func = _on_indicate_event;
 	_indicate_params.data = buf;
 	_indicate_params.len 	= buf_length;
 
@@ -220,4 +223,4 @@ int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
   return error;
 }
 
-#endif  // CONFIG_BT_PERIPHERAL
+#endif  // CONFIG_BLUETOOTH_PERIPHERAL

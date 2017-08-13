@@ -52,7 +52,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 	switch(id)
 	{
 	#if SPI0_ENABLED
-		case _spi0:	{
+		case SPI0:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI0_SCK,
@@ -70,7 +70,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									error = nrf_drv_spi_init(&_spi0, &config, _on_spi0_event, NULL);
 									if (error) {
-										iPrint("/!\\ _spi0 configuration failed: error %d\n", error);
+										iPrint("/!\\ SPI0 configuration failed: error %d\n", error);
 										return error;
 									}
 
@@ -96,13 +96,13 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									nrf_mtx_init(&_spi0_mutex);
 
-									iPrint("[INIT] _spi0 initialized\n");
+									iPrint("[INIT] SPI0 initialized\n");
 								}
 		break;
 	#endif	// SPI0_ENABLED
 
 	#if SPI1_ENABLED
-		case _spi1:	{
+		case SPI1:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI1_SCK,
@@ -120,7 +120,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									error = nrf_drv_spi_init(&_spi1, &config, _on_spi1_event, NULL);
 									if (error) {
-										iPrint("/!\\ _spi1 configuration failed: error %d\n", error);
+										iPrint("/!\\ SPI1 configuration failed: error %d\n", error);
 										return error;
 									}
 
@@ -147,13 +147,13 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									nrf_mtx_init(&_spi1_mutex);
 
-									iPrint("[INIT] _spi1 initialized\n");
+									iPrint("[INIT] SPI1 initialized\n");
 								}
 		break;
 	#endif	// SPI1_ENABLED
 
 	#if SPI2_ENABLED
-		case _spi2:	{
+		case SPI2:	{
 									nrf_drv_spi_config_t const config =
 									{
 										.sck_pin      = SPI2_SCK,
@@ -198,7 +198,7 @@ int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_or
 
 									nrf_mtx_init(&_spi2_mutex);
 
-									iPrint("[INIT] _spi2 initialized\n");
+									iPrint("[INIT] SPI2 initialized\n");
 								}
 		break;
 	#endif	// SPI2_ENABLED
@@ -235,7 +235,7 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	switch(id)
 	{
 	#if SPI0_ENABLED
-		case _spi0: 	// Wait if another system already send a communication
+		case SPI0: 	// Wait if another system already send a communication
 								while(!nrf_mtx_trylock(&_spi0_mutex)) {
 									iSleep();
 								}
@@ -262,7 +262,7 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	#endif	// SPI0_ENABLED
 
 	#if SPI1_ENABLED
-		case _spi1: 	// Wait if another system already send a communication
+		case SPI1: 	// Wait if another system already send a communication
 								while(!nrf_mtx_trylock(&_spi1_mutex)) {
 									iSleep();
 								}
@@ -289,7 +289,7 @@ int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_
 	#endif	// SPI1_ENABLED
 
 	#if SPI2_ENABLED
-		case _spi2: 	// Wait if another system already send a communication
+		case SPI2: 	// Wait if another system already send a communication
 								while(!nrf_mtx_trylock(&_spi2_mutex)) {
 									iSleep();
 								}

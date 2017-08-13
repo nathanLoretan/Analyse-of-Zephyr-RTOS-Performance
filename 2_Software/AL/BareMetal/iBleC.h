@@ -121,19 +121,19 @@ typedef struct {
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
-typedef struct iBleC_scan_params_t {
-	uint6_t type;
+typedef struct {
+	uint16_t type;
 	uint16_t window;
 	uint16_t interval;
 	uint16_t timeout;
-}
+} iBleC_scan_params_t;
 
-typedef struct iBleC_conn_params_t {
-	uint6_t interval_min;
+typedef struct {
+	uint16_t interval_min;
 	uint16_t interval_max;
 	uint16_t latency;
 	uint16_t timeout;
-}
+} iBleC_conn_params_t;
 
 struct iBleC_read_params_t;
 struct iBleC_write_params_t;

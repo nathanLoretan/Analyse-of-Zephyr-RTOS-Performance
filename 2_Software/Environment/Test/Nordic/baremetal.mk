@@ -134,7 +134,7 @@ INC_FOLDERS += \
 	$(SDK_ROOT)/components/toolchain/gcc \
 	$(SDK_ROOT)/components/toolchain/cmsis/include \
 	$(PROJECT_BASE) \
-	$(PROJECT_BASE)/Test/Peripheral/Nordic/ \
+	$(PROJECT_BASE)/Environment/Test/Nordic/ \
 
 # Libraries common to all targets
 LIB_FILES += \

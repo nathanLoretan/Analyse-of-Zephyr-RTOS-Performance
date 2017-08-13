@@ -7,6 +7,8 @@ typedef void (*iThread_handler_t)(void* p1, void* p2, void* p3);
 #define ITHREAD_HANDLER(fn)   struct k_thread _k_thread_obj_##fn; \
                               void fn(void* p1, void* p2, void* p3)
 
+typedef char* k_thread_stack_t;
+
 typedef struct {
   k_thread_stack_t  stack;
   size_t            stack_size;

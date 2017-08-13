@@ -1,4 +1,4 @@
-#if CONFIG_BT_PERIPHERAL
+#if CONFIG_BLUETOOTH_PERIPHERAL
 
 #ifndef __IBLEP__
 #define __IBLEP__
@@ -17,7 +17,7 @@
 #define UNIT_10_MS										10000
 #define UNIT_0_625_MS									625
 
-#define IBLEP_DEVICE_NAME					CONFIG_BT_DEVICE_NAME
+#define IBLEP_DEVICE_NAME					CONFIG_BLUETOOTH_DEVICE_NAME
 #define IBLEP_ADV_TIMEOUT_NONE		0
 
 typedef enum {
@@ -27,25 +27,25 @@ typedef enum {
 } iBleP_adv_flags_t;
 
 typedef enum {
-	IBLEP_ADV_DATA_FLAGS							= BT_DATA_FLAGS,
-	IBLEP_ADV_DATA_UUID16_SOME				= BT_DATA_UUID16_SOME,
-	IBLEP_ADV_DATA_UUID16_ALL					= BT_DATA_UUID16_ALL,
-	IBLEP_ADV_DATA_UUID32_SOME				= BT_DATA_UUID32_SOME,
-	IBLEP_ADV_DATA_UUID32_ALL					= BT_DATA_UUID32_ALL,
-	IBLEP_ADV_DATA_UUID128_SOME				= BT_DATA_UUID128_SOME,
-	IBLEP_ADV_DATA_UUID128_ALL				= BT_DATA_UUID128_ALL,
-	IBLEP_ADV_DATA_NAME_SHORTENED			= BT_DATA_NAME_SHORTENED,
-	IBLEP_ADV_DATA_NAME_COMPLETE			= BT_DATA_NAME_COMPLETE,
-	IBLEP_ADV_DATA_TX_POWER						= BT_DATA_TX_POWER,
-	IBLEP_ADV_DATA_SOLICIT16					= BT_DATA_SOLICIT16,
-	IBLEP_ADV_DATA_SOLICIT128					= BT_DATA_SOLICIT128,
-	IBLEP_ADV_DATA_SVC_DATA16					= BT_DATA_SVC_DATA16,
-	IBLEP_ADV_DATA_GAP_APPEARANCE			= BT_DATA_GAP_APPEARANCE,
-	IBLEP_ADV_DATA_SOLICIT32					= BT_DATA_SOLICIT32,
-	IBLEP_ADV_DATA_SVC_DATA32					= BT_DATA_SVC_DATA32,
-	IBLEP_ADV_DATA_SVC_DATA128				= BT_DATA_SVC_DATA128,
-	IBLEP_ADV_DATA_MANUFACTURER_DATA	= BT_DATA_MANUFACTURER_DATA,
-} iBleP_adv_data_type_t
+	IBLEP_ADVDATA_FLAGS							= BT_DATA_FLAGS,
+	IBLEP_ADVDATA_UUID16_SOME				= BT_DATA_UUID16_SOME,
+	IBLEP_ADVDATA_UUID16_ALL				= BT_DATA_UUID16_ALL,
+	IBLEP_ADVDATA_UUID32_SOME				= BT_DATA_UUID32_SOME,
+	IBLEP_ADVDATA_UUID32_ALL				= BT_DATA_UUID32_ALL,
+	IBLEP_ADVDATA_UUID128_SOME			= BT_DATA_UUID128_SOME,
+	IBLEP_ADVDATA_UUID128_ALL				= BT_DATA_UUID128_ALL,
+	IBLEP_ADVDATA_NAME_SHORTENED		= BT_DATA_NAME_SHORTENED,
+	IBLEP_ADVDATA_NAME_COMPLETE			= BT_DATA_NAME_COMPLETE,
+	IBLEP_ADVDATA_TX_POWER					= BT_DATA_TX_POWER,
+	IBLEP_ADVDATA_SOLICIT16					= BT_DATA_SOLICIT16,
+	IBLEP_ADVDATA_SOLICIT128				= BT_DATA_SOLICIT128,
+	IBLEP_ADVDATA_SVC_DATA16				= BT_DATA_SVC_DATA16,
+	IBLEP_ADVDATA_GAP_APPEARANCE		= BT_DATA_GAP_APPEARANCE,
+	IBLEP_ADVDATA_SOLICIT32					= BT_DATA_SOLICIT32,
+	IBLEP_ADVDATA_SVC_DATA32				= BT_DATA_SVC_DATA32,
+	IBLEP_ADVDATA_SVC_DATA128				= BT_DATA_SVC_DATA128,
+	IBLEP_ADVDATA_MANUFACTURER_DATA	= BT_DATA_MANUFACTURER_DATA,
+} iBleP_adv_data_type_t;
 
 typedef enum {
 	IBLEP_CHRC_PROPS_BROADCAST 						= BT_GATT_CHRC_BROADCAST,
@@ -56,7 +56,7 @@ typedef enum {
 	IBLEP_CHRC_PROPS_INDICATE 						= BT_GATT_CHRC_INDICATE,
 	IBLEP_CHRC_PROPS_AUTH 								= BT_GATT_CHRC_AUTH,
 	IBLEP_CHRC_PROPS_EXT_PROP 						= BT_GATT_CHRC_EXT_PROP,
-} iBleP_chrc_props_t
+} iBleP_chrc_props_t;
 
 typedef enum {
 	IBLEP_ATTR_PERM_NONE						= BT_GATT_PERM_NONE,
@@ -67,7 +67,7 @@ typedef enum {
 	IBLEP_ATTR_PERM_READ_AUTHEN			= BT_GATT_PERM_READ_AUTHEN,
 	IBLEP_ATTR_PERM_WRITE_AUTHEN		= BT_GATT_PERM_WRITE_AUTHEN,
 	IBLEP_ATTR_PERM_PREPARE_WRITE		= BT_GATT_PERM_PREPARE_WRITE,
-} iBleP_attr_perm_t
+} iBleP_attr_perm_t;
 
 typedef ssize_t (*iBleP_write_handler_t)(struct bt_conn *conn, const struct bt_gatt_attr *attr,
 																				const void *buf, u16_t len, u16_t offset, u8_t flags);
@@ -83,18 +83,19 @@ typedef struct bt_gatt_attr iBleP_attr_t;
 
 typedef struct {
 	size_t nbr_attrs;
-	struct bt_gatt_attr* 	attrs;
-	struct bt_gatt_service svc;
+	struct bt_gatt_service 	svc;
+	struct bt_gatt_attr 		attrs[];
 } iBleP_svc_t;
 
 #define ADD_SVC_DECL(_uuid)			BT_GATT_PRIMARY_SERVICE(_uuid)
 
-#define ADD_CHRC_DECL(_uuid, _attr_perm, _chrc_prop, _write_handler, _data)\
+#define ADD_CHRC_DECL(_uuid, _chrc_prop, _attr_perm, _write_handler, _data)\
  	BT_GATT_CHARACTERISTIC(_uuid, _chrc_prop),\
-	BT_GATT_DESCRIPTOR(_uuid, _attr_perm, iBleP_read_handler, _write_handler, _data)
+	BT_GATT_DESCRIPTOR(_uuid, _attr_perm, on_read_rsq, _write_handler, _data)
 
-static struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX] = {};
-#define ADD_DESC_CCC() 	BT_GATT_CCC(ccc_cfg, NULL)
+void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
+extern struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX];
+#define ADD_DESC_CCC() 	BT_GATT_CCC(ccc_cfg, on_ccc_config_evt)
 
 //The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
 #define UUID16(_uuid)	_uuid
@@ -125,10 +126,10 @@ typedef struct {
 	uint16_t timeout;
 } iBleP_adv_params_t;
 
-typedef struct bt_data* iBleP_advdata_t;
+typedef struct bt_data iBleP_advdata_t;
 
 #define ADD_ADVDATA(_type, _data...)						BT_DATA_BYTES(_type, _data)
-#define ADD_ADVDATA__TEXT(_type, _data...)			BT_DATA(_type, _data, sizeof((uint8_t[]){_data}) - 1)
+#define ADD_ADVDATA_TEXT(_type, _data...)			BT_DATA(_type, _data, sizeof((uint8_t[]){_data}) - 1)
 
 typedef enum {
 	BLEP_EVENT_CONNECTED = 0,
@@ -147,4 +148,4 @@ int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
 
 #endif	// __IBLEP__
 
-#endif  // CONFIG_BT_PERIPHERAL
+#endif  // CONFIG_BLUETOOTH_PERIPHERAL

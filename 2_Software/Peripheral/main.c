@@ -10,43 +10,37 @@
 #define ACC_CHRC_CLICK  	0x2ACC
 #define ACC_BASE    			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
-iBleP_svc_t acc_svc;
-size_t acc_nbr_chrcs = 2;
-acc_sample_t sample;
 uint8_t click = 0;
-DEFINE_IBLEP_SVC_CONFIG(acc_config)
-{
-  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(ACC_SVC, ACC_BASE)),
-  DEFINE_IBLEP_CHRCS
-  (
-    DEFINE_IBLEP_CHRC (
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_DATA, ACC_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_DATA, ACC_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &sample)
-    ),
-    DEFINE_IBLEP_CHRC (
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_CLICK, ACC_BASE), IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ACC_CHRC_CLICK, ACC_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, NULL)
-    ),
-  )
+acc_sample_t sample;
+iBleP_svc_t acc_svc = {
+  .nbr_attrs = 7,
+  .attrs = {
+    ADD_SVC_DECL(UUID128(ACC_SVC, ACC_BASE)),
+    ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, ACC_BASE),
+                  IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
+                  IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &sample),
+    ADD_DESC_CCC(),
+    ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, ACC_BASE),
+                  IBLEP_CHRC_PROPS_NOTIFY,
+                  IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
+    ADD_DESC_CCC(),
+  },
 };
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
 #define ADC_BASE   			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
-iBleP_svc_t adc_svc;
-size_t adc_nbr_chrcs = 1;
 uint32_t adc_measurement;
-DEFINE_IBLEP_SVC_CONFIG(adc_config)
-{
-  IBLEP_SVC_UUID(DEFINE_IBLEP_UUID128(ADC_UUID_SVC, ADC_UUID_BASE)),
-  DEFINE_IBLEP_CHRCS
-  (
-    DEFINE_IBLEP_CHRC (
-      IBLEP_CHRC_CONFIG(DEFINE_IBLEP_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLEP_CHRC_PERM_READ | IBLEP_CHRC_PERM_NOTIFY),
-      IBLEP_ATTR_CONFIG(DEFINE_IBLEP_UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE), IBLEP_GATT_PERM_READ | IBLEP_GATT_PERM_WRITE, NULL, &adc_measurement)
-    ),
-  )
+iBleP_svc_t adc_svc = {
+  .nbr_attrs = 4,
+  .attrs = {
+    ADD_SVC_DECL(UUID128(ADC_UUID_SVC, ADC_UUID_BASE)),
+    ADD_CHRC_DECL(UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE),
+                  IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
+                  IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &adc_measurement),
+    ADD_DESC_CCC(),
+  },
 };
 
 iBleP_adv_params_t adv_params = {
@@ -54,15 +48,13 @@ iBleP_adv_params_t adv_params = {
 	.timeout 	= ADV_TIMEOUT,
 };
 
-static DEFINE_IBLEP_ADV_DATA(advdata) =
-{
-  IBLEP_ADV_ADD_DATA(IBLEP_DATA_FLAGS, IBLEP_FLAGS_GENERAL | IBLEP_FLAGS_NO_BREDR),
-  IBLEP_ADV_ADD_DATA(IBLEP_DATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
+iBleP_advdata_t advdata[] = {
+  ADD_ADVDATA(IBLEP_ADVDATA_FLAGS, IBLEP_FLAGS_GENERAL | IBLEP_FLAGS_NO_BREDR),
+  ADD_ADVDATA(IBLEP_ADVDATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
 };
 
-static DEFINE_IBLEP_ADV_DATA(scanrsp) =
-{
-  IBLEP_ADV_ADD_TEXT(IBLEP_DATA_NAME_COMPLETE, IBLEP_DEVICE_NAME),
+iBleP_advdata_t scanrsp[] = {
+  ADD_ADVDATA_TEXT(IBLEP_ADVDATA_NAME_COMPLETE, IBLEP_DEVICE_NAME),
 };
 #endif  // ENABLE_BLE
 
@@ -287,8 +279,8 @@ void ble_init()
   iPrint("--------------------\n");
 
   iBleP_init();
-  iBleP_svc_init(&acc_svc, acc_config, acc_nbr_chrcs);
-  iBleP_svc_init(&adc_svc, adc_config, adc_nbr_chrcs);
+  iBleP_svc_init(&acc_svc);
+  iBleP_svc_init(&adc_svc);
   iBleP_adv_start(&adv_params, advdata, sizeof(advdata)/sizeof(iBleP_advdata_t),
                                scanrsp, sizeof(scanrsp)/sizeof(iBleP_advdata_t));
 
