@@ -18,6 +18,7 @@ static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
+static char*                _searched_devices;
 
 static ble_uuid_t uuid = {0};
 
@@ -115,12 +116,12 @@ static void _on_device_found(ble_evt_t const* ble_evt)
   // iPrint("-> Device found %s\n", complete_local_name_str);
 
   // Control the size of the peripheral's name, the \0 is not include in the device's name
-  if(complete_local_name.size != sizeof(IBLE_PERIPHERAL_NAME)-1) {
+  if(complete_local_name.size != sizeof(_searched_devices)-1) {
 		return;
 	}
 
   // Control the the peripheral's name
-  if(memcmp(IBLE_PERIPHERAL_NAME, complete_local_name.p_data, sizeof(IBLE_PERIPHERAL_NAME)-1) != 0) {
+  if(memcmp(_searched_devices, complete_local_name.p_data, sizeof(_searched_devices)-1) != 0) {
     return;
   }
 
@@ -130,7 +131,7 @@ static void _on_device_found(ble_evt_t const* ble_evt)
   error = sd_ble_gap_connect(peer_addr, &_scan_params, &_conn_params, CONN_CFG_TAG);
   if(error) {
       iPrint("/!\\ Connection request to %s failed: error 0x%04x\n", complete_local_name_str, error);
-      iBleC_scan_start(NULL);
+      iBleC_scan_start(NULL, NULL);
   }
 }
 
@@ -183,7 +184,8 @@ static void _on_discovery(uint16_t conn_handle, iBleC_attr_type_t type, iBleC_di
 	{
     link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
-    iBleC_scan_start(NULL);
+    iBleC_scan_start(NULL, NULL);
+    iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return;
 	}
 
@@ -200,7 +202,7 @@ static void _on_discovery(uint16_t conn_handle, iBleC_attr_type_t type, iBleC_di
     error = sd_ble_gattc_primary_services_discover(conn_handle, 0x0001, &uuid);
     if(error) {
       iPrint("Start Discovery failed: error %d\n", error);
-      iBleC_scan_start(NULL);
+      iBleC_scan_start(NULL, NULL);
       return;
     }
   }
@@ -211,7 +213,7 @@ static void _on_discovery(uint16_t conn_handle, iBleC_attr_type_t type, iBleC_di
     error = sd_ble_gattc_characteristics_discover(conn_handle, &handle_range);
     if(error) {
       iPrint("Start Discovery failed: error %d\n", error);
-      iBleC_scan_start(NULL);
+      iBleC_scan_start(NULL, NULL);
       return;
     }
   }
@@ -222,7 +224,7 @@ static void _on_discovery(uint16_t conn_handle, iBleC_attr_type_t type, iBleC_di
     error = sd_ble_gattc_descriptors_discover(conn_handle, &handle_range);
     if(error) {
       iPrint("Start Discovery failed: error %d\n", error);
-      iBleC_scan_start(NULL);
+      iBleC_scan_start(NULL, NULL);
       return;
     }
   }
@@ -250,7 +252,7 @@ static void _start_discovery(uint16_t conn_handle)
   error = sd_ble_gattc_primary_services_discover(conn_handle, 0x0001, &uuid);
   if(error) {
     iPrint("/!\\ Start Discovery failed : error %d\n", error);
-    iBleC_scan_start(NULL);
+    iBleC_scan_start(NULL, NULL);
     return;
   }
 }
@@ -311,6 +313,8 @@ static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t c
   iPrint("Connection Timeout: %u[ms]\n", conn_params->conn_sup_timeout * UNIT_10_MS / 1000);
 
   _start_discovery(link[ref].conn_ref);
+
+  iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_CONNECTED_BASE + ref);
 }
 
 static void _on_disconnection(uint16_t conn_handle)
@@ -324,8 +328,10 @@ static void _on_disconnection(uint16_t conn_handle)
   iPrint("-> Peripheral %d disconnected\n", ref);
 
   if(ble_conn_state_n_centrals() >= IBLEC_MAX_CONN-1) {
-    iBleC_scan_start(NULL);
+    iBleC_scan_start(NULL, NULL);
   }
+
+  iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_DISCONNECTED_BASE + ref);
 }
 
 static void _on_conn_params_update(uint16_t conn_handle, ble_gap_conn_params_t const* conn_params)
@@ -635,11 +641,13 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
   // sets all states to their default, removing all records of connection handles.
 	ble_conn_state_init();
 
+	iEventQueue_init(&bleC_EventQueue);
+
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
 }
 
-int iBleC_scan_start(iBleC_scan_params_t* scan_params)
+int iBleC_scan_start(iBleC_scan_params_t* scan_params, char* searched_devices)
 {
 	int error;
 
@@ -649,6 +657,7 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
     _scan_params.interval = scan_params->interval;
     _scan_params.window   = scan_params->window;
     _scan_params.timeout  = scan_params->timeout;
+    _searched_devices = searched_devices;
   }
 
   error = sd_ble_gap_scan_start(&_scan_params);

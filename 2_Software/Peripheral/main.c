@@ -67,8 +67,14 @@ typedef enum {
 
 iEventQueue_t swg_EventQueue;
 
-iTimer_t newInterval_timer;
-ITIMER_HANDLER(on_newInterval)
+// iTimer_t newInterval_timer;
+// ITIMER_HANDLER(on_newInterval)
+// {
+//   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
+// }
+
+iGpio_t btn_freq;
+IGPIO_HANDLER(on_btn_freq, pin)
 {
   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 }
@@ -303,13 +309,16 @@ void sys_init()
 		iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
 		iGpio_enable_interrupt(&interrupt);
 
+    iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_btn_freq);
+    iGpio_enable_interrupt(&btn_freq);
+
 		#if ENABLE_BLE
 			swg_sleep();
 		#endif	// !ENABLE_BLE
 
-		#if !ENABLE_BLE && !POWER_MEASUREMENT
-			iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
-		#endif	// !ENABLE_BLE && !POWER_MEASUREMENT
+		// #if !ENABLE_BLE && !POWER_MEASUREMENT
+		// 	iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
+		// #endif	// !ENABLE_BLE && !POWER_MEASUREMENT
 
 	#endif  // ENABLE_SWG
 

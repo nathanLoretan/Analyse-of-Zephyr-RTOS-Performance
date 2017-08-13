@@ -18,7 +18,6 @@
 #define UNIT_10_MS                    10000
 #define UNIT_0_625_MS                 625
 
-#define IBLE_PERIPHERAL_NAME   			"ExtBoard-P"
 #define IBLE_CENTRAL_NAME   				CONFIG_BT_DEVICE_NAME
 
 #define IBLEC_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
@@ -116,9 +115,6 @@ typedef struct {
 #define BYTE14(b1, ...)   BYTE13(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
-
-// typedef struct bt_le_scan_param 	iBleC_scan_params_t;
-// typedef struct bt_le_conn_param 	iBleC_conn_params_t;
 
 typedef struct iBleC_scan_params_t {
 	uint6_t type;
@@ -221,17 +217,25 @@ struct {
 	volatile bool isReady;
 } link[CONFIG_BT_MAX_CONN];
 
-#define IBLEC_READ_HANDLER(handler, params)\
+#define IBLEC_READ_HANDLER(handler, conn, params)\
 	void handler(iBleC_conn_t conn, iBleC_read_params_t* params)
-#define IBLEC_WRITE_HANDLER(handler, params)\
+#define IBLEC_WRITE_HANDLER(handler, conn, params)\
 	void handler(iBleC_conn_t conn, iBleC_write_params_t* params)
-#define IBLEC_NOTIFY_HANDLER(handler, params)\
+#define IBLEC_NOTIFY_HANDLER(handler, conn, params)\
 	void handler(iBleC_conn_t conn, iBleC_notify_params_t* params)
-#define IBLEC_INDICATE_HANDLER(handler, params)\
+#define IBLEC_INDICATE_HANDLER(handler, conn, params)\
 	void handler(iBleC_conn_t conn, iBleC_indicate_params_t* params)
 
+typedef enum {
+	BLEC_EVENT_CONNECTED_BASE 	 = 0x00,
+	BLEC_EVENT_READY_BASE				 = 0x20,
+	BLEC_EVENT_DISCONNECTED_BASE = 0x40,
+} bleCEvent_t;
+
+iEventQueue_t bleC_EventQueue;
+
 int	iBleC_init(iBleC_conn_params_t* conn_params);
-int iBleC_scan_start(iBleC_scan_params_t* scan_params);
+int iBleC_scan_start(iBleC_scan_params_t* scan_params, char* searched_devices);
 void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs);
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params);

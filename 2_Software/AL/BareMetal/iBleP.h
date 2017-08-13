@@ -213,9 +213,12 @@ int iBleP_init();
 volatile bool iBleP_isConnected();
 int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata,
 										size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
+
 int iBleP_svc_init(iBleP_svc_t* svc);
 int iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
 int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
-void iBleP_chrc_write(uint16_t conn, uint16_t attr, uint8_t const* buf, size_t buf_length, size_t offset);
+
+void iBleP_chrc_write(uint16_t conn, uint16_t attr, uint8_t const* buf,
+											size_t buf_length, size_t offset);
 
 #endif  // __IBLEP__

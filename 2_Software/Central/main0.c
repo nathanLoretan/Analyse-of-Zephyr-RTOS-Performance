@@ -68,19 +68,25 @@ IGPIO_HANDLER(on_interrupt, pin)
 #endif  // ENABLE_SWG
 
 // -----------------------------------------------------------------------------
-IBLEC_NOTIFY_HANDLER(on_acc_data, conn, params)
+
+IBLEC_WRITE_HANDLER(write_rsp, params)
 {
-	iPrint("NOTIFY ACC DATA %d, %u\n", conn, *((uint32_t*) params->data));
+	iPrint("WRITE %u\n", *((uint8_t*) params->data));
 }
 
-IBLEC_NOTIFY_HANDLER(on_acc_click, conn, params)
+IBLEC_READ_HANDLER(read_rsp, params)
 {
-	iPrint("NOTIFY ACC CLICK %d, %u\n", conn, *((uint32_t*) params->data));
+	iPrint("READ %u\n", *((uint8_t*) params->data));
 }
 
-IBLEC_NOTIFY_HANDLER(on_adc_data, conn, params)
+IBLEC_NOTIFY_HANDLER(notify_rsp, params)
 {
-	iPrint("NOTIFY ADC DATA %d, %u\n", conn, *((uint32_t*) params->data));
+	iPrint("NOTIFY %u\n", *((uint8_t*) params->data));
+}
+
+IBLEC_INDICATE_HANDLER(indicate_rsp, params)
+{
+	iPrint("INDICATE %u\n", *((uint8_t*) params->data));
 }
 
 // Threads----------------------------------------------------------------------
@@ -93,8 +99,7 @@ ITHREAD_HANDLER(ble)
     // Wait for event
     while(iEventQueue_isEmpty(&bleC_EventQueue)) { iThread_sleep(); }
 
-		iEvent_t ble_event = iEventQueue_get(&bleC_EventQueue);
-    switch(ble_event)
+    switch(iEventQueue_get(&bleC_EventQueue))
 		{
 			case BLEC_EVENT_CONNECTED_BASE + 0:
 			case BLEC_EVENT_CONNECTED_BASE + 1:
@@ -105,6 +110,21 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_CONNECTED_BASE + 6:
 			case BLEC_EVENT_CONNECTED_BASE + 7:
 		  {
+				iBleC_notify_params_t notify_params;
+				notify_params.handler				= notify_rsp;
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(0, ADC_SVC, ADC_CHRC_DATA);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(0, ADC_SVC, ADC_CHRC_DATA, 0x2902);
+				iBleC_subscribe_notify(0, &notify_params);
+
+				notify_params.handler				= notify_rsp;
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(0, ACC_SVC, ACC_CHRC_DATA);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(0, ACC_SVC, ACC_CHRC_DATA, 0x2902);
+				iBleC_subscribe_notify(0, &notify_params);
+
+				notify_params.handler				= notify_rsp;
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(0, ACC_SVC, ACC_CHRC_CLICK);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(0, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
+				iBleC_subscribe_notify(0, &notify_params);
 
 		  } break;
 
@@ -117,21 +137,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 6:
 			case BLEC_EVENT_READY_BASE + 7:
 		  {
-				iBleC_notify_params_t notify_params;
-				notify_params.handler				= on_acc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_acc_click;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_adc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
 
 		  } break;
 
@@ -144,21 +149,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_DISCONNECTED_BASE + 6:
 			case BLEC_EVENT_DISCONNECTED_BASE + 7:
 		  {
-				iBleC_notify_params_t notify_params;
-				notify_params.handler				= on_acc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_acc_click;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_adc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
 
 		  } break;
 
@@ -220,7 +210,49 @@ int main()
 
   while(1)
   {
-		iThread_sleep();
+		// static bool enabled = false;
+		// iSleep_ms(1000);
+		//
+		// if(link[0].conn_ref != IBLEC_NOT_CONNECTED && link[0].isReady && !enabled)
+		// {
+			// enabled = true;
+			// iPrint("0x%x, %x\n", 0x1805, iBleC_get_svc_handle(0, 0x1805));
+			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_decl_handle(0, 0x1805, 0x2A2B));
+			// iPrint("0x%x, %x\n", 0x2A2B, iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B));
+			// iPrint("0x%x, %x\n", 0x2902, iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902));
+			// iPrint("0x%x, %x\n", 0x2A00, iBleC_get_chrc_decl_handle(0, 0x1800, 0x2A00));
+
+			// enabled = true;
+			// iBleC_notify_params_t notify_params;
+			// notify_params.handler				= notify_rsp;
+			// notify_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// notify_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
+			// iBleC_subscribe_notify(0, &notify_params);
+
+			// enabled = true;
+			// iBleC_indicate_params_t indicate_params;
+			// indicate_params.handler				= indicate_rsp;
+			// indicate_params.value_handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// indicate_params.ccc_handle		= iBleC_get_desc_handle(0, 0x1805, 0x2A2B, 0x2902);
+			// iBleC_subscribe_indicate(0, &indicate_params);
+
+			// iBleC_read_params_t read_params;
+			// read_params.handler = read_rsp;
+			// read_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// read_params.offset = 0;
+			// iBleC_read(0, &read_params);
+
+			// static int val = 0;
+			// val++;
+			// iBleC_write_params_t write_params;
+			// write_params.handler = write_rsp;
+			// write_params.handle	= iBleC_get_chrc_val_handle(0, UUID_SVC, UUID_CHRC);
+			// // write_params.handle	= iBleC_get_chrc_val_handle(0, 0x1805, 0x2A2B);
+			// write_params.offset = 0;
+			// write_params.data 	= &val;
+			// write_params.length = 4;
+			// iBleC_write(0, &write_params);
+		// }
   }
 
   iPrint("-> Exit\n");

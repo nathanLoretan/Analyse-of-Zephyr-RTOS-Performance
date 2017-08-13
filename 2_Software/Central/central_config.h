@@ -18,8 +18,11 @@
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
+#define BTN_FREQ_PIN       14
 
 // BLE Configuration------------------------------------------------------------
+#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
+
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
 #define SCAN_TIMEOUT        IBLEC_SCAN_TIMEOUT_NONE
@@ -31,7 +34,7 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              0             // [Hz]
-#define INTERVAL                  1000          // [ms]
+// #define INTERVAL                  1000          // [ms]
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]

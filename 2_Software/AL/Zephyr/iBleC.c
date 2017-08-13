@@ -11,6 +11,7 @@ static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
+static char*								_searched_devices;
 
 static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
 static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
@@ -107,12 +108,12 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	// iPrint("-> Device found %s\n", complete_local_name_str);
 
 	// Control the size of the peripheral's name, the \0 is not include in the device's name
-	if(complete_local_name.len != sizeof(IBLE_PERIPHERAL_NAME)-1) {
+	if(complete_local_name.len != sizeof(_searched_devices)-1) {
 		return;
 	}
 
 	// Control the the peripheral's name
-	if(memcmp(IBLE_PERIPHERAL_NAME, (char*) complete_local_name.data, sizeof(IBLE_PERIPHERAL_NAME)-1) != 0) {
+	if(memcmp(_searched_devices, (char*) complete_local_name.data, sizeof(_searched_devices)-1) != 0) {
 		return;
 	}
 
@@ -129,7 +130,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	_new_conn = bt_conn_create_le(peer_addr, _conn_params);
 	if(_new_conn == NULL) {
 		iPrint("/!\\  Connection request to %s failed\n", addr_str);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
 	}
 }
 
@@ -184,7 +185,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	{
 		link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
 		return BT_GATT_ITER_STOP;
 	}
 
@@ -222,7 +223,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
 		return BT_GATT_ITER_STOP;
 	}
 
@@ -258,7 +259,8 @@ static void _start_discovery(struct bt_conn* conn)
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
+		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return;
 	}
 }
@@ -323,7 +325,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 	if(conn_err) {
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
 	}
 	else if(_new_conn == conn)
 	{
@@ -347,10 +349,12 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
 
 		_start_discovery(link[ref].conn_ref);
+
+		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_CONNECTED_BASE + ref);
 	}
 	else {
 		iPrint("-> Connection to %d failed: error connection reference\n", ref);
-		iBleC_scan_start(NULL);
+		iBleC_scan_start(NULL, NULL);
 	}
 }
 
@@ -369,8 +373,10 @@ static void _on_disconnection(struct bt_conn* conn, u8_t reason)
 	iPrint("-> Peripheral %d disconnected: 0x%x\n", ref, reason);
 
 	if(_nbr_conn >= CONFIG_BT_MAX_CONN-1) {
-    iBleC_scan_start(NULL);
+    iBleC_scan_start(NULL, NULL);
 	}
+
+	iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_DISCONNECTED_BASE + ref);
 }
 
 static void _on_conn_parameters_update(struct bt_conn *conn,
@@ -411,20 +417,23 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	// Call back for connection and disconnection event
 	bt_conn_cb_register(&connection_callback);
 
+	iEventQueue_init(&bleC_EventQueue);
+
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
 }
 
-int iBleC_scan_start(iBleC_scan_params_t* scan_params)
+int iBleC_scan_start(iBleC_scan_params_t* scan_params, char* searched_devices)
 {
   int error;
 
 	// Save the scan parameters
 	if(scan_params != NULL) {
-		 _scan_params.active   = scan_params->type,
-		 _scan_params.interval = scan_params->interval,
-		 _scan_params.window   = scan_params->window,
-		 _scan_params.timeout  = scan_params->timeout,
+		 _scan_params.active   = scan_params->type;
+		 _scan_params.interval = scan_params->interval;
+		 _scan_params.window   = scan_params->window;
+		 _scan_params.timeout  = scan_params->timeout;
+		 _searched_devices	= searched_devices;
 	}
 
 	if(_scan_params == NULL) {

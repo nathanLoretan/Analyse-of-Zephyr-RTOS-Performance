@@ -12,6 +12,9 @@
 #include <bluetooth/gatt.h>
 #include <bluetooth/bluetooth.h>
 
+void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
+extern struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX];
+
 #define MSEC_TO_UNITS(_time, _unit)		(_time*1000)/_unit
 #define UNIT_1_25_MS									1250
 #define UNIT_10_MS										10000
@@ -93,8 +96,6 @@ typedef struct {
  	BT_GATT_CHARACTERISTIC(_uuid, _chrc_prop),\
 	BT_GATT_DESCRIPTOR(_uuid, _attr_perm, on_read_rsq, _write_handler, _data)
 
-void on_ccc_config_evt(const struct bt_gatt_attr* attr, u16_t value);
-extern struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX];
 #define ADD_DESC_CCC() 	BT_GATT_CCC(ccc_cfg, on_ccc_config_evt)
 
 //The vendor UUIDs of Nordic are defined with a base 128bit and uuid 16bits (bits 12 - 13)
@@ -140,11 +141,15 @@ iEventQueue_t bleP_EventQueue;
 
 int	iBleP_init();
 volatile bool iBleP_isConnected();
-int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
+int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata,
+										size_t advdata_size, iBleP_advdata_t* scanrsp, size_t scanrsp_size);
+
 int iBleP_svc_init(iBleP_svc_t* svc);
 int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
 int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
-#define iBleP_chrc_write(_conn, _attr, _buf, _buf_length, _offset) 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
+
+#define iBleP_chrc_write(_conn, _attr, _buf, _buf_length, _offset)\
+ 	memcpy((_attr)->user_data + _offset, _buf, _buf_length)
 
 #endif	// __IBLEP__
 

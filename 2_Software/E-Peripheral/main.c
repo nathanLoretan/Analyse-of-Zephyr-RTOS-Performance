@@ -54,6 +54,7 @@ iBleP_svc_t eAdc_svc = {
 	.nbr_attrs = 4,
 	.attrs = {
 	  IBLEP_SVC_UUID(UUID128(ADC_SVC, ADC_BASE)),
+
 	  ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, ADC_BASE),
 									BLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
 									IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAdc_measurement),

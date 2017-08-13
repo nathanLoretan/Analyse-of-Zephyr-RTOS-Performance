@@ -22,21 +22,21 @@
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_ACC        1
-#define ENABLE_ADC        1
+#define ENABLE_ACC        0
+#define ENABLE_ADC        0
 #define ENABLE_SWG        0
-#define ENABLE_BLE        1
+#define ENABLE_BLE        0
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31
 
 #define INTERRUPT_PIN		   39
+#define BTN_FREQ_PIN       14
 
 // BLE Configuration------------------------------------------------------------
 #define ADV_INTERVAL       MSEC_TO_UNITS(50, UNIT_0_625_MS)
 #define ADV_TIMEOUT        IBLEP_ADV_TIMEOUT_NONE
-
 
 // Sensors Configuration--------------------------------------------------------
 #define ADC_DATA_RATE             ADC_DATA_RATE_7
@@ -48,7 +48,7 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              0             // [Hz]
-#define INTERVAL                  1000          // [ms]
+// #define INTERVAL                  1000          // [ms]
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
