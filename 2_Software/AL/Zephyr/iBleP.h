@@ -1,4 +1,4 @@
-#if CONFIG_BLUETOOTH_PERIPHERAL
+#if CONFIG_BT_PERIPHERAL
 
 #ifndef __IBLEP__
 #define __IBLEP__
@@ -20,7 +20,7 @@ extern struct bt_gatt_ccc_cfg ccc_cfg[BT_GATT_CCC_MAX];
 #define UNIT_10_MS										10000
 #define UNIT_0_625_MS									625
 
-#define IBLEP_DEVICE_NAME					CONFIG_BLUETOOTH_DEVICE_NAME
+#define IBLEP_DEVICE_NAME					CONFIG_BT_DEVICE_NAME
 #define IBLEP_ADV_TIMEOUT_NONE		0
 
 typedef enum {
@@ -153,4 +153,4 @@ int	iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length);
 
 #endif	// __IBLEP__
 
-#endif  // CONFIG_BLUETOOTH_PERIPHERAL
+#endif  // CONFIG_BT_PERIPHERAL

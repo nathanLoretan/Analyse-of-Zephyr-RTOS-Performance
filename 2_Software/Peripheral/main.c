@@ -18,10 +18,10 @@ iBleP_svc_t acc_svc = {
     ADD_SVC_DECL(UUID128(ACC_SVC, ACC_BASE)),
     ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, ACC_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
-                  IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &sample),
+                  IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &sample),
     ADD_DESC_CCC(),
     ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, ACC_BASE),
-                  IBLEP_CHRC_PROPS_NOTIFY,
+                  IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
                   IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
     ADD_DESC_CCC(),
   },
@@ -35,10 +35,10 @@ uint32_t adc_measurement;
 iBleP_svc_t adc_svc = {
   .nbr_attrs = 4,
   .attrs = {
-    ADD_SVC_DECL(UUID128(ADC_UUID_SVC, ADC_UUID_BASE)),
-    ADD_CHRC_DECL(UUID128(ADC_UUID_CHRC1, ADC_UUID_BASE),
+    ADD_SVC_DECL(UUID128(ADC_SVC, ADC_BASE)),
+    ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, ADC_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
-                  IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &adc_measurement),
+                  IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &adc_measurement),
     ADD_DESC_CCC(),
   },
 };
@@ -103,7 +103,7 @@ ITHREAD_HANDLER(ble)
 				#if ENABLE_SWG
 					swg_wakeup();
 					iGpio_enable_interrupt(&interrupt);
-					iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
+					// iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
 				#endif	// ENABLE_SWG
 
 				#if ENABLE_ADC
@@ -121,7 +121,7 @@ ITHREAD_HANDLER(ble)
 				#if ENABLE_SWG
 					swg_sleep();
 					iGpio_disable_interrupt(&interrupt);
-					iTimer_stop(&newInterval_timer);
+					// iTimer_stop(&newInterval_timer);
 				#endif	// ENABLE_SWG
 
 				#if ENABLE_ADC
@@ -259,7 +259,10 @@ void sys_init();
 
 int main()
 {
-  iDebug_init();
+  iPrint("\nPeripheral\n");
+	iPrint("----------\n");
+
+  // iDebug_init();
 
 	#if ENABLE_BLE
 	  ble_init();
@@ -309,7 +312,7 @@ void sys_init()
 		iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
 		iGpio_enable_interrupt(&interrupt);
 
-    iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_btn_freq);
+    iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
     iGpio_enable_interrupt(&btn_freq);
 
 		#if ENABLE_BLE

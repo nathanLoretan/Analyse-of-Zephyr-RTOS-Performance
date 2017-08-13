@@ -18,9 +18,9 @@ typedef struct {
 iEventQueue_t eAdc_EventQueue;
 iEventQueue_t eAcc_EventQueue;
 
-static acc_sample_t eAcc_sample;
-static uint8_t			eAcc_click = 0;
-static uint32_t 		eAdc_measurement;
+static acc_sample_t eAcc_sample = {0};
+static uint32_t			eAcc_click = 0;
+static uint32_t 		eAdc_measurement = 0;
 
 iGpio_t led_connected;
 iGpio_t led_started;
@@ -36,8 +36,8 @@ iBleP_svc_t eAcc_svc = {
 	.attrs = {
 	  ADD_SVC_DECL(UUID128(ACC_SVC, ACC_BASE)),
 	  ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, ACC_BASE),
-									BLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
-									IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAcc_sample),
+									IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
+									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAcc_sample),
 		ADD_DESC_CCC(),
     ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, ACC_BASE),
 									IBLEP_CHRC_PROPS_NOTIFY,
@@ -53,11 +53,10 @@ iBleP_svc_t eAcc_svc = {
 iBleP_svc_t eAdc_svc = {
 	.nbr_attrs = 4,
 	.attrs = {
-	  IBLEP_SVC_UUID(UUID128(ADC_SVC, ADC_BASE)),
-
+	  ADD_SVC_DECL(UUID128(ADC_SVC, ADC_BASE)),
 	  ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, ADC_BASE),
-									BLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
-									IBLEP_GATT_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAdc_measurement),
+									IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
+									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAdc_measurement),
 		ADD_DESC_CCC(),
   },
 };
@@ -68,12 +67,12 @@ iBleP_adv_params_t adv_params = {
 };
 
 iBleP_advdata_t advdata[] = {
-  ADD_ADVDATA(IBLEP_DATA_FLAGS, IBLEP_FLAGS_GENERAL | IBLEP_FLAGS_NO_BREDR),
-  ADD_ADVDATA(IBLEP_DATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
+  ADD_ADVDATA(IBLEP_ADVDATA_FLAGS, IBLEP_FLAGS_GENERAL | IBLEP_FLAGS_NO_BREDR),
+  ADD_ADVDATA(IBLEP_ADVDATA_UUID16_ALL, 0xCC, 0x0A, 0xDC, 0x0A),
 };
 
 iBleP_advdata_t scanrsp[] = {
-  ADD_ADVDATA_TEXT(IBLEP_DATA_NAME_COMPLETE, IBLEP_DEVICE_NAME),
+  ADD_ADVDATA_TEXT(IBLEP_ADVDATA_NAME_COMPLETE, IBLEP_DEVICE_NAME),
 };
 
 // Timer-------------------------------------------------------------------
@@ -141,13 +140,13 @@ ITHREAD_HANDLER(acc)
 				eAcc_sample.x++;
 				eAcc_sample.y++;
 				eAcc_sample.z++;
-				iBleP_svc_notify(&eAcc_svc, 1, (uint8_t*) &eAcc_sample, sizeof(eAcc_sample));
+				iBleP_svc_notify(&eAcc_svc.attrs[1], (uint8_t*) &eAcc_sample, sizeof(eAcc_sample));
 			} break;
 
 			case ACC_EVENT_INT2:
 			{
 				eAcc_click++;
-				iBleP_svc_notify(&eAcc_svc, 2, (uint8_t*) &eAcc_click, sizeof(eAcc_click));
+				iBleP_svc_notify(&eAcc_svc.attrs[4], (uint8_t*) &eAcc_click, sizeof(eAcc_click));
 			} break;
 
 			default:	// NOTHING
@@ -168,7 +167,7 @@ ITHREAD_HANDLER(adc)
 			case ADC_EVENT_DATA:
 			{
 				eAdc_measurement++;
-				iBleP_svc_notify(&eAdc_svc, 1, (uint8_t*) &eAdc_measurement, sizeof(eAdc_measurement));
+				iBleP_svc_notify(&eAdc_svc.attrs[1], (uint8_t*) &eAdc_measurement, sizeof(eAdc_measurement));
 			} break;
 
 			default: // NOTHING
@@ -187,6 +186,9 @@ void sys_init();
 
 int main()
 {
+	iPrint("\nE-Peripheral\n");
+	iPrint("------------\n");
+
   iThread_run(&eAcc_thread, acc);
   iThread_run(&eAdc_thread, adc);
 	iThread_run(&ble_thread, 	ble);
@@ -206,8 +208,8 @@ int main()
 void ble_init()
 {
   iBleP_init();
-  iBleP_svc_init(&eAcc_svc, eAcc_config, eAcc_nbr_chrcs);
-  iBleP_svc_init(&eAdc_svc, eAdc_config, eAdc_nbr_chrcs);
+  iBleP_svc_init(&eAcc_svc);
+  iBleP_svc_init(&eAdc_svc);
   iBleP_adv_start(&adv_params, advdata, sizeof(advdata)/sizeof(iBleP_advdata_t),
 															 scanrsp, sizeof(scanrsp)/sizeof(iBleP_advdata_t));
 }

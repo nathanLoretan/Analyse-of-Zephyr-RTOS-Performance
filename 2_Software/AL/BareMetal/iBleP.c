@@ -569,7 +569,7 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 	{
 		error = sd_ble_uuid_vs_add(&chrc->uuid.base, &chrc->uuid.uuid.type);
 		if(error) {
-			iPrint("/!\\ GATT failed to add the characteristic uuid: error %d\n", error);
+			iPrint("/!\\ GATT failed to add the characteristic uuid: error %04x\n", error);
 			return error;
 		}
 	}
@@ -584,7 +584,7 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 	// Store the new characteristic of the service
 	error = sd_ble_gatts_characteristic_add(svc->handle, &chrc->chrc_md, &chrc->attr_config, &chrc->handles);
 	if(error) {
-		iPrint("/!\\ GATT failed to add the characteristic: error %d\n", error);
+		iPrint("/!\\ GATT failed to add the characteristic: error %04x\n", error);
 		return error;
 	}
 
@@ -618,7 +618,7 @@ int iBleP_svc_init(iBleP_svc_t* svc)
 		error = sd_ble_uuid_vs_add(&svc->attrs[0].svc.uuid.base,
 															 &svc->attrs[0].svc.uuid.uuid.type);
 		if(error) {
-			iPrint("/!\\ GATT failed to add the service uuid: error %d\n", error);
+			iPrint("/!\\ GATT failed to add the service uuid: error %04x\n", error);
 			return error;
 		}
 	}
@@ -627,7 +627,7 @@ int iBleP_svc_init(iBleP_svc_t* svc)
 																	&svc->attrs[0].svc.uuid.uuid,
 																	&svc->attrs[0].svc.handle);
 	if(error) {
-		iPrint("/!\\ GATT failed to add the service: error %d\n", error);
+		iPrint("/!\\ GATT failed to add the service: error %04x\n", error);
 		return error;
 	}
 

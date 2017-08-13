@@ -5,7 +5,6 @@
 
 #define ACC_FIFO_MAX_SIZE					0x1F
 
-
 // High Resolution
 // 					 |  1	|  2  |  3	|  4	|   5	|   6	|   7 |	     9	|
 // DATA RATE |	1	| 10	| 25	| 50	| 100	| 200	| 400	| 1.344k	|  [Hz]

@@ -6,9 +6,10 @@
 // Zephyr headers
 #include <gpio.h>
 
+// Only to compile with zephyr wihtou my modification on the drivers
 #ifndef CONFIG_GPIO_NRF5_P1_DEV_NAME
   #define CONFIG_GPIO_NRF5_P1_DEV_NAME "GPIO_1"
-#endif  
+#endif
 
 #define IGPIO_PIN_IN					GPIO_DIR_IN
 #define IGPIO_PIN_OUT					GPIO_DIR_OUT

@@ -1,20 +1,25 @@
 #include "../configuration.h"
 
+typedef struct {
+    uint16_t x;
+    uint16_t y;
+    uint16_t z;
+} acc_sample_t;
+
 // BLE--------------------------------------------------------------------------
-#if ENABLE_BLE
-iBleC_scan_params_t conn_params = {
+iBleC_scan_params_t scan_params = {
 	.type 		= IBLEC_SCAN_ACTIVE,
 	.window 	= SCAN_WINDOW,
 	.interval = SCAN_INTERVAL,
 	.timeout 	= SCAN_TIMEOUT,
-}
+};
 
-iBleC_conn_params_t scan_params = {
+iBleC_conn_params_t conn_params = {
 	.interval_min = CONN_MIN_INTERVAL,
 	.interval_max = CONN_MAX_INTERVAL,
 	.latency 			= SLAVE_LATENCY,
 	.timeout 			= CONN_TIMOUT,
-}
+};
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
@@ -37,7 +42,6 @@ iBleC_attr_disc_t attr_disc_list[] =
 	ADD_CHRC_TO_DISCOVER_UUID128(ADC_CHRC_DATA, ADC_BASE),
 	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
 };
-#endif  // ENABLE_BLE
 
 // Interrupts-------------------------------------------------------------------
 #if ENABLE_SWG
@@ -70,21 +74,21 @@ IGPIO_HANDLER(on_interrupt, pin)
 // -----------------------------------------------------------------------------
 IBLEC_NOTIFY_HANDLER(on_acc_data, conn, params)
 {
-	iPrint("NOTIFY ACC DATA %d, %u\n", conn, *((uint32_t*) params->data));
+	acc_sample_t* sample = ((acc_sample_t*) params->data);
+	iPrint("NOTIFY ACC DATA %d, %lu, %lu, %lu\n", conn, (uint32_t) sample->x, (uint32_t) sample->y, (uint32_t) sample->z);
 }
 
 IBLEC_NOTIFY_HANDLER(on_acc_click, conn, params)
 {
-	iPrint("NOTIFY ACC CLICK %d, %u\n", conn, *((uint32_t*) params->data));
+	iPrint("NOTIFY ACC CLICK %d, %lu\n", conn, *((uint32_t*) params->data));
 }
 
 IBLEC_NOTIFY_HANDLER(on_adc_data, conn, params)
 {
-	iPrint("NOTIFY ADC DATA %d, %u\n", conn, *((uint32_t*) params->data));
+	iPrint("NOTIFY ADC DATA %d, %lu\n", conn, *((uint32_t*) params->data));
 }
 
 // Threads----------------------------------------------------------------------
-#if ENABLE_BLE
 DEFINE_ITHREAD(ble_thread, 4096, 0);
 ITHREAD_HANDLER(ble)
 {
@@ -118,20 +122,20 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 7:
 		  {
 				iBleC_notify_params_t notify_params;
+				// notify_params.handler				= on_adc_data;
+				// notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA);
+				// notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902);
+				// iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
+				//
 				notify_params.handler				= on_acc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_acc_click;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_adc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
-				iBleC_subscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902);
+				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
+				//
+				// notify_params.handler				= on_acc_click;
+				// notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK);
+				// notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
+				// iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
 
 		  } break;
 
@@ -144,21 +148,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_DISCONNECTED_BASE + 6:
 			case BLEC_EVENT_DISCONNECTED_BASE + 7:
 		  {
-				iBleC_notify_params_t notify_params;
-				notify_params.handler				= on_acc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ADC_SVC, ADC_CHRC_DATA, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_acc_click;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_DATA, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
-
-				notify_params.handler				= on_adc_data;
-				notify_params.value_handle	= iBleC_get_chrc_val_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK);
-				notify_params.ccc_handle		= iBleC_get_desc_handle(BLEC_EVENT_READY_BASE - ble_event, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
-				iBleC_unsubscribe_notify(BLEC_EVENT_READY_BASE - ble_event, &notify_params);
 
 		  } break;
 
@@ -167,7 +156,6 @@ ITHREAD_HANDLER(ble)
   	}
   }
 }
-#endif  // ENABLE_BLE
 
 #if ENABLE_SWG
 DEFINE_ITHREAD(swg_thread, 4096, 0);
@@ -208,11 +196,12 @@ void ble_init();
 
 int main()
 {
+	iPrint("\nCentral\n");
+	iPrint("----------\n");
+
 	iDebug_init();
 
-	#if ENABLE_BLE
-	  ble_init();
-	#endif  // ENABLE_BLE
+	ble_init();
 
 	#if ENABLE_SWG
 	  sys_init();
@@ -220,14 +209,13 @@ int main()
 
   while(1)
   {
-		iThread_sleep();
+		iThreads_start();
   }
 
   iPrint("-> Exit\n");
   return 0;
 }
 
-#if ENABLE_BLE
 void ble_init()
 {
   iPrint("\nInitialize Bluetooth\n");
@@ -235,11 +223,10 @@ void ble_init()
 
 	iBleC_init(&conn_params);
 	iBleC_discovery_init(attr_disc_list, sizeof(attr_disc_list) / sizeof(iBleC_attr_disc_t));
-	iBleC_scan_start(&scan_params, IBLE_SEARCHED_DEVICE);
+	iBleC_scan_start(&scan_params);
 
 	iThread_run(&ble_thread, ble);
 }
-#endif	// ENABLE_BLE
 
 #if ENABLE_SWG
 void sys_init()
@@ -255,7 +242,7 @@ void sys_init()
 	iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
 	iGpio_enable_interrupt(&interrupt);
 
-	iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_btn_freq);
+	iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
 	iGpio_enable_interrupt(&btn_freq);
 
 	#if ENABLE_BLE

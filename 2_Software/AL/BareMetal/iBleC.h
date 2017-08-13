@@ -23,6 +23,7 @@
 #include "boards.h"
 
 #define IBLE_CENTRAL_NAME   				"ExtBoard-C"
+#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
 
 #define IBLEC_SCAN_PASSIVE	0
 #define IBLEC_SCAN_ACTIVE		1
@@ -221,7 +222,7 @@ typedef enum {
 iEventQueue_t bleC_EventQueue;
 
 int iBleC_init(iBleC_conn_params_t* conn_params);
-int iBleC_scan_start(iBleC_scan_params_t* scan_params, char* searched_devices);
+int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs);
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params);

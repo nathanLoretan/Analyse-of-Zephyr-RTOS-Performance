@@ -24,15 +24,15 @@
 // Drivers----------------------------------------------------------------------
 #define ENABLE_ACC        0
 #define ENABLE_ADC        0
-#define ENABLE_SWG        0
-#define ENABLE_BLE        0
+#define ENABLE_SWG        1
+#define ENABLE_BLE        1
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31
 
 #define INTERRUPT_PIN		   39
-#define BTN_FREQ_PIN       14
+#define BTN_FREQ_PIN       11
 
 // BLE Configuration------------------------------------------------------------
 #define ADV_INTERVAL       MSEC_TO_UNITS(50, UNIT_0_625_MS)
@@ -52,6 +52,6 @@
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
-#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
+#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
 
 #endif  // __PERIPHERAL_CONFIG_H__

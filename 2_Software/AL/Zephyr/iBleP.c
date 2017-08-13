@@ -1,4 +1,4 @@
-#if CONFIG_BLUETOOTH_PERIPHERAL
+#if CONFIG_BT_PERIPHERAL
 
 #include "iBleP.h"
 
@@ -148,7 +148,7 @@ int iBleP_adv_start(iBleP_adv_params_t* params, iBleP_advdata_t* advdata, size_t
 	}
 
 	// Define timeout to stop advertising, no timeout if 0
-	if(ADV_TIMEOUT != IBLEP_ADV_TIMEOUT_NONE) {
+	if(params->timeout != IBLEP_ADV_TIMEOUT_NONE) {
 		k_timer_start(&_adv_timeout_timer, K_MSEC(params->timeout), 0);
 	}
 
@@ -223,4 +223,4 @@ int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
   return error;
 }
 
-#endif  // CONFIG_BLUETOOTH_PERIPHERAL
+#endif  // CONFIG_BT_PERIPHERAL

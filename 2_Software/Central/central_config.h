@@ -14,15 +14,12 @@
 
 // Drivers----------------------------------------------------------------------
 #define ENABLE_SWG        0
-#define ENABLE_BLE        1
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
-#define BTN_FREQ_PIN       14
+#define BTN_FREQ_PIN       11
 
 // BLE Configuration------------------------------------------------------------
-#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
-
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
 #define SCAN_TIMEOUT        IBLEC_SCAN_TIMEOUT_NONE

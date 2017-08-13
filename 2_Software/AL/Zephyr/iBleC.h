@@ -1,5 +1,4 @@
-// #if CONFIG_BT_CENTRAL
-#if CONFIG_BLUETOOTH_CENTRAL
+#if CONFIG_BT_CENTRAL
 
 #ifndef __IBLEC__
 #define __IBLEC__
@@ -19,6 +18,7 @@
 #define UNIT_0_625_MS                 625
 
 #define IBLE_CENTRAL_NAME   				CONFIG_BT_DEVICE_NAME
+#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
 
 #define IBLEC_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
 #define IBLEC_SCAN_ACTIVE		BT_HCI_LE_SCAN_ACTIVE
@@ -116,19 +116,19 @@ typedef struct {
 #define BYTE15(b1, ...)   BYTE14(__VA_ARGS__, N)  // Keep only the 13 last bits
 #define BYTE16(b1, ...)   BYTE15(__VA_ARGS__, N)  // Keep only the 13 last bits
 
-typedef struct iBleC_scan_params_t {
-	uint6_t type;
+typedef struct {
+	uint16_t type;
 	uint16_t window;
 	uint16_t interval;
 	uint16_t timeout;
-}
+} iBleC_scan_params_t;
 
-typedef struct iBleC_conn_params_t {
-	uint6_t interval_min;
+typedef struct {
+	uint16_t interval_min;
 	uint16_t interval_max;
 	uint16_t latency;
 	uint16_t timeout;
-}
+} iBleC_conn_params_t;
 
 // // Interval and Windows in 0,625 Unit
 // #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)
@@ -235,7 +235,7 @@ typedef enum {
 iEventQueue_t bleC_EventQueue;
 
 int	iBleC_init(iBleC_conn_params_t* conn_params);
-int iBleC_scan_start(iBleC_scan_params_t* scan_params, char* searched_devices);
+int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs);
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params);
@@ -252,4 +252,4 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
 #endif	// __IBLEC__
 
-#endif	// CONFIG_BLUETOOTH_CENTRAL
+#endif	// CONFIG_BT_CENTRAL

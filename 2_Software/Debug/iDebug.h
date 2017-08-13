@@ -32,31 +32,31 @@ do {\
 
 //  -> iBleP_svc_indication()
 //  -> iBleP_svc_notify()
-#define BLE_ERROR_PIN           28
+#define BLE_ERROR_PIN           27
 #define BLE_ERROR_PORT          NRF_P0
 #define BLE_ERROR(_flag)        DEBUG_PIN_SET(BLE_ERROR_PIN, BLE_ERROR_PORT, _flag)
 
 //  -> iBleP_svc_indication()
-#define BLE_INDICATE_PIN        15
+#define BLE_INDICATE_PIN        26
 #define BLE_INDICATE_PORT       NRF_P0
 #define BLE_INDICATE(_flag)     DEBUG_PIN_SET(BLE_INDICATE_PIN, BLE_INDICATE_PORT, _flag)
 
 //  -> iBleP_svc_notify()
-#define BLE_NOTIFY_PIN          24
+#define BLE_NOTIFY_PIN          2
 #define BLE_NOTIFY_PORT         NRF_P0
 #define BLE_NOTIFY(_flag)       DEBUG_PIN_SET(BLE_NOTIFY_PIN, BLE_NOTIFY_PORT, _flag)
 
 // Inspired by the State Machine from nRF52840 Datasheet p.252 Figure.35
-#define RADIO_TX_PIN            11
+#define RADIO_TX_PIN            13
 #define RADIO_TX_PORT           NRF_P0
 
-#define RADIO_RX_PIN            12
+#define RADIO_RX_PIN            14
 #define RADIO_RX_PORT           NRF_P0
 
-#define RADIO_RTX_PIN            13
-#define RADIO_RTX_PORT           NRF_P0
+#define RADIO_RTX_PIN           15
+#define RADIO_RTX_PORT          NRF_P0
 
-#define RADIO_CRCOK_PIN         14
+#define RADIO_CRCOK_PIN         16
 #define RADIO_CRCOK_PORT        NRF_P0
 
 #else  // !ENABLE_MEASUREMENT
