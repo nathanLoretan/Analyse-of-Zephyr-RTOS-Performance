@@ -297,6 +297,10 @@ static u8_t _on_notify_rsp(struct bt_conn *conn,
 	uint8_t ref = _get_conn_ref(conn);
 	uint16_t handle = params->ccc_handle;
 
+	if(length <= 0) {
+		return BT_GATT_ITER_CONTINUE;
+	}
+
 	link[ref].attrs[handle].notify_params.data 		= data;
 	link[ref].attrs[handle].notify_params.length 	= length;
 	link[ref].attrs[handle].notify_params.handler(ref, &link[ref].attrs[handle].notify_params);
@@ -310,6 +314,10 @@ static u8_t _on_indicate_rsp(struct bt_conn *conn,
 {
 	uint8_t ref = _get_conn_ref(conn);
 	uint16_t handle = params->ccc_handle;
+
+	if(length <= 0) {
+		return BT_GATT_ITER_CONTINUE;
+	}
 
 	link[ref].attrs[handle].indicate_params.data 		= data;
 	link[ref].attrs[handle].indicate_params.length 	= length;
@@ -333,7 +341,12 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 		link[ref].conn_ref 	= conn;
 		link[ref].isReady 	= false;
-		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t*) * _nbr_handles);
+		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
+		memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
+
+		// iPrint("nbr handles %d\n", _nbr_handles);
+		// iPrint("table %d\n", link[1].attrs - link[0].attrs);
+
 		_nbr_conn++;
 
 		struct bt_conn_info info;
@@ -400,6 +413,13 @@ static struct bt_conn_cb connection_callback =
 int iBleC_init(iBleC_conn_params_t* conn_params)
 {
 	int error;
+
+	for(int i = 0; i < IBLEC_MAX_CONN; i++) {
+		link[i].conn_ref 	= NULL;
+		// memset(link[i].attrs, 0, sizeof(link[i].attrs));
+		link[i].attrs 		= NULL;
+		link[i].isReady		= false;
+	}
 
 	// Save the connection parameters
 	_conn_params.interval_min	= conn_params->interval_min;
@@ -583,6 +603,7 @@ uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
 {
   for(int i = 0; i < _nbr_handles; i++)
   {
+		// iPrint("SVC 0x%04x, 0x%04x \n", i, link[conn].attrs[i].uuid16);
     if(link[conn].attrs[i].type == IBLEC_ATTR_SVC && link[conn].attrs[i].uuid16 == svc_uuid) {
       return i;
      }
@@ -598,7 +619,7 @@ uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16
 
   for(int i = svc_handle; i < _nbr_handles; i++)
   {
-		iPrint("CHRC 0x%04x \n", i);
+		// iPrint("CHRC 0x%04x \n", i);
     if(link[conn].attrs[i].type == IBLEC_ATTR_CHRC && link[conn].attrs[i].uuid16 == chrc_uuid) {
       return i;
     }
@@ -619,7 +640,7 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
   for(int i = chrc_handle; i <= _nbr_handles; i++)
   {
-		iPrint("DESC 0x%04x \n", i);
+		// iPrint("DESC 0x%04x \n", i);
     if(link[conn].attrs[i].type == IBLEC_ATTR_DESC && link[conn].attrs[i].uuid16 == desc_uuid) {
       return i;
     }

@@ -309,7 +309,8 @@ static void _on_connection(ble_gap_evt_t const* gap_evt, ble_gap_conn_params_t c
 
   link[ref].conn_ref = gap_evt->conn_handle;
   link[ref].isReady  = false;
-  link[ref].attrs    = (iBleC_attr_t*) malloc(sizeof(iBleC_attr_t*) * _nbr_handles);
+  link[ref].attrs    = (iBleC_attr_t*) malloc(sizeof(iBleC_attr_t) * _nbr_handles);
+  memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
 
   iPrint("\n-> Peripheral %d connected\n", ref);
   iPrint("--------------------------\n");

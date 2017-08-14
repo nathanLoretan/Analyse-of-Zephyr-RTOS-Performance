@@ -2,7 +2,7 @@
 #define __CENTRAL_CONFIG_H__
 
 // Measurement------------------------------------------------------------------
-#define ENABLE_MEASUREMENT  0
+#define ENABLE_MEASUREMENT  1
 #define POWER_MEASUREMENT   0
 
 // Serial Configuration---------------------------------------------------------
@@ -19,6 +19,10 @@
 #define INTERRUPT_PIN		   39
 #define BTN_FREQ_PIN       11
 #define BTN_SWG            12
+
+// Software interrupt-----------------------------------------------------------
+#define ENABLE_SOFT_INT   1
+#define SOFT_INT_FREQ     1000
 
 // BLE Configuration------------------------------------------------------------
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
