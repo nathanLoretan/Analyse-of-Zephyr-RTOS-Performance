@@ -22,8 +22,8 @@
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_ACC        0
-#define ENABLE_ADC        0
+#define ENABLE_ACC        1
+#define ENABLE_ADC        1
 #define ENABLE_SWG        1
 #define ENABLE_BLE        1
 

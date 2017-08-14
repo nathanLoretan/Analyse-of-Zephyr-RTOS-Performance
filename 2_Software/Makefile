@@ -1,5 +1,5 @@
-# PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
-PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
+PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
+# PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
 
 ifeq ($(sys),baremetal)
 

@@ -294,7 +294,7 @@ int iBleP_init()
 
 	// Configure number of custom UUIDS.
 	memset(&ble_cfg, 0, sizeof(ble_cfg));
-	ble_cfg.common_cfg.vs_uuid_cfg.vs_uuid_count = 20;
+	ble_cfg.common_cfg.vs_uuid_cfg.vs_uuid_count = 1;
 	error = sd_ble_cfg_set(BLE_COMMON_CFG_VS_UUID, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the number of custom UUIDS: error %d\n", error);
@@ -338,7 +338,7 @@ int iBleP_init()
 	// Configure the size of the TX buffer
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                     				= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 230;
+	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 20;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATTS, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the number of handle value notification: error %d\n", error);

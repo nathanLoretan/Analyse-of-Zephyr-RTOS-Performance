@@ -26,20 +26,22 @@ iGpio_t led_connected;
 iGpio_t led_started;
 
 // BLE--------------------------------------------------------------------------
+
+#define UUID_BASE    		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
 #define ACC_SVC     			0x0ACC
 #define ACC_CHRC_DATA   	0x1ACC
 #define ACC_CHRC_CLICK  	0x2ACC
-#define ACC_BASE    			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBleP_svc_t eAcc_svc = {
 	.nbr_attrs = 7,
 	.attrs = {
-	  ADD_SVC_DECL(UUID128(ACC_SVC, ACC_BASE)),
-	  ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, ACC_BASE),
+	  ADD_SVC_DECL(UUID128(ACC_SVC, UUID_BASE)),
+	  ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, UUID_BASE),
 									IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
 									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAcc_sample),
 		ADD_DESC_CCC(),
-    ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, ACC_BASE),
+    ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, UUID_BASE),
 									IBLEP_CHRC_PROPS_NOTIFY,
 									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
 		ADD_DESC_CCC(),
@@ -48,13 +50,12 @@ iBleP_svc_t eAcc_svc = {
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
-#define ADC_BASE   			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBleP_svc_t eAdc_svc = {
 	.nbr_attrs = 4,
 	.attrs = {
-	  ADD_SVC_DECL(UUID128(ADC_SVC, ADC_BASE)),
-	  ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, ADC_BASE),
+	  ADD_SVC_DECL(UUID128(ADC_SVC, UUID_BASE)),
+	  ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, UUID_BASE),
 									IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
 									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAdc_measurement),
 		ADD_DESC_CCC(),
@@ -75,7 +76,7 @@ iBleP_advdata_t scanrsp[] = {
   ADD_ADVDATA_TEXT(IBLEP_ADVDATA_NAME_COMPLETE, IBLEP_DEVICE_NAME),
 };
 
-// Timer-------------------------------------------------------------------
+// Timer------------------------------------------------------------------------
 static iTimer_t eAcc_data_timer;
 ITIMER_HANDLER(on_eAcc_data_timer)
 {
@@ -94,6 +95,61 @@ ITIMER_HANDLER(on_eAdc_data_timer)
 	iEventQueue_add(&eAdc_EventQueue, ADC_EVENT_DATA);
 }
 
+// Button-----------------------------------------------------------------------
+static iGpio_t btn_eAdc_data;
+IGPIO_HANDLER(on_btn_eAdc_data, pin)
+{
+	static bool isEnabled = false;
+
+	if(isEnabled)
+	{
+		iTimer_stop(&eAdc_data_timer);
+		isEnabled = false;
+	}
+	else
+	{
+		iTimer_start(&eAdc_data_timer,  on_eAdc_data_timer,  ADC_DATA_TIMER);
+		isEnabled = true;
+	}
+
+}
+
+static iGpio_t btn_eAcc_data;
+IGPIO_HANDLER(on_btn_eAcc_data, pin)
+{
+	static bool isEnabled = false;
+
+	if(isEnabled)
+	{
+		iTimer_stop(&eAcc_data_timer);
+		isEnabled = false;
+	}
+	else
+	{
+		iTimer_start(&eAcc_data_timer,  on_eAcc_data_timer,  ACC_DATA_TIMER);
+		isEnabled = true;
+	}
+
+}
+
+static iGpio_t btn_eAcc_click;
+IGPIO_HANDLER(on_btn_eAcc_click, pin)
+{
+	static bool isEnabled = false;
+
+	if(isEnabled)
+	{
+		iTimer_stop(&eAcc_click_timer);
+		isEnabled = false;
+	}
+	else
+	{
+		iTimer_start(&eAcc_click_timer, on_eAcc_click_timer, ACC_CLICK_TIMER);
+		isEnabled = true;
+	}
+
+}
+
 // Threads----------------------------------------------------------------------
 ITHREAD_HANDLER(ble)
 {
@@ -107,17 +163,19 @@ ITHREAD_HANDLER(ble)
 			case BLEP_EVENT_CONNECTED:
 			{
 				iGpio_write(&led_connected, 0);
-				iTimer_start(&eAdc_data_timer,  on_eAdc_data_timer,  ADC_DATA_TIMER);
-				iTimer_start(&eAcc_data_timer,  on_eAcc_data_timer,  ACC_DATA_TIMER);
-				iTimer_start(&eAcc_click_timer, on_eAcc_click_timer, ACC_CLICK_TIMER);
+				iGpio_enable_interrupt(&btn_eAdc_data);
+				iGpio_enable_interrupt(&btn_eAcc_data);
+				iGpio_enable_interrupt(&btn_eAcc_click);
+
 			} break;
 
 			case BLEP_EVENT_DISCONNECTED:
 			{
 				iGpio_write(&led_connected, 1);
-				iTimer_stop(&eAdc_data_timer);
-				iTimer_stop(&eAcc_data_timer);
-				iTimer_stop(&eAcc_click_timer);
+				iGpio_disable_interrupt(&btn_eAdc_data);
+				iGpio_disable_interrupt(&btn_eAcc_data);
+				iGpio_disable_interrupt(&btn_eAcc_click);
+
 			} break;
 
 			default:	// NOTHING
@@ -227,4 +285,9 @@ void sys_init()
 
 	iGpio_write(&led_started, 0);
 	iGpio_write(&led_connected, 1);
+
+	iGpio_interrupt_init(&btn_eAdc_data,  BTN_ADC_DATA,  IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_eAdc_data);
+	iGpio_interrupt_init(&btn_eAcc_data,  BTN_ACC_DATA,  IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_eAcc_data);
+	iGpio_interrupt_init(&btn_eAcc_click, BTN_ACC_CLICK, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_eAcc_click);
+
 }

@@ -5,10 +5,14 @@
 #define LED_CONNECTED         18
 #define LED_STARTED           17
 
+#define BTN_ACC_DATA           13
+#define BTN_ACC_CLICK          14
+#define BTN_ADC_DATA           15
+
 // Data rate--------------------------------------------------------------------
-#define ADC_DATA_TIMER		1000
-#define ACC_DATA_TIMER		2000
-#define ACC_CLICK_TIMER		3000
+#define ADC_DATA_TIMER		750
+#define ACC_DATA_TIMER		750
+#define ACC_CLICK_TIMER		750
 
 // BLE Configuration------------------------------------------------------------
 #define ADV_INTERVAL       MSEC_TO_UNITS(50, UNIT_0_625_MS)

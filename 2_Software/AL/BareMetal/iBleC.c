@@ -278,15 +278,14 @@ static void _on_write_rsp(uint16_t conn_handle, ble_gattc_evt_write_rsp_t const*
 
 static void _on_notify_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
 {
-  iPrint("HERE\n");
-
-
   uint8_t ref = _get_conn_ref(conn_handle);
   uint16_t handle = hvx->handle+1;
 
 	link[ref].attrs[handle].notify_params.data 		= hvx->data;
 	link[ref].attrs[handle].notify_params.length 	= hvx->len;
+
 	link[ref].attrs[handle].notify_params.handler(conn_handle, &link[ref].attrs[handle].notify_params);
+
 }
 
 static void _on_indicate_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
@@ -581,6 +580,15 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 		return error;
 	}
 
+  // // Configure number of custom UUIDS.
+	// memset(&ble_cfg, 0, sizeof(ble_cfg));
+	// ble_cfg.common_cfg.vs_uuid_cfg.vs_uuid_count = 1;
+	// error = sd_ble_cfg_set(BLE_COMMON_CFG_VS_UUID, &ble_cfg, ram_start);
+	// if(error) {
+	// 	iPrint("/!\\ fail to configure the number of custom UUIDS: error %d\n", error);
+	// 	return error;
+	// }
+
 	// Configure the maximum number of connections.
 	memset(&ble_cfg, 0, sizeof(ble_cfg));
 	ble_cfg.gap_cfg.role_count_cfg.periph_role_count  = NRF_BLE_CENTRAL_LINK_COUNT;
@@ -695,6 +703,12 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
   _nbr_handles = nbr_handles + 20;
 	_nbr_attr_disc = nbr_attrs;
 	_attr_disc_list = attr_disc_list;
+
+}
+
+int iBleC_get_nbr_connection()
+{
+  return ble_conn_state_n_centrals();
 }
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params)

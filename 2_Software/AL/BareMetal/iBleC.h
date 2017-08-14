@@ -224,6 +224,7 @@ iEventQueue_t bleC_EventQueue;
 int iBleC_init(iBleC_conn_params_t* conn_params);
 int iBleC_scan_start(iBleC_scan_params_t* scan_params);
 void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs);
+int iBleC_get_nbr_connection();
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params);
 int iBleC_write(iBleC_conn_t conn, iBleC_write_params_t* params);

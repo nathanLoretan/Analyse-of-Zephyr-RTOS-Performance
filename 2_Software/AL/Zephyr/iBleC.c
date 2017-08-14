@@ -104,7 +104,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	char complete_local_name_str[complete_local_name.len+1];
 	memset(complete_local_name_str, 0, complete_local_name.len+1);
 	memcpy(complete_local_name_str, complete_local_name.data, complete_local_name.len);
-	iPrint("-> Device found %s\n", complete_local_name_str);
+	// iPrint("-> Device found %s\n", complete_local_name_str);
 
 	// Control the size of the peripheral's name, the \0 is not include in the device's name
 	if(complete_local_name.len != sizeof(IBLE_SEARCHED_DEVICE)-1) {
@@ -457,6 +457,11 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
   _nbr_handles = nbr_handles + 20;
 	_nbr_attr_disc = nbr_attrs;
 	_attr_disc_list = attr_disc_list;
+}
+
+int iBleC_get_nbr_connection()
+{
+  return _nbr_conn;
 }
 
 int iBleC_read(iBleC_conn_t conn, iBleC_read_params_t* params)
