@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>19</zoom_level>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>228</x>
+      <y>817</y>
+      <w>437</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>Wait for IRQ
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLSpecialState</id>
+    <coordinates>
+      <x>418</x>
+      <y>665</y>
+      <w>38</w>
+      <h>38</h>
+    </coordinates>
+    <panel_attributes>type=initial</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>665</y>
+      <w>57</w>
+      <h>190</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>133</x>
+      <y>741</y>
+      <w>342</w>
+      <h>513</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;
+</panel_attributes>
+    <additional_attributes>160.0;200.0;160.0;250.0;10.0;250.0;10.0;10.0;160.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLState</id>
+    <coordinates>
+      <x>266</x>
+      <y>1026</y>
+      <w>342</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>GPIO Toggle
+valign=center
+fontsize=18
+lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>418</x>
+      <y>893</y>
+      <w>152</w>
+      <h>171</h>
+    </coordinates>
+    <panel_attributes>Call ISR
+lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>931</x>
+      <y>437</y>
+      <w>323</w>
+      <h>57</h>
+    </coordinates>
+    <panel_attributes>_:ISR_</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1083</x>
+      <y>475</y>
+      <w>57</w>
+      <h>323</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1482</x>
+      <y>475</y>
+      <w>57</w>
+      <h>323</h>
+    </coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1349</x>
+      <y>437</y>
+      <w>323</w>
+      <h>57</h>
+    </coordinates>
+    <panel_attributes>register GPIO</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>893</x>
+      <y>513</y>
+      <w>247</w>
+      <h>114</h>
+    </coordinates>
+    <panel_attributes>IRQ
+lt=&lt;-</panel_attributes>
+    <additional_attributes>110.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1083</x>
+      <y>589</y>
+      <w>456</w>
+      <h>76</h>
+    </coordinates>
+    <panel_attributes>GPIO Toggle 
+lt=&lt;-</panel_attributes>
+    <additional_attributes>220.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>893</x>
+      <y>627</y>
+      <w>247</w>
+      <h>114</h>
+    </coordinates>
+    <panel_attributes>IRQ
+lt=&lt;-</panel_attributes>
+    <additional_attributes>110.0;40.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>

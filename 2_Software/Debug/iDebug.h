@@ -30,6 +30,10 @@ do {\
 #define EXT_INT_LATENCY_PORT    NRF_P1
 #define EXT_INT_LATENCY()       DEBUG_PIN_TOGGLE(EXT_INT_LATENCY_PIN, EXT_INT_LATENCY_PORT)
 
+#define SOFT_INT_LATENCY_PIN     2
+#define SOFT_INT_LATENCY_PORT    NRF_P1
+#define SOFT_INT_LATENCY()       DEBUG_PIN_TOGGLE(SOFT_INT_LATENCY_PIN, SOFT_INT_LATENCY_PORT)
+
 //  -> iBleP_svc_indication()
 //  -> iBleP_svc_notify()
 #define BLE_ERROR_PIN           27

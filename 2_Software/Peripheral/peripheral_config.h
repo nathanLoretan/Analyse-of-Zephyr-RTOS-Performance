@@ -27,6 +27,10 @@
 #define ENABLE_SWG        1
 #define ENABLE_BLE        1
 
+// Software interrupt-----------------------------------------------------------
+#define ENABLE_SOFT_INT   1
+#define SOFT_INT_FREQ     1000
+
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31

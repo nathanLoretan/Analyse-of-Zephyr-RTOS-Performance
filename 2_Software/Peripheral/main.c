@@ -196,6 +196,15 @@ IGPIO_HANDLER(on_btn_swg, pin)
 }
 #endif  // ENABLE_SWG
 
+// Softtimer latency -----------------------------------------------------------
+#if ENABLE_SOFT_INT
+iTimer_t soft_timer;
+ITIMER_HANDLER(on_soft_timer)
+{
+  SOFT_INT_LATENCY();
+}
+#endif  // ENABLE_SOFT_INT
+
 // Threads----------------------------------------------------------------------
 #if ENABLE_BLE
 DEFINE_ITHREAD(ble_thread, 4096, 0);
@@ -382,11 +391,15 @@ void ble_init()
 }
 #endif	// ENABLE_BLE
 
-#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC || ENABLE_SOFT_INT
 void sys_init()
 {
   iPrint("\nInitialize ExtBoard\n");
   iPrint("-------------------\n");
+
+  #if ENABLE_SOFT_INT
+    iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+  #endif  // ENABLE_SOFT_INT
 
 	#if ENABLE_SWG
 
@@ -431,4 +444,4 @@ void sys_init()
 
 	#endif  // ENABLE_ACC
 }
-#endif	// ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+#endif	// ENABLE_SWG || ENABLE_ADC || ENABLE_ACC || ENABLE_SOFT_INT
