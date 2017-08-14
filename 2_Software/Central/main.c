@@ -126,7 +126,7 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 5:
 			case BLEC_EVENT_READY_BASE + 6:
 			case BLEC_EVENT_READY_BASE + 7:
-		  {
+		  {      
 				iBleC_notify_params_t notify_params;
 				notify_params.handler				= on_adc_data;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA);
