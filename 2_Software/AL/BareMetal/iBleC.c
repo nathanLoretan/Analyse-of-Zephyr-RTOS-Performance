@@ -1,4 +1,5 @@
 #include "iBleC.h"
+#include "nrf_mtx.h"
 
 // iTimer element only used by the system
 extern void iTimer_init();
@@ -18,6 +19,7 @@ static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
+volatile static nrf_mtx_t	 	_subscribe_mutex;
 
 static ble_uuid_t uuid = {0};
 
@@ -268,12 +270,17 @@ static void _on_read_rsp(uint16_t conn_handle, ble_gattc_evt_read_rsp_t const* r
 
 static void _on_write_rsp(uint16_t conn_handle, ble_gattc_evt_write_rsp_t const* write_rsp)
 {
+  nrf_mtx_unlock(&_subscribe_mutex);
+
   uint8_t ref = _get_conn_ref(conn_handle);
 	uint16_t handle = write_rsp->handle;
 
-	// link[conn_handle].attrs[handle].write_params.data    = write_rsp->data;
-	// link[conn_handle].attrs[handle].write_params.length  = write_rsp->len;
-	link[ref].attrs[handle].write_params.handler(conn_handle, &link[ref].attrs[handle].write_params);
+  if(link[ref].attrs[handle].type != IBLEC_ATTR_DESC)
+  {
+  	// link[conn_handle].attrs[handle].write_params.data    = write_rsp->data;
+  	// link[conn_handle].attrs[handle].write_params.length  = write_rsp->len;
+  	link[ref].attrs[handle].write_params.handler(conn_handle, &link[ref].attrs[handle].write_params);
+  }
 }
 
 static void _on_notify_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
@@ -283,9 +290,7 @@ static void _on_notify_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
 
 	link[ref].attrs[handle].notify_params.data 		= hvx->data;
 	link[ref].attrs[handle].notify_params.length 	= hvx->len;
-
 	link[ref].attrs[handle].notify_params.handler(conn_handle, &link[ref].attrs[handle].notify_params);
-
 }
 
 static void _on_indicate_rsp(uint16_t conn_handle, ble_gattc_evt_hvx_t const* hvx)
@@ -651,6 +656,7 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
   // sets all states to their default, removing all records of connection handles.
 	ble_conn_state_init();
 
+  nrf_mtx_init(&_subscribe_mutex);
 	iEventQueue_init(&bleC_EventQueue);
 
 	iPrint("[INIT] Bluetooth initialized\n");
@@ -751,8 +757,12 @@ int iBleC_subscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
 {
   int error;
 
+  while(!nrf_mtx_trylock(&_subscribe_mutex)) {
+      iSleep();
+  }
+
   params->isEnabled = CCC_NOTIFY;
-  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_REQ;
   params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
   params->subscribe_params.handle    = params->ccc_handle;
   params->subscribe_params.offset    = 0;
@@ -762,7 +772,7 @@ int iBleC_subscribe_notify(iBleC_conn_t conn, iBleC_notify_params_t* params)
 
   error = sd_ble_gattc_write(conn, &link[conn].attrs[params->ccc_handle].notify_params.subscribe_params);
   if(error) {
-    iPrint("/!\\ Notify request failed: error %d\n", error);
+    iPrint("/!\\ Notify subscribe 0x%04x failed: error 0x%04x\n", params->ccc_handle, error);
     return error;
   }
 
@@ -773,8 +783,12 @@ int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
 {
   int error;
 
+  while(!nrf_mtx_trylock(&_subscribe_mutex)) {
+      iSleep();
+  }
+
   params->isEnabled = CCC_INDICATE;
-  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_CMD;
+  params->subscribe_params.write_op  = BLE_GATT_OP_WRITE_REQ;
   params->subscribe_params.flags     = BLE_GATT_EXEC_WRITE_FLAG_PREPARED_WRITE;
   params->subscribe_params.handle    = params->ccc_handle;
   params->subscribe_params.offset    = 0;
@@ -784,7 +798,7 @@ int iBleC_subscribe_indicate(iBleC_conn_t conn, iBleC_indicate_params_t* params)
 
   error = sd_ble_gattc_write(conn, &link[conn].attrs[params->ccc_handle].indicate_params.subscribe_params);
 	if(error) {
-		iPrint("/!\\ Indicate request failed: error %d\n", error);
+		iPrint("/!\\ Indicate subscribe 0x%04x failed: error 0x%04x\n", params->ccc_handle, error);
 		return error;
 	}
 
