@@ -69,9 +69,6 @@ SRC_FILES += \
 	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
 	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \
 	$(PROJECT_BASE)/Debug/iDebug.c \
-	$(PROJECT_BASE)/Drivers/acc.c \
-	$(PROJECT_BASE)/Drivers/adc.c \
-	$(PROJECT_BASE)/Drivers/swg.c \
 	$(PROJECT_BASE)/Measurement/main.c
 
 # Include folders common to all targets

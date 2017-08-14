@@ -53,23 +53,69 @@ typedef enum {
 
 iEventQueue_t swg_EventQueue;
 
-// iTimer_t newInterval_timer;
-// ITIMER_HANDLER(on_newInterval)
-// {
-//   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
-// }
-
-iGpio_t btn_freq;
-IGPIO_HANDLER(on_btn_freq, pin)
-{
-  iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
-}
-
 iGpio_t interrupt;
 IGPIO_HANDLER(on_interrupt, pin)
 {
   EXT_INT_LATENCY();
 }
+
+// Button-----------------------------------------------------------------------
+
+int debouncer_ms = 200;
+bool btn_swg_debouncer  = false;
+bool btn_freq_debouncer = false;
+
+static iTimer_t debouncer_timer;
+ITIMER_HANDLER(on_debouncer_timer)
+{
+	btn_swg_debouncer  = false;
+  btn_freq_debouncer = false;
+	iTimer_stop(&debouncer_timer);
+}
+
+iGpio_t btn_freq;
+IGPIO_HANDLER(on_btn_freq, pin)
+{
+  if(btn_freq_debouncer)
+    return;
+
+  iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
+
+  btn_freq_debouncer = true;
+  iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+
+}
+
+static iGpio_t btn_swg;
+IGPIO_HANDLER(on_btn_swg, pin)
+{
+	static bool isEnabled = false;
+
+	if(btn_swg_debouncer)
+		return;
+
+	if(isEnabled)
+	{
+		iPrint("-> SWG disabled\n");
+    swg_sleep();
+    iGpio_disable_interrupt(&interrupt);
+    iGpio_disable_interrupt(&btn_freq);
+		isEnabled = false;
+	}
+	else
+	{
+		iPrint("-> SWG enabled\n");
+    swg_wakeup();
+    iGpio_enable_interrupt(&interrupt);
+    iGpio_enable_interrupt(&btn_freq);
+		isEnabled = true;
+	}
+
+	btn_swg_debouncer = true;
+	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+
+}
+
 #endif  // ENABLE_SWG
 
 // -----------------------------------------------------------------------------
@@ -110,11 +156,11 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_CONNECTED_BASE + 6:
 			case BLEC_EVENT_CONNECTED_BASE + 7:
 		  {
-        #if ENABLE_SWG
-          swg_wakeup();
-          iGpio_enable_interrupt(&interrupt);
-        	iGpio_enable_interrupt(&btn_freq);
-        #endif  // ENABLE_SWG
+        // #if ENABLE_SWG
+        //   swg_wakeup();
+        //   iGpio_enable_interrupt(&interrupt);
+        // 	iGpio_enable_interrupt(&btn_freq);
+        // #endif  // ENABLE_SWG
 
 		  } break;
 
@@ -127,16 +173,28 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 6:
 			case BLEC_EVENT_READY_BASE + 7:
       {
+        iPrint("%d, value Handle 0x%04x, cccd Handle 0x%04x\n", ble_event - BLEC_EVENT_READY_BASE,
+                                                                iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA),
+                                                                iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902));
+
 				iBleC_notify_params_t notify_params;
 				notify_params.handler				= on_adc_data;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA);
 				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902);
 				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
 
+        iPrint("%d, value Handle 0x%04x, cccd Handle 0x%04x\n", ble_event - BLEC_EVENT_READY_BASE,
+                                                                iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA),
+                                                                iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902));
+
 				notify_params.handler				= on_acc_data;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA);
 				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902);
 				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
+
+        iPrint("%d, value Handle 0x%04x, cccd Handle 0x%04x\n", ble_event - BLEC_EVENT_READY_BASE,
+                                                                iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK),
+                                                                iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK, 0x2902));
 
 				notify_params.handler				= on_acc_click;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK);
@@ -154,14 +212,14 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_DISCONNECTED_BASE + 6:
 			case BLEC_EVENT_DISCONNECTED_BASE + 7:
 		  {
-        if(!iBleC_get_nbr_connection())
-        {
-          #if ENABLE_SWG
-            swg_sleep();
-            iGpio_disable_interrupt(&interrupt);
-            iGpio_disable_interrupt(&btn_freq);
-          #endif// ENABLE_SWG
-        }
+        // if(!iBleC_get_nbr_connection())
+        // {
+        //   #if ENABLE_SWG
+        //     swg_sleep();
+        //     iGpio_disable_interrupt(&interrupt);
+        //     iGpio_disable_interrupt(&btn_freq);
+        //   #endif// ENABLE_SWG
+        // }
 
 		  } break;
 
@@ -259,8 +317,8 @@ void sys_init()
 	iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
 	iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
 
-	// #if !ENABLE_BLE && !POWER_MEASUREMENT
-	// 	iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
-	// #endif	// !ENABLE_BLE && !POWER_MEASUREMENT
+  iGpio_interrupt_init(&btn_swg, BTN_SWG, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_bnt_swg);
+  iGpio_enable_interrupt(&btn_swg);
+
 }
 #endif  // ENABLE_SWG

@@ -52,6 +52,7 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              0             // [Hz]
+// #define INTERVAL                  1000          // [ms]
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]

@@ -6,7 +6,6 @@ SOURCE_DIR 		= 	$(PROJ_DIR)
 BOARD					?= 	nrf52840_pca10056
 CONF_FILE 		= 	$(PROJECT_BASE)/Environment/Measurement/Zephyr/zephyr.config
 
-obj-y += Drivers/
 obj-y += Debug/
 obj-y += AL/Zephyr/
 obj-y += Measurement/

@@ -18,6 +18,7 @@
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
 #define BTN_FREQ_PIN       11
+#define BTN_SWG            12
 
 // BLE Configuration------------------------------------------------------------
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)

@@ -588,23 +588,23 @@ uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
      }
   }
 
+	iPrint("SVC 0x%04x not found\n", svc_uuid);
   return 0xFFFF;
 }
 
 uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
 {
-  for(int i = 0; i < _nbr_handles; i++)
+	uint16_t svc_handle = iBleC_get_svc_handle(conn, svc_uuid);
+
+  for(int i = svc_handle; i < _nbr_handles; i++)
   {
-    if(link[conn].attrs[i].type == IBLEC_ATTR_SVC && link[conn].attrs[i].uuid16 == svc_uuid)
-    {
-      for(int y = i; y < _nbr_handles; y++)
-      {
-        if(link[conn].attrs[y].type == IBLEC_ATTR_CHRC && link[conn].attrs[y].uuid16 == chrc_uuid) {
-          return y;
-        }
-      }
+		iPrint("CHRC 0x%04x \n", i);
+    if(link[conn].attrs[i].type == IBLEC_ATTR_CHRC && link[conn].attrs[i].uuid16 == chrc_uuid) {
+      return i;
     }
   }
+
+	iPrint("CHRC 0x%04x not found\n", chrc_uuid);
   return 0xFFFF;
 }
 
@@ -619,11 +619,13 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
   for(int i = chrc_handle; i <= _nbr_handles; i++)
   {
+		iPrint("DESC 0x%04x \n", i);
     if(link[conn].attrs[i].type == IBLEC_ATTR_DESC && link[conn].attrs[i].uuid16 == desc_uuid) {
       return i;
     }
   }
 
+	iPrint("DESC 0x%04x not found\n", desc_uuid);
   return 0xFFFF;
 }
 

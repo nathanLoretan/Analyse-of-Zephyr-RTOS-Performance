@@ -131,19 +131,6 @@ static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_e
 
 static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* write)
 {
-	// uint8_t reset = 0;
-	// ble_gatts_value_t value = {
-	// 	.len			= sizeof(reset),
-	// 	.offset		= 0,
-	// 	.p_value	= (uint8_t*) &reset,
-	// };
-	//
-	// sd_ble_gatts_value_set(conn, chrc->handles.ccc_handle, &value);
-	//
-	// if(write->handle = )
-
-	iPrint("Write Handle 0x%04x\n", write->handle);
-
 	write_handler_list_t** next_write_handler = &_write_handler_list;
 
 	// Browse all the elements of the list
@@ -158,8 +145,6 @@ static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* wri
 
 static void _on_ble_evt(ble_evt_t* ble_evt)
 {
-	iPrint("Evt id 0x%04x\n", ble_evt->header.evt_id);
-
 	switch(ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
