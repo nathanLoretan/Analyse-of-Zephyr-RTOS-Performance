@@ -3,6 +3,7 @@
 
 #define DEBUG_START()           do{}while(0)
 #define EXT_INT_LATENCY()       do{}while(0)
+#define SOFT_INT_LATENCY()      do{}while(0)
 #define BLE_ERROR(_flag)        do{}while(0)
 #define BLE_INDICATE(_flag)     do{}while(0)
 #define BLE_NOTIFY(_flag)       do{}while(0)

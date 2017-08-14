@@ -214,6 +214,10 @@ ITHREAD_HANDLER(ble)
 				iGpio_disable_interrupt(&btn_eAcc_data);
 				iGpio_disable_interrupt(&btn_eAcc_click);
 
+				iTimer_stop(&eAdc_data_timer);
+				iTimer_stop(&eAcc_data_timer);
+				iTimer_stop(&eAcc_click_timer);
+
 			} break;
 
 			default:	// NOTHING
