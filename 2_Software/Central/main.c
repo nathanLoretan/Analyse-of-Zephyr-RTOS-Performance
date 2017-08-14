@@ -1,4 +1,5 @@
 #include "../configuration.h"
+#include "../Drivers/swg.h"
 
 typedef struct {
     uint16_t x;
@@ -23,23 +24,23 @@ iBleC_conn_params_t conn_params = {
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
-#define ADC_BASE    		0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 #define ACC_SVC     		0x0ACC
 #define ACC_CHRC_DATA   0x1ACC
 #define ACC_CHRC_CLICK  0x2ACC
-#define ACC_BASE    	 	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
+#define UUID_BASE    		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 iBleC_attr_disc_t attr_disc_list[] =
 {
-	ADD_SVC_TO_DISCOVER_UUID128(ACC_SVC, ACC_BASE),
-	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_DATA, ACC_BASE),
+	ADD_SVC_TO_DISCOVER_UUID128(ACC_SVC, UUID_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_DATA, UUID_BASE),
 	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
-	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_CLICK, ACC_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(ACC_CHRC_CLICK, UUID_BASE),
 	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
 
-	ADD_SVC_TO_DISCOVER_UUID128(ADC_SVC, ADC_BASE),
-	ADD_CHRC_TO_DISCOVER_UUID128(ADC_CHRC_DATA, ADC_BASE),
+	ADD_SVC_TO_DISCOVER_UUID128(ADC_SVC, UUID_BASE),
+	ADD_CHRC_TO_DISCOVER_UUID128(ADC_CHRC_DATA, UUID_BASE),
 	ADD_DESC_TO_DISCOVER_UUID16(0x2902),
 };
 
@@ -109,6 +110,11 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_CONNECTED_BASE + 6:
 			case BLEC_EVENT_CONNECTED_BASE + 7:
 		  {
+        #if ENABLE_SWG
+          swg_wakeup();
+          iGpio_enable_interrupt(&interrupt);
+        	iGpio_enable_interrupt(&btn_freq);
+        #endif  // ENABLE_SWG
 
 		  } break;
 
@@ -122,20 +128,20 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 7:
 		  {
 				iBleC_notify_params_t notify_params;
-				// notify_params.handler				= on_adc_data;
-				// notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA);
-				// notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902);
-				// iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
-				//
+				notify_params.handler				= on_adc_data;
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902);
+				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
+
 				notify_params.handler				= on_acc_data;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA);
 				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902);
 				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
-				//
-				// notify_params.handler				= on_acc_click;
-				// notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK);
-				// notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
-				// iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
+
+				notify_params.handler				= on_acc_click;
+				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK);
+				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK, 0x2902);
+				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
 
 		  } break;
 
@@ -148,6 +154,14 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_DISCONNECTED_BASE + 6:
 			case BLEC_EVENT_DISCONNECTED_BASE + 7:
 		  {
+        if(!iBleC_get_nbr_connection())
+        {
+          #if ENABLE_SWG
+            swg_sleep();
+            iGpio_disable_interrupt(&interrupt);
+            iGpio_disable_interrupt(&btn_freq);
+          #endif// ENABLE_SWG
+        }
 
 		  } break;
 
@@ -235,19 +249,15 @@ void sys_init()
 	iPrint("-------------------\n");
 
 	iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);
-	swg_init(EXT_INT_FREQ);
-	iEventQueue_init(&swg_EventQueue);
+
+  swg_init(EXT_INT_FREQ);
+  swg_sleep();
+
+  iEventQueue_init(&swg_EventQueue);
 	iThread_run(&swg_thread, swg);
 
 	iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
-	iGpio_enable_interrupt(&interrupt);
-
 	iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
-	iGpio_enable_interrupt(&btn_freq);
-
-	#if ENABLE_BLE
-		swg_sleep();
-	#endif	// !ENABLE_BLE
 
 	// #if !ENABLE_BLE && !POWER_MEASUREMENT
 	// 	iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);

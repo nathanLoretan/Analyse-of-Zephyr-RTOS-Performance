@@ -35,6 +35,6 @@
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
-#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
+#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
 
 #endif  // __CENTRAL_CONFIG_H__

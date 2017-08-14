@@ -5,22 +5,24 @@
 
 // BLE--------------------------------------------------------------------------
 #if ENABLE_BLE
+
+#define UUID_BASE    		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE0, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+
 #define ACC_SVC     			0x0ACC
 #define ACC_CHRC_DATA   	0x1ACC
 #define ACC_CHRC_CLICK  	0x2ACC
-#define ACC_BASE    			0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE1, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 uint8_t click = 0;
 acc_sample_t sample;
 iBleP_svc_t acc_svc = {
   .nbr_attrs = 7,
   .attrs = {
-    ADD_SVC_DECL(UUID128(ACC_SVC, ACC_BASE)),
-    ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, ACC_BASE),
+    ADD_SVC_DECL(UUID128(ACC_SVC, UUID_BASE)),
+    ADD_CHRC_DECL(UUID128(ACC_CHRC_DATA, UUID_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
                   IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &sample),
     ADD_DESC_CCC(),
-    ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, ACC_BASE),
+    ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, UUID_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
                   IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
     ADD_DESC_CCC(),
@@ -29,14 +31,13 @@ iBleP_svc_t acc_svc = {
 
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
-#define ADC_BASE   			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xE2, 0xB1, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 
 uint32_t adc_measurement;
 iBleP_svc_t adc_svc = {
   .nbr_attrs = 4,
   .attrs = {
-    ADD_SVC_DECL(UUID128(ADC_SVC, ADC_BASE)),
-    ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, ADC_BASE),
+    ADD_SVC_DECL(UUID128(ADC_SVC, UUID_BASE)),
+    ADD_CHRC_DECL(UUID128(ADC_CHRC_DATA, UUID_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
                   IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &adc_measurement),
     ADD_DESC_CCC(),
@@ -103,6 +104,7 @@ ITHREAD_HANDLER(ble)
 				#if ENABLE_SWG
 					swg_wakeup();
 					iGpio_enable_interrupt(&interrupt);
+          iGpio_enable_interrupt(&btn_freq);
 					// iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
 				#endif	// ENABLE_SWG
 
@@ -121,6 +123,7 @@ ITHREAD_HANDLER(ble)
 				#if ENABLE_SWG
 					swg_sleep();
 					iGpio_disable_interrupt(&interrupt);
+          iGpio_disable_interrupt(&btn_freq);
 					// iTimer_stop(&newInterval_timer);
 				#endif	// ENABLE_SWG
 
@@ -194,7 +197,7 @@ ITHREAD_HANDLER(acc)
 		    acc_getXYZ(&sample, 1);
 
 				#if ENABLE_BLE
-					iBleP_svc_notify(&acc_svc, 1, (uint8_t*) &sample, sizeof(sample));
+					iBleP_svc_notify(&acc_svc.attrs[1], (uint8_t*) &sample, sizeof(sample));
 				#endif	// ENABLE_BLE
 
 				// iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
@@ -205,7 +208,7 @@ ITHREAD_HANDLER(acc)
     	{
 				#if ENABLE_BLE
 					click++;
-					iBleP_svc_notify(&acc_svc, 4, (uint8_t*) &click, sizeof(click));
+					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &click, sizeof(click));
 				#endif	// ENABLE_BLE
 
 				// iPrint("Click\n");
@@ -239,7 +242,7 @@ ITHREAD_HANDLER(adc)
 				adc_getMeasurement(&adc_measurement);
 
 				#if ENABLE_BLE
-				iBleP_svc_notify(&adc_svc, 1, (uint8_t*) &adc_measurement, sizeof(adc_measurement));
+				iBleP_svc_notify(&adc_svc.attrs[1], (uint8_t*) &adc_measurement, sizeof(adc_measurement));
 				#endif	// ENABLE_BLE
 
 				// iPrint("Measurement: %u[uV]\n", adc_measurement);
@@ -310,18 +313,18 @@ void sys_init()
 		iThread_run(&swg_thread, swg);
 
 		iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
-		iGpio_enable_interrupt(&interrupt);
-
     iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
-    iGpio_enable_interrupt(&btn_freq);
 
 		#if ENABLE_BLE
 			swg_sleep();
-		#endif	// !ENABLE_BLE
+    #else // !ENABLE_BLE
+      iGpio_enable_interrupt(&interrupt);
+      iGpio_enable_interrupt(&btn_freq);
+		#endif	// ENABLE_BLE
 
-		// #if !ENABLE_BLE && !POWER_MEASUREMENT
-		// 	iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
-		// #endif	// !ENABLE_BLE && !POWER_MEASUREMENT
+		#if !ENABLE_BLE && !POWER_MEASUREMENT
+    	// iTimer_start(&newInterval_timer, on_newInterval, INTERVAL);
+		#endif	// !ENABLE_BLE && !POWER_MEASUREMENT
 
 	#endif  // ENABLE_SWG
 
