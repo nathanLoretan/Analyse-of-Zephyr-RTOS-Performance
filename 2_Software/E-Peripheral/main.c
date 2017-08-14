@@ -42,8 +42,8 @@ iBleP_svc_t eAcc_svc = {
 									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAcc_sample),
 		ADD_DESC_CCC(),
     ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, UUID_BASE),
-									IBLEP_CHRC_PROPS_NOTIFY,
-									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
+									IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
+									IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &eAcc_click),
 		ADD_DESC_CCC(),
   },
 };
@@ -96,21 +96,43 @@ ITIMER_HANDLER(on_eAdc_data_timer)
 }
 
 // Button-----------------------------------------------------------------------
+int debouncer_ms = 200;
+bool btn_eAdc_data_debouncer = false;
+bool btn_eAcc_data_debouncer = false;
+bool btn_eAcc_click_debouncer = false;
+
+static iTimer_t debouncer_timer;
+ITIMER_HANDLER(on_debouncer_timer)
+{
+	btn_eAdc_data_debouncer = false;
+	btn_eAcc_data_debouncer = false;
+	btn_eAcc_click_debouncer = false;
+	iTimer_stop(&debouncer_timer);
+}
+
 static iGpio_t btn_eAdc_data;
 IGPIO_HANDLER(on_btn_eAdc_data, pin)
 {
 	static bool isEnabled = false;
 
+	if(btn_eAdc_data_debouncer)
+		return;
+
 	if(isEnabled)
 	{
+		iPrint("-> ADC DATA notification disabled\n");
 		iTimer_stop(&eAdc_data_timer);
 		isEnabled = false;
 	}
 	else
 	{
+		iPrint("-> ADC DATA notification enabled\n");
 		iTimer_start(&eAdc_data_timer,  on_eAdc_data_timer,  ADC_DATA_TIMER);
 		isEnabled = true;
 	}
+
+	btn_eAdc_data_debouncer = true;
+	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
 
 }
 
@@ -119,16 +141,24 @@ IGPIO_HANDLER(on_btn_eAcc_data, pin)
 {
 	static bool isEnabled = false;
 
+	if(btn_eAcc_data_debouncer)
+		return;
+
 	if(isEnabled)
 	{
+		iPrint("-> ACC DATA notification disabled\n");
 		iTimer_stop(&eAcc_data_timer);
 		isEnabled = false;
 	}
 	else
 	{
+		iPrint("-> ACC DATA notification enabled\n");
 		iTimer_start(&eAcc_data_timer,  on_eAcc_data_timer,  ACC_DATA_TIMER);
 		isEnabled = true;
 	}
+
+	btn_eAcc_data_debouncer = true;
+	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
 
 }
 
@@ -137,16 +167,24 @@ IGPIO_HANDLER(on_btn_eAcc_click, pin)
 {
 	static bool isEnabled = false;
 
+	if(btn_eAcc_click_debouncer)
+		return;
+
 	if(isEnabled)
 	{
+		iPrint("-> ACC CLICK notification disabled\n");
 		iTimer_stop(&eAcc_click_timer);
 		isEnabled = false;
 	}
 	else
 	{
+		iPrint("-> ACC CLICK notification enabled\n");
 		iTimer_start(&eAcc_click_timer, on_eAcc_click_timer, ACC_CLICK_TIMER);
 		isEnabled = true;
 	}
+
+	btn_eAcc_click_debouncer = true;
+	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
 
 }
 

@@ -119,6 +119,11 @@ typedef struct {
 } iBleP_chrc_decl_t;
 
 typedef struct {
+	ble_gatts_hvx_params_t hvx_params;
+	uint16_t buf_length;
+} iBleP_chrc_val_t;
+
+typedef struct {
 	ble_gatts_attr_md_t	ccc;
 } iBleP_ccc_desc_t;
 
@@ -126,6 +131,7 @@ typedef struct {
 	union {
 		iBleP_svc_decl_t	svc;
 		iBleP_chrc_decl_t	chrc;
+		iBleP_chrc_val_t	chrc_val;
 		iBleP_ccc_desc_t	cccd;
 	};
 	iBleP_attr_type_t	type;

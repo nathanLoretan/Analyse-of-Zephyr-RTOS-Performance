@@ -12,8 +12,10 @@
 #define ACC_CHRC_DATA   	0x1ACC
 #define ACC_CHRC_CLICK  	0x2ACC
 
-uint8_t click = 0;
-acc_sample_t sample;
+acc_sample_t  sample = {0};
+uint8_t       acc_click = 0;
+uint32_t      adc_measurement = 0;
+
 iBleP_svc_t acc_svc = {
   .nbr_attrs = 7,
   .attrs = {
@@ -24,7 +26,7 @@ iBleP_svc_t acc_svc = {
     ADD_DESC_CCC(),
     ADD_CHRC_DECL(UUID128(ACC_CHRC_CLICK, UUID_BASE),
                   IBLEP_CHRC_PROPS_READ | IBLEP_CHRC_PROPS_NOTIFY,
-                  IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, NULL),
+                  IBLEP_ATTR_PERM_READ | IBLEP_ATTR_PERM_WRITE, NULL, &acc_click),
     ADD_DESC_CCC(),
   },
 };
@@ -32,7 +34,6 @@ iBleP_svc_t acc_svc = {
 #define ADC_SVC     		0x0ADC
 #define ADC_CHRC_DATA   0x1ADC
 
-uint32_t adc_measurement;
 iBleP_svc_t adc_svc = {
   .nbr_attrs = 4,
   .attrs = {
@@ -182,7 +183,7 @@ ITHREAD_HANDLER(acc)
 {
 	#if !ENABLE_BLE
 		static acc_sample_t sample;
-		static uint8_t click = 0;
+		static uint8_t acc_click = 0;
 	#endif	// !ENABLE_BLE
 
   while(1)
@@ -207,8 +208,8 @@ ITHREAD_HANDLER(acc)
     	case ACC_EVENT_INT2: // Click
     	{
 				#if ENABLE_BLE
-					click++;
-					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &click, sizeof(click));
+					acc_click++;
+					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &acc_click, sizeof(acc_click));
 				#endif	// ENABLE_BLE
 
 				// iPrint("Click\n");

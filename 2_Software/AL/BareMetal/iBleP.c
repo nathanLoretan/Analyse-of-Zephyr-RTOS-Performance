@@ -131,6 +131,19 @@ static void _on_gatts_exchange_mtu_request(uint16_t conn_handle, ble_gatts_evt_e
 
 static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* write)
 {
+	// uint8_t reset = 0;
+	// ble_gatts_value_t value = {
+	// 	.len			= sizeof(reset),
+	// 	.offset		= 0,
+	// 	.p_value	= (uint8_t*) &reset,
+	// };
+	//
+	// sd_ble_gatts_value_set(conn, chrc->handles.ccc_handle, &value);
+	//
+	// if(write->handle = )
+
+	iPrint("Write Handle 0x%04x\n", write->handle);
+
 	write_handler_list_t** next_write_handler = &_write_handler_list;
 
 	// Browse all the elements of the list
@@ -145,7 +158,9 @@ static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* wri
 
 static void _on_ble_evt(ble_evt_t* ble_evt)
 {
-	switch (ble_evt->header.evt_id)
+	iPrint("Evt id 0x%04x\n", ble_evt->header.evt_id);
+
+	switch(ble_evt->header.evt_id)
 	{
 		case BLE_GAP_EVT_CONNECTED:
 		{
@@ -605,6 +620,8 @@ static uint32_t _char_add(iBleP_svc_decl_t* svc, iBleP_chrc_decl_t* chrc,
 		(*next_write_handler)->next 	  = NULL;
 	}
 
+	iPrint("[INIT] CHRC 0x%04x, Handle 0x%04x initialized\n", chrc->uuid.uuid.uuid, chrc->handles.value_handle);
+
 	return 0;
 }
 
@@ -648,28 +665,31 @@ int iBleP_svc_init(iBleP_svc_t* svc)
 		}
 	}
 
-	iPrint("[INIT] Service 0x%04x initialized\n", svc->attrs[0].svc.uuid.uuid.uuid);
+	iPrint("[INIT] SVC  0x%04x, Handle 0x%04x initialized\n", svc->attrs[0].svc.uuid.uuid.uuid, svc->attrs[0].svc.handle);
 	return 0;
 }
 
 int iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 {
 	int error;
-	ble_gatts_hvx_params_t hvx_params = {0};
+	ble_gatts_hvx_params_t* hvx_params = &(attr+1)->chrc_val.hvx_params;
 
-	hvx_params.handle = attr->chrc.handles.value_handle;
-	hvx_params.type   = BLE_GATT_HVX_NOTIFICATION;
-	hvx_params.offset = 0;
-	hvx_params.p_len  = (uint16_t*) &buf_length;
-	hvx_params.p_data = buf;
+	(attr+1)->chrc_val.buf_length = buf_length;
+
+	hvx_params->handle = attr->chrc.handles.value_handle;
+	hvx_params->type   = BLE_GATT_HVX_NOTIFICATION;
+	hvx_params->offset = 0;
+	hvx_params->p_len  = &(attr+1)->chrc_val.buf_length;
+	hvx_params->p_data = (uint8_t*) buf;
 
 	BLE_ERROR(0);
 
 	BLE_NOTIFY(1);
-	error = sd_ble_gatts_hvx(_conn_ref, &hvx_params);
+	error = sd_ble_gatts_hvx(_conn_ref, hvx_params);
 	BLE_NOTIFY(0);
 
 	if(error) {
+		iPrint("/!\\ Notification failed: error 0x%04x\n", error);
 		BLE_ERROR(1);
 	}
 
@@ -679,21 +699,22 @@ int iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 {
 	int error;
-	ble_gatts_hvx_params_t hvx_params = {0};
+	ble_gatts_hvx_params_t* hvx_params = &(attr+1)->chrc_val.hvx_params;
 
-	hvx_params.handle = attr->chrc.handles.value_handle;
-	hvx_params.type   = BLE_GATT_HVX_INDICATION;
-	hvx_params.offset = 0;
-	hvx_params.p_len  = (uint16_t*) &buf_length;
-	hvx_params.p_data = buf;
+	hvx_params->handle = attr->chrc.handles.value_handle;
+	hvx_params->type   = BLE_GATT_HVX_INDICATION;
+	hvx_params->offset = 0;
+	hvx_params->p_len  = &(attr+1)->chrc_val.buf_length;
+	hvx_params->p_data = buf;
 
 	BLE_ERROR(0);
 
 	BLE_INDICATE(1);
-	error = sd_ble_gatts_hvx(_conn_ref, &hvx_params);
+	error = sd_ble_gatts_hvx(_conn_ref, hvx_params);
 	BLE_INDICATE(0);
 
 	if(error) {
+		iPrint("/!\\ Indication failed: error 0x%04x\n", error);
 		BLE_ERROR(1);
 	}
 
