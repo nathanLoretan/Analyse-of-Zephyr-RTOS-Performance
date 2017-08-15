@@ -222,7 +222,11 @@ ITHREAD_HANDLER(ble)
 
 			case BLEP_EVENT_DISCONNECTED:
 			{
-
+        acc_sleep();
+        adc_sleep();
+        swg_sleep();
+        iGpio_disable_interrupt(&interrupt);
+        iGpio_disable_interrupt(&btn_freq);
 			} break;
 
 			default: // NOTHING
