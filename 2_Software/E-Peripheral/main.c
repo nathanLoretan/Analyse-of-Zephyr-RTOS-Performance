@@ -127,12 +127,12 @@ IGPIO_HANDLER(on_btn_eAdc_data, pin)
 	else
 	{
 		iPrint("-> ADC DATA notification enabled\n");
-		iTimer_start(&eAdc_data_timer,  on_eAdc_data_timer,  ADC_DATA_TIMER);
+		iTimer_start(&eAdc_data_timer, ADC_DATA_TIMER);
 		isEnabled = true;
 	}
 
 	btn_eAdc_data_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 
@@ -153,13 +153,12 @@ IGPIO_HANDLER(on_btn_eAcc_data, pin)
 	else
 	{
 		iPrint("-> ACC DATA notification enabled\n");
-		iTimer_start(&eAcc_data_timer,  on_eAcc_data_timer,  ACC_DATA_TIMER);
+		iTimer_start(&eAcc_data_timer, ACC_DATA_TIMER);
 		isEnabled = true;
 	}
 
 	btn_eAcc_data_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
-
+	iTimer_start(&debouncer_timer, debouncer_ms);
 }
 
 static iGpio_t btn_eAcc_click;
@@ -179,13 +178,12 @@ IGPIO_HANDLER(on_btn_eAcc_click, pin)
 	else
 	{
 		iPrint("-> ACC CLICK notification enabled\n");
-		iTimer_start(&eAcc_click_timer, on_eAcc_click_timer, ACC_CLICK_TIMER);
+		iTimer_start(&eAcc_click_timer, ACC_CLICK_TIMER);
 		isEnabled = true;
 	}
 
 	btn_eAcc_click_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
-
+	iTimer_start(&debouncer_timer, debouncer_ms);
 }
 
 // Threads----------------------------------------------------------------------
@@ -332,4 +330,8 @@ void sys_init()
 	iGpio_interrupt_init(&btn_eAcc_data,  BTN_ACC_DATA,  IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_eAcc_data);
 	iGpio_interrupt_init(&btn_eAcc_click, BTN_ACC_CLICK, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_eAcc_click);
 
+	iTimer_init(&eAdc_data_timer,  on_eAdc_data_timer);
+	iTimer_init(&eAcc_data_timer,  on_eAcc_data_timer);
+	iTimer_init(&eAcc_click_timer, on_eAcc_click_timer);
+	iTimer_init(&debouncer_timer,  on_debouncer_timer);
 }

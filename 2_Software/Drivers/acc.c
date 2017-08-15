@@ -324,8 +324,8 @@ void acc_init()
 	// Configure the interrupt on pins INT1 and INT2
 	iGpio_interrupt_init(&int1, ACC_INT1, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_acc_int1);
 	iGpio_interrupt_init(&int2, ACC_INT2, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_acc_int2);
-	iGpio_enable_interrupt(&int1);
-	iGpio_enable_interrupt(&int2);
+	// iGpio_enable_interrupt(&int1);
+	// iGpio_enable_interrupt(&int2);
   iEventQueue_init(&acc_EventQueue);
 
   iPrint("[INIT] ACC initialized\n");
@@ -448,7 +448,7 @@ void acc_sleep()
   iGpio_disable_interrupt(&int2);
 
   // At the end to not lose another event
-  iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
+  // iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
 
   isSleeping = true;
 }
@@ -459,7 +459,7 @@ void acc_wakeup()
   uint8_t rx_buf[6];
 
   // At the beginning to not lose another event
-  iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
+  // iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
 
   // Define the data rate and enable the axis
   II2C_CREATE_DATA(tx_buf, ACC_DATA_RATE | MODE_LOW_POWER_ENABLE | Z_EN | Y_EN | X_EN);

@@ -49,6 +49,8 @@ iBleC_attr_disc_t attr_disc_list[] =
 
 typedef enum {
 	SWG_EVENT_FREQ = 0,
+  SWG_EVENT_SLEEP,
+  SWG_EVENT_WAKEUP,
 } swgEvent_t;
 
 iEventQueue_t swg_EventQueue;
@@ -60,8 +62,7 @@ IGPIO_HANDLER(on_interrupt, pin)
 }
 
 // Button-----------------------------------------------------------------------
-
-int debouncer_ms = 200;
+int debouncer_ms = 250;
 bool btn_swg_debouncer  = false;
 bool btn_freq_debouncer = false;
 
@@ -82,7 +83,7 @@ IGPIO_HANDLER(on_btn_freq, pin)
   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 
   btn_freq_debouncer = true;
-  iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+  iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 
@@ -97,22 +98,18 @@ IGPIO_HANDLER(on_btn_swg, pin)
 	if(isEnabled)
 	{
 		iPrint("-> SWG disabled\n");
-    swg_sleep();
-    iGpio_disable_interrupt(&interrupt);
-    iGpio_disable_interrupt(&btn_freq);
+    iEventQueue_add(&swg_EventQueue, SWG_EVENT_SLEEP);
 		isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> SWG enabled\n");
-    swg_wakeup();
-    iGpio_enable_interrupt(&interrupt);
-    iGpio_enable_interrupt(&btn_freq);
+    iEventQueue_add(&swg_EventQueue, SWG_EVENT_WAKEUP);
 		isEnabled = true;
 	}
 
 	btn_swg_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 
@@ -267,6 +264,21 @@ ITHREAD_HANDLER(swg)
 
 	    } break;
 
+      case SWG_EVENT_WAKEUP:
+      {
+        swg_wakeup();
+        iGpio_enable_interrupt(&interrupt);
+        iGpio_enable_interrupt(&btn_freq);
+        ext_int_freq = EXT_INT_FREQ;
+      } break;
+
+      case SWG_EVENT_SLEEP:
+      {
+        swg_sleep();
+        iGpio_disable_interrupt(&interrupt);
+        iGpio_disable_interrupt(&btn_freq);
+      } break;
+
 			default: // NOTHING
 			break;
 		}
@@ -293,7 +305,8 @@ int main()
 	#endif	// ENABLE_SWG
 
   #if ENABLE_SOFT_INT
-    iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+    iTimer_init(&soft_timer, on_soft_timer);
+    iTimer_start(&soft_timer, SOFT_INT_INTERVAL);
   #endif  // ENABLE_SOFT_INT
 
   while(1)
@@ -334,8 +347,10 @@ void sys_init()
 	iGpio_interrupt_init(&interrupt, INTERRUPT_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_interrupt);
 	iGpio_interrupt_init(&btn_freq, BTN_FREQ_PIN, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_freq);
 
-  iGpio_interrupt_init(&btn_swg, BTN_SWG, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_bnt_swg);
+  iGpio_interrupt_init(&btn_swg, BTN_SWG, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_swg);
   iGpio_enable_interrupt(&btn_swg);
+
+  iTimer_init(&debouncer_timer, on_debouncer_timer);
 
 }
 #endif  // ENABLE_SWG

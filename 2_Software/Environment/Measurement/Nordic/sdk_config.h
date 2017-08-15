@@ -11,17 +11,32 @@
 #define SPI1_MISO		       (14 + NRF5_GPIO_P1)
 #define SPI1_MOSI		       (13 + NRF5_GPIO_P1)
 #define SPI1_CS0			     (12 + NRF5_GPIO_P1)
-#define SPI1_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define SPI2_SCK		       (6 + NRF5_GPIO_P1)
 #define SPI2_MISO		       (5 + NRF5_GPIO_P1)
 #define SPI2_MOSI		       (4 + NRF5_GPIO_P1)
 #define SPI2_CS0			     (3 + NRF5_GPIO_P1)
-#define SPI2_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define I2C0_SCL           3
 #define I2C0_SDA           4
-#define I2C0_IRQ_PRIORITY  2// TWI_DEFAULT_CONFIG_IRQ_PRIORITY
+
+#define GPIO_P0_PRIORITY		APP_IRQ_PRIORITY_HIGHEST
+#define GPIO_P1_PRIORITY		APP_IRQ_PRIORITY_HIGHEST
+#define SPI1_IRQ_PRIORITY  	APP_IRQ_PRIORITY_HIGHEST
+#define SPI2_IRQ_PRIORITY  	APP_IRQ_PRIORITY_HIGHEST
+#define I2C0_IRQ_PRIORITY  	APP_IRQ_PRIORITY_HIGHEST
+#define TIMER_PRIORITY			APP_IRQ_PRIORITY_HIGHEST
+#define CLOCK_PRIORITY			APP_IRQ_PRIORITY_HIGHEST
+
+// <e> The interrupt priorities available to the application
+//     while the SoftDevice is active.
+//==========================================================
+// APP_IRQ_PRIORITY_HIGHEST = 1
+// APP_IRQ_PRIORITY_HIGH 		= 1
+// APP_IRQ_PRIORITY_MID 		= 2
+// APP_IRQ_PRIORITY_LOW 		= 3
+// APP_IRQ_PRIORITY_LOWEST	= 3
+// APP_IRQ_PRIORITY_THREAD 	= 4
 
 // <e> PIN MAPPING
 //==========================================================

@@ -18,7 +18,7 @@
 #define UNIT_0_625_MS                 625
 
 #define IBLE_CENTRAL_NAME   				CONFIG_BT_DEVICE_NAME
-#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
+#define IBLE_SEARCHED_DEVICE   			"BT-Peripheral"
 
 #define IBLEC_SCAN_PASSIVE	BT_HCI_LE_SCAN_PASSIVE
 #define IBLEC_SCAN_ACTIVE		BT_HCI_LE_SCAN_ACTIVE

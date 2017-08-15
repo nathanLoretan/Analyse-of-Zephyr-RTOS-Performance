@@ -119,7 +119,8 @@ void adc_init()
 	iSPI_write(spi, ADC_SPI_CS, tx_buf, 1);
 
 	iEventQueue_init(&adc_EventQueue);
-  iTimer_start(&adc_timer, on_adc_data_timer, ADC_TIMER);
+	iTimer_init(&adc_timer, on_adc_data_timer);
+  // iTimer_start(&adc_timer, ADC_TIMER);
 
 	iPrint("[INIT] ADC initialized\n");
 }
@@ -128,7 +129,6 @@ static adc_status_t adc_getStatus()
 {
 	uint8_t tx_buf[1];
 	uint8_t rx_buf[1];
-
 
 	// Read the status register
 	ISPI_CREATE_DATA(&tx_buf, START | MODE_REGISTER | REGISTER_STAT | READ);
@@ -180,7 +180,7 @@ void adc_sleep()
 	iTimer_stop(&adc_timer);
 
 	// At the end to not lose another event
-	iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
+	// iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
 
 	isSleeping = true;
 }
@@ -190,13 +190,13 @@ void adc_wakeup()
 	uint8_t tx_buf[1];
 
 	// At the beginning to not lose another event
-	iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
+	// iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
 
 	// Configure Sample per second and start measurements
 	ISPI_CREATE_DATA(tx_buf, START | MODE_COMMAND | ADC_DATA_RATE);
 	iSPI_write(spi, ADC_SPI_CS, tx_buf, 1);
 
-  iTimer_start(&adc_timer, on_adc_data_timer, ADC_TIMER);
+  iTimer_start(&adc_timer, ADC_TIMER);
 
 	isSleeping = false;
 }

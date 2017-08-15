@@ -2,7 +2,7 @@
 #include "nrf_mtx.h"
 
 // iTimer element only used by the system
-extern void iTimer_init();
+extern void iTimer_sys_init();
 
 // GAP init
 #define CONN_CFG_TAG						  1
@@ -577,7 +577,7 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	ble_cfg_t ble_cfg;
 	uint32_t ram_start = 0;
 
-	iTimer_init();
+	iTimer_sys_init();
 
 	// Fetch the start address of the application RAM.
 	error = softdevice_app_ram_start_get(&ram_start);

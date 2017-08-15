@@ -47,6 +47,8 @@ void iDebug_init()
                   DEBUG_START_PORT);
   DEBUG_PIN_INIT( EXT_INT_LATENCY_PIN,
                   EXT_INT_LATENCY_PORT);
+  DEBUG_PIN_INIT( SOFT_INT_LATENCY_PIN,
+                  SOFT_INT_LATENCY_PORT);
   DEBUG_PIN_INIT( RADIO_TX_PIN,
                   RADIO_TX_PORT);
   DEBUG_PIN_INIT( RADIO_RX_PIN,

@@ -30,7 +30,7 @@ static nrf_ble_gatt_t 				_gatt_module;
 #define DEFAULT_SLAVE_LATENCY         0
 
 // iTimer element only used by the system
-extern void iTimer_init();
+extern void iTimer_sys_init();
 
 typedef struct write_handler_list {
 	uint16_t 										handle;
@@ -283,7 +283,7 @@ int iBleP_init()
 	ble_cfg_t ble_cfg;
 	uint32_t ram_start = 0;
 
-	iTimer_init();
+	iTimer_sys_init();
 
 	// Fetch the start address of the application RAM.
 	error = softdevice_app_ram_start_get(&ram_start);
@@ -303,8 +303,8 @@ int iBleP_init()
 
 	// Configure the maximum number of connections.
 	memset(&ble_cfg, 0, sizeof(ble_cfg));
-	ble_cfg.gap_cfg.role_count_cfg.periph_role_count  	= BLE_GAP_ROLE_COUNT_PERIPH_DEFAULT;
-	ble_cfg.gap_cfg.role_count_cfg.central_role_count 	= 0;
+	ble_cfg.gap_cfg.role_count_cfg.periph_role_count  	= NRF_BLE_CENTRAL_LINK_COUNT;
+	ble_cfg.gap_cfg.role_count_cfg.central_role_count 	= NRF_BLE_PERIPHERAL_LINK_COUNT;
 	ble_cfg.gap_cfg.role_count_cfg.central_sec_count 		= 0;
 	error = sd_ble_cfg_set(BLE_GAP_CFG_ROLE_COUNT, &ble_cfg, ram_start);
 	if(error) {
@@ -313,10 +313,10 @@ int iBleP_init()
 	}
 
 	// Configure the maximum ATT MTU.
-	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
-	ble_cfg.conn_cfg.conn_cfg_tag                 	= CONN_CFG_TAG;
 	// Maximum size of the ATT packet the SoftDevice can send or receive, 251Bytes
 	// https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
+	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
+	ble_cfg.conn_cfg.conn_cfg_tag                 	= CONN_CFG_TAG;
 	ble_cfg.conn_cfg.params.gatt_conn_cfg.att_mtu 	= NRF_BLE_GATT_MAX_MTU_SIZE;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATT, &ble_cfg, ram_start);
 	if(error) {
@@ -327,8 +327,8 @@ int iBleP_init()
 	// Configure the maximum event length.
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                     	= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gap_conn_cfg.event_length 	= 320;
-	ble_cfg.conn_cfg.params.gap_conn_cfg.conn_count  	 	= BLE_GAP_CONN_COUNT_DEFAULT;
+	ble_cfg.conn_cfg.params.gap_conn_cfg.conn_count  	 	= NRF_BLE_CENTRAL_LINK_COUNT + NRF_BLE_PERIPHERAL_LINK_COUNT;
+	ble_cfg.conn_cfg.params.gap_conn_cfg.event_length 	= 320;//BLE_GAP_EVENT_LENGTH_DEFAULT;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GAP, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the maximum event length: error %d\n", error);
@@ -338,7 +338,7 @@ int iBleP_init()
 	// Configure the size of the TX buffer
 	memset(&ble_cfg, 0x00, sizeof(ble_cfg));
 	ble_cfg.conn_cfg.conn_cfg_tag                     				= CONN_CFG_TAG;
-	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= 20;
+	ble_cfg.conn_cfg.params.gatts_conn_cfg.hvn_tx_queue_size 	= BLE_TX_BUF_COUNT;
 	error = sd_ble_cfg_set(BLE_CONN_CFG_GATTS, &ble_cfg, ram_start);
 	if(error) {
 		iPrint("/!\\ fail to configure the number of handle value notification: error %d\n", error);
@@ -674,7 +674,7 @@ int iBleP_svc_notify(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 	BLE_NOTIFY(0);
 
 	if(error) {
-		iPrint("/!\\ Notification failed: error 0x%04x\n", error);
+		// iPrint("/!\\ Notification failed: error 0x%04x\n", error);
 		BLE_ERROR(1);
 	}
 
@@ -699,7 +699,7 @@ int iBleP_svc_indication(iBleP_attr_t* attr, uint8_t* buf, size_t buf_length)
 	BLE_INDICATE(0);
 
 	if(error) {
-		iPrint("/!\\ Indication failed: error 0x%04x\n", error);
+		// iPrint("/!\\ Indication failed: error 0x%04x\n", error);
 		BLE_ERROR(1);
 	}
 

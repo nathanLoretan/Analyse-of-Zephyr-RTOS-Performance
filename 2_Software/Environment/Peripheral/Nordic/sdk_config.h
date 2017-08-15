@@ -4,6 +4,8 @@
 //==========================================================
 // <h> GENERAL INFORMATION
 //==========================================================
+#define BLE_TX_BUF_COUNT		230
+
 #define NRF5_GPIO_P0	0
 #define NRF5_GPIO_P1	32
 
@@ -11,17 +13,45 @@
 #define SPI1_MISO		       (14 + NRF5_GPIO_P1)
 #define SPI1_MOSI		       (13 + NRF5_GPIO_P1)
 #define SPI1_CS0			     (12 + NRF5_GPIO_P1)
-#define SPI1_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define SPI2_SCK		       (6 + NRF5_GPIO_P1)
 #define SPI2_MISO		       (5 + NRF5_GPIO_P1)
 #define SPI2_MOSI		       (4 + NRF5_GPIO_P1)
 #define SPI2_CS0			     (3 + NRF5_GPIO_P1)
-#define SPI2_IRQ_PRIORITY  2// SPI_DEFAULT_CONFIG_IRQ_PRIORITY
 
 #define I2C0_SCL           3
 #define I2C0_SDA           4
-#define I2C0_IRQ_PRIORITY  2// TWI_DEFAULT_CONFIG_IRQ_PRIORITY
+
+// App Priority
+#define SPI1_IRQ_PRIORITY  	1
+#define SPI2_IRQ_PRIORITY  	1
+#define I2C0_IRQ_PRIORITY  	1
+#define TIMER_PRIORITY			1
+
+// <e> The interrupt priorities available to the application
+//     while the SoftDevice is active.
+//==========================================================
+// APP_IRQ_PRIORITY_HIGHEST = 1
+// APP_IRQ_PRIORITY_HIGH 		= 1
+// APP_IRQ_PRIORITY_MID 		= 2
+// APP_IRQ_PRIORITY_LOW 		= 3
+// APP_IRQ_PRIORITY_LOWEST	= 3
+// APP_IRQ_PRIORITY_THREAD 	= 4
+
+// Peripheral Priority
+#define GPIO_P0_PRIORITY		2	// 0,1 priorities reserved by the softdevice
+#define GPIO_P1_PRIORITY		2 // 0,1 priorities reserved by the softdevice
+#define CLOCK_PRIORITY			2 // 0,1 priorities reserved by the softdevice
+
+// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
+// <0=> 0 (highest)
+// <1=> 1
+// <2=> 2
+// <3=> 3
+// <4=> 4
+// <5=> 5
+// <6=> 6
+// <7=> 7
 
 // <e> PIN MAPPING
 //==========================================================
@@ -87,7 +117,7 @@
 // <6=> 6
 // <7=> 7
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //==========================================================
 // <h> SPI_CONFIGURATION
@@ -235,7 +265,7 @@
 #endif //SPI_ENABLED
 // </e>
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //==========================================================
 // <h> TWI_CONFIGURATION
@@ -370,7 +400,7 @@
 #endif //TWI_ENABLED
 // </e>
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //==========================================================
 // <h> GPIOTE_CONFIGURATION
@@ -400,7 +430,7 @@
 	// <6=> 6
 	// <7=> 7
 	#ifndef GPIOTE_CONFIG_IRQ_PRIORITY
-		#define GPIOTE_CONFIG_IRQ_PRIORITY APP_IRQ_PRIORITY_HIGHEST
+		#define GPIOTE_CONFIG_IRQ_PRIORITY GPIO_P0_PRIORITY
 	#endif
 
 	// <e> GPIOTE_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -454,11 +484,22 @@
 #endif //GPIOTE_ENABLED
 // </e>
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //==========================================================
 // <h> BLE_CONFIGURATION
 //==========================================================
+
+//==========================================================
+// <o> NRF_BLE_CENTRAL_LINK_COUNT - Number of central links
+#ifndef NRF_BLE_CENTRAL_LINK_COUNT
+#define NRF_BLE_CENTRAL_LINK_COUNT BLE_GAP_ROLE_COUNT_PERIPH_DEFAULT
+#endif
+
+// <o> NRF_BLE_PERIPHERAL_LINK_COUNT - Number of peripheral links
+#ifndef NRF_BLE_PERIPHERAL_LINK_COUNT
+#define NRF_BLE_PERIPHERAL_LINK_COUNT 0
+#endif
 
 // <e> BLE_ADVERTISING_ENABLED  - ble_advertising - Advertising module
 //==========================================================
@@ -485,9 +526,9 @@
 #if  NRF_BLE_GATT_ENABLED
 
 	// <o> NRF_BLE_GATT_MAX_MTU_SIZE - Static maximum MTU size that is passed to the @ref sd_ble_enable function.
+	// https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
 	#ifndef NRF_BLE_GATT_MAX_MTU_SIZE
 		#define NRF_BLE_GATT_MAX_MTU_SIZE 23
-		// #define NRF_BLE_GATT_MAX_MTU_SIZE 251 // https://infocenter.nordicsemi.com/index.jsp?topic=%2Fcom.nordic.infocenter.sdk5.v13.0.0%2Flib_ble_gatt.html
 	#endif
 
 #endif //NRF_BLE_GATT_ENABLED
@@ -750,7 +791,7 @@
 	// <6=> 6
 	// <7=> 7
 	#ifndef CLOCK_CONFIG_IRQ_PRIORITY
-		#define CLOCK_CONFIG_IRQ_PRIORITY 7
+		#define CLOCK_CONFIG_IRQ_PRIORITY CLOCK_PRIORITY
 	#endif
 
 	// <e> CLOCK_CONFIG_LOG_ENABLED - Enables logging in the module.
@@ -805,7 +846,7 @@
 #endif //CLOCK_ENABLED
 // </e>
 
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 //==========================================================
 // <h> TIMER CONFIGURATION
@@ -841,7 +882,7 @@
 	// <6=> 6
 	// <7=> 7
 	#ifndef APP_TIMER_CONFIG_IRQ_PRIORITY
-		#define APP_TIMER_CONFIG_IRQ_PRIORITY 7
+		#define APP_TIMER_CONFIG_IRQ_PRIORITY TIMER_PRIORITY
 	#endif
 
 	// <o> APP_TIMER_CONFIG_OP_QUEUE_SIZE - Capacity of timer requests queue.
@@ -880,153 +921,12 @@
 #endif //APP_TIMER_ENABLED
 // </e>
 
-// <e> RTC_ENABLED - nrf_drv_rtc - RTC peripheral driver
-//==========================================================
-#ifndef RTC_ENABLED
-	#define RTC_ENABLED 0
-#endif
-
-#if  RTC_ENABLED
-
-	// <o> RTC_DEFAULT_CONFIG_FREQUENCY - Frequency  <16-32768>
-	#ifndef RTC_DEFAULT_CONFIG_FREQUENCY
-		#define RTC_DEFAULT_CONFIG_FREQUENCY 32768
-	#endif
-
-	// <q> RTC_DEFAULT_CONFIG_RELIABLE  - Ensures safe compare event triggering
-	#ifndef RTC_DEFAULT_CONFIG_RELIABLE
-		#define RTC_DEFAULT_CONFIG_RELIABLE 0
-	#endif
-
-	// <o> RTC_DEFAULT_CONFIG_IRQ_PRIORITY  - Interrupt priority
-	// <i> Priorities 0,2 (nRF51) and 0,1,4,5 (nRF52) are reserved for SoftDevice
-	// <0=> 0 (highest)
-	// <1=> 1
-	// <2=> 2
-	// <3=> 3
-	// <4=> 4
-	// <5=> 5
-	// <6=> 6
-	// <7=> 7
-	#ifndef RTC_DEFAULT_CONFIG_IRQ_PRIORITY
-		#define RTC_DEFAULT_CONFIG_IRQ_PRIORITY 7
-	#endif
-
-	// <q> RTC0_ENABLED  - Enable RTC0 instance
-	#ifndef RTC0_ENABLED
-		#define RTC0_ENABLED 0
-	#endif
-
-	// <q> RTC1_ENABLED  - Enable RTC1 instance
-	#ifndef RTC1_ENABLED
-		#define RTC1_ENABLED 0
-	#endif
-
-	// <q> RTC2_ENABLED  - Enable RTC2 instance
-	#ifndef RTC2_ENABLED
-		#define RTC2_ENABLED 0
-	#endif
-
-	// <o> NRF_MAXIMUM_LATENCY_US - Maximum possible time[us] in highest priority interrupt
-	#ifndef NRF_MAXIMUM_LATENCY_US
-		#define NRF_MAXIMUM_LATENCY_US 2000
-	#endif
-
-	// <e> RTC_CONFIG_LOG_ENABLED - Enables logging in the module.
-	//==========================================================
-	#ifndef RTC_CONFIG_LOG_ENABLED
-		#define RTC_CONFIG_LOG_ENABLED 0
-	#endif
-	#if  RTC_CONFIG_LOG_ENABLED
-
-		// <o> RTC_CONFIG_LOG_LEVEL  - Default Severity level
-		// <0=> Off
-		// <1=> Error
-		// <2=> Warning
-		// <3=> Info
-		// <4=> Debug
-		#ifndef RTC_CONFIG_LOG_LEVEL
-			#define RTC_CONFIG_LOG_LEVEL 3
-		#endif
-
-		// <o> RTC_CONFIG_INFO_COLOR  - ANSI escape code prefix.
-		// <0=> Default
-		// <1=> Black
-		// <2=> Red
-		// <3=> Green
-		// <4=> Yellow
-		// <5=> Blue
-		// <6=> Magenta
-		// <7=> Cyan
-		// <8=> White
-		#ifndef RTC_CONFIG_INFO_COLOR
-			#define RTC_CONFIG_INFO_COLOR 0
-		#endif
-
-		// <o> RTC_CONFIG_DEBUG_COLOR  - ANSI escape code prefix.
-		// <0=> Default
-		// <1=> Black
-		// <2=> Red
-		// <3=> Green
-		// <4=> Yellow
-		// <5=> Blue
-		// <6=> Magenta
-		// <7=> Cyan
-		// <8=> White
-		#ifndef RTC_CONFIG_DEBUG_COLOR
-			#define RTC_CONFIG_DEBUG_COLOR 0
-		#endif
-
-	#endif //RTC_CONFIG_LOG_ENABLED
-	// </e>
-
-#endif //RTC_ENABLED
-// </e>
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//==========================================================
-// <e> APP_SCHEDULER_ENABLED - app_scheduler - Events scheduler
-//==========================================================
-#ifndef APP_SCHEDULER_ENABLED
-	#define APP_SCHEDULER_ENABLED 0
-#endif
-
-#if  APP_SCHEDULER_ENABLED
-
-	// <q> APP_SCHEDULER_WITH_PAUSE  - Enabling pause feature
-	#ifndef APP_SCHEDULER_WITH_PAUSE
-		#define APP_SCHEDULER_WITH_PAUSE 0
-	#endif
-
-	// <q> APP_SCHEDULER_WITH_PROFILER  - Enabling scheduler profiling
-	#ifndef APP_SCHEDULER_WITH_PROFILER
-		#define APP_SCHEDULER_WITH_PROFILER 0
-	#endif
-
-#endif //APP_SCHEDULER_ENABLED
-// </e>
-
-//--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-// <q> BUTTON_ENABLED  - app_button - buttons handling module
-
-
-#ifndef BUTTON_ENABLED
-#define BUTTON_ENABLED 1
-#endif
-
-// <q> NRF_STRERROR_ENABLED  - nrf_strerror - Library for converting error code to string.
-
-
-#ifndef NRF_STRERROR_ENABLED
-#define NRF_STRERROR_ENABLED 1
-#endif
-
-// </h>
-//==========================================================
-
-// <h> nRF_Log
+//------------------------------------------------------------------------------
 
 //==========================================================
+// <h> NRF LOG
+//==========================================================
+
 // <e> NRF_LOG_ENABLED - nrf_log - Logging
 //==========================================================
 #ifndef NRF_LOG_ENABLED

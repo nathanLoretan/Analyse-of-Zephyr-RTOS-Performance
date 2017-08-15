@@ -60,14 +60,7 @@ SRC_FILES += \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT.c \
 	$(SDK_ROOT)/external/segger_rtt/RTT_Syscalls_GCC.c \
 	$(SDK_ROOT)/external/segger_rtt/SEGGER_RTT_printf.c \
-	$(PROJECT_BASE)/AL/BareMetal/iBleP.c \
-	$(PROJECT_BASE)/AL/BareMetal/iBleC.c \
-	$(PROJECT_BASE)/AL/BareMetal/iI2c.c \
-	$(PROJECT_BASE)/AL/BareMetal/iSpi.c \
 	$(PROJECT_BASE)/AL/BareMetal/iGpio.c \
-	$(PROJECT_BASE)/AL/BareMetal/iTimer.c \
-	$(PROJECT_BASE)/AL/BareMetal/iThread.c \
-	$(PROJECT_BASE)/AL/BareMetal/iEventQueue.c \
 	$(PROJECT_BASE)/Debug/iDebug.c \
 	$(PROJECT_BASE)/Measurement/main.c
 

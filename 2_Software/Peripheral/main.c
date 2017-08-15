@@ -65,6 +65,8 @@ iBleP_advdata_t scanrsp[] = {
 
 typedef enum {
 	SWG_EVENT_FREQ = 0,
+  SWG_EVENT_SLEEP,
+  SWG_EVENT_WAKEUP,
 } swgEvent_t;
 
 iEventQueue_t swg_EventQueue;
@@ -78,7 +80,7 @@ IGPIO_HANDLER(on_interrupt, pin)
 
 // Button-----------------------------------------------------------------------
 #if ENABLE_ADC | ENABLE_ACC | ENABLE_SWG
-int debouncer_ms = 200;
+int debouncer_ms = 250;
 bool btn_adc_debouncer  = false;
 bool btn_acc_debouncer  = false;
 bool btn_swg_debouncer  = false;
@@ -107,18 +109,18 @@ IGPIO_HANDLER(on_btn_adc, pin)
 	if(isEnabled)
 	{
 		iPrint("-> ADC disabled\n");
-    adc_sleep();
+    iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
 		isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ADC enabled\n");
-    adc_wakeup();
+    iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
 		isEnabled = true;
 	}
 
 	btn_adc_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 #endif  // ENABLE_ADC
@@ -135,18 +137,18 @@ IGPIO_HANDLER(on_btn_acc, pin)
 	if(isEnabled)
 	{
 		iPrint("-> ACC disabled\n");
-    acc_sleep();
+    iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
 		isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ACC enabled\n");
-    acc_wakeup();
+    iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
 		isEnabled = true;
 	}
 
 	btn_acc_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 #endif  // ENABLE_ACC
@@ -161,7 +163,7 @@ IGPIO_HANDLER(on_btn_freq, pin)
   iEventQueue_add(&swg_EventQueue, SWG_EVENT_FREQ);
 
   btn_freq_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 
@@ -176,22 +178,18 @@ IGPIO_HANDLER(on_btn_swg, pin)
 	if(isEnabled)
 	{
 		iPrint("-> SWG disabled\n");
-    swg_sleep();
-    iGpio_disable_interrupt(&interrupt);
-    iGpio_disable_interrupt(&btn_freq);
+    iEventQueue_add(&swg_EventQueue, SWG_EVENT_SLEEP);
 		isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> SWG enabled\n");
-    swg_wakeup();
-    iGpio_enable_interrupt(&interrupt);
-    iGpio_enable_interrupt(&btn_freq);
+    iEventQueue_add(&swg_EventQueue, SWG_EVENT_WAKEUP);
 		isEnabled = true;
 	}
 
 	btn_swg_debouncer = true;
-	iTimer_start(&debouncer_timer, on_debouncer_timer, debouncer_ms);
+	iTimer_start(&debouncer_timer, debouncer_ms);
 
 }
 #endif  // ENABLE_SWG
@@ -259,6 +257,21 @@ ITHREAD_HANDLER(swg)
 
 	    } break;
 
+      case SWG_EVENT_WAKEUP:
+      {
+        swg_wakeup();
+        iGpio_enable_interrupt(&interrupt);
+        iGpio_enable_interrupt(&btn_freq);
+        ext_int_freq = EXT_INT_FREQ;
+      } break;
+
+      case SWG_EVENT_SLEEP:
+      {
+        swg_sleep();
+        iGpio_disable_interrupt(&interrupt);
+        iGpio_disable_interrupt(&btn_freq);
+      } break;
+
 			default: // NOTHING
 			break;
 		}
@@ -287,6 +300,7 @@ ITHREAD_HANDLER(acc)
 		    acc_getXYZ(&sample, 1);
 
 				#if ENABLE_BLE
+          // iPrint("ACC DATA NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[1], (uint8_t*) &sample, sizeof(sample));
 				#endif	// ENABLE_BLE
 
@@ -298,12 +312,23 @@ ITHREAD_HANDLER(acc)
     	{
 				#if ENABLE_BLE
 					acc_click++;
+          // iPrint("ACC CLICK NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &acc_click, sizeof(acc_click));
+          iPrint("Click\n");
 				#endif	// ENABLE_BLE
 
-				// iPrint("Click\n");
 
 			} break;
+
+      case ACC_EVENT_WAKEUP:
+      {
+        acc_wakeup();
+      } break;
+
+      case ACC_EVENT_SLEEP:
+      {
+        acc_sleep();
+      } break;
 
 			default: // NOTHING
 			break;
@@ -332,6 +357,7 @@ ITHREAD_HANDLER(adc)
 				adc_getMeasurement(&adc_measurement);
 
 				#if ENABLE_BLE
+            // iPrint("ADC DATA NOTIFY\n");
 				    iBleP_svc_notify(&adc_svc.attrs[1], (uint8_t*) &adc_measurement,
                              sizeof(adc_measurement));
 				#endif	// ENABLE_BLE
@@ -339,6 +365,16 @@ ITHREAD_HANDLER(adc)
 				// iPrint("Measurement: %u[uV]\n", adc_measurement);
 
 			} break;
+
+      case ADC_EVENT_WAKEUP:
+      {
+        adc_wakeup();
+      } break;
+
+      case ADC_EVENT_SLEEP:
+      {
+        adc_sleep();
+      } break;
 
 			default: // NOTHING
 			break;
@@ -356,7 +392,7 @@ int main()
   iPrint("\nPeripheral\n");
 	iPrint("----------\n");
 
-  // iDebug_init();
+  iDebug_init();
 
 	#if ENABLE_BLE
 	  ble_init();
@@ -394,11 +430,15 @@ void ble_init()
 #if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC || ENABLE_SOFT_INT
 void sys_init()
 {
+
+  iTimer_init(&debouncer_timer, on_debouncer_timer);
+
   iPrint("\nInitialize ExtBoard\n");
   iPrint("-------------------\n");
 
   #if ENABLE_SOFT_INT
-    iTimer_start(&soft_timer, on_soft_timer, SOFT_INT_FREQ);
+    iTimer_init(&soft_timer, on_soft_timer);
+    iTimer_start(&soft_timer, SOFT_INT_INTERVAL);
   #endif  // ENABLE_SOFT_INT
 
 	#if ENABLE_SWG

@@ -22,8 +22,8 @@
 #include "nrf_ble_gatt.h"
 #include "boards.h"
 
-#define IBLE_CENTRAL_NAME   				"ExtBoard-C"
-#define IBLE_SEARCHED_DEVICE   			"ExtBoard-P"
+#define IBLE_CENTRAL_NAME   				"BT-Central"
+#define IBLE_SEARCHED_DEVICE   			"BT-Peripheral"
 
 #define IBLEC_SCAN_PASSIVE	0
 #define IBLEC_SCAN_ACTIVE		1

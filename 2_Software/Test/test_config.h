@@ -1,10 +1,6 @@
 #ifndef __TEST_CONFIG_H__
 #define __TEST_CONFIG_H__
 
-// Measurement------------------------------------------------------------------
-#define ENABLE_MEASUREMENT  1
-#define POWER_MEASUREMENT   0
-
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI                 SPI1
 #define ADC_SPI_CS              CS0
@@ -21,12 +17,6 @@
 #define ACC_I2C                 I2C0
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
-// Drivers----------------------------------------------------------------------
-#define ENABLE_ACC        0
-#define ENABLE_ADC        0
-#define ENABLE_SWG        0
-#define ENABLE_BLE        0
-
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30
 #define ACC_INT1           31
@@ -36,7 +26,6 @@
 // BLE Configuration------------------------------------------------------------
 #define ADV_INTERVAL       MSEC_TO_UNITS(50, UNIT_0_625_MS)
 #define ADV_TIMEOUT        IBLEP_ADV_TIMEOUT_NONE
-
 
 // Sensors Configuration--------------------------------------------------------
 #define ADC_DATA_RATE             ADC_DATA_RATE_7
@@ -48,10 +37,5 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              0             // [Hz]
-#define INTERVAL                  1000          // [ms]
-#define FREQ_STEP1                1000          // [Hz]
-#define FREQ_STEP2                10000         // [Hz]
-#define FREQ_STEP_1TO2            10000         // [Hz]
-#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
 
 #endif  // __TEST_CONFIG_H__

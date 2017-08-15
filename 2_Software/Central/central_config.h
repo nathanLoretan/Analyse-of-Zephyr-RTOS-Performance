@@ -13,16 +13,16 @@
 #define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_SWG        0
+#define ENABLE_SWG        1
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
-#define BTN_FREQ_PIN       11
-#define BTN_SWG            12
+#define BTN_SWG            24
+#define BTN_FREQ_PIN       25
 
 // Software interrupt-----------------------------------------------------------
-#define ENABLE_SOFT_INT   1
-#define SOFT_INT_FREQ     1000
+#define ENABLE_SOFT_INT     1
+#define SOFT_INT_INTERVAL   1 // [ms]
 
 // BLE Configuration------------------------------------------------------------
 #define SCAN_INTERVAL				MSEC_TO_UNITS(100, UNIT_0_625_MS)
@@ -36,7 +36,6 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              0             // [Hz]
-// #define INTERVAL                  1000          // [ms]
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]

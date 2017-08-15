@@ -22,7 +22,7 @@
 #include "nrf_ble_gatt.h"
 #include "boards.h"
 
-#define IBLEP_DEVICE_NAME				"ExtBoard-P"
+#define IBLEP_DEVICE_NAME				"BT-Peripheral"
 #define IBLEP_ADV_TIMEOUT_NONE	0
 
 typedef enum {

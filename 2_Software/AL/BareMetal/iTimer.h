@@ -15,7 +15,9 @@ typedef struct {
   app_timer_t     timer_data;
 } iTimer_t;
 
-void 		iTimer_start(iTimer_t* timer, iTimer_handler_t handler, uint32_t period);
+void iTimer_init(iTimer_t* timer, iTimer_handler_t handler);
+// void iTimer_start(iTimer_t* timer, iTimer_handler_t handler, uint32_t period);
+void iTimer_start(iTimer_t* timer, uint32_t period);
 #define iTimer_stop(_timer)         app_timer_stop((_timer)->id)
 
 #endif  // __ITIMER__
