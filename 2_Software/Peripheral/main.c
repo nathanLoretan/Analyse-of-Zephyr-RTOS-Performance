@@ -99,24 +99,24 @@ ITIMER_HANDLER(on_debouncer_timer)
 
 #if ENABLE_ADC
 static iGpio_t btn_adc;
+static bool btn_adc_isEnabled = false;
 IGPIO_HANDLER(on_btn_adc, pin)
 {
-	static bool isEnabled = false;
 
 	if(btn_adc_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_adc_isEnabled)
 	{
 		iPrint("-> ADC disabled\n");
     iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
-		isEnabled = false;
+		btn_adc_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ADC enabled\n");
     iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_adc_isEnabled = true;
 	}
 
 	btn_adc_debouncer = true;
@@ -127,24 +127,24 @@ IGPIO_HANDLER(on_btn_adc, pin)
 
 #if ENABLE_ACC
 static iGpio_t btn_acc;
+static bool btn_acc_isEnabled = false;
 IGPIO_HANDLER(on_btn_acc, pin)
 {
-	static bool isEnabled = false;
 
 	if(btn_acc_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_acc_isEnabled)
 	{
 		iPrint("-> ACC disabled\n");
     iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
-		isEnabled = false;
+		btn_acc_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ACC enabled\n");
     iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_acc_isEnabled = true;
 	}
 
 	btn_acc_debouncer = true;
@@ -168,24 +168,24 @@ IGPIO_HANDLER(on_btn_freq, pin)
 }
 
 static iGpio_t btn_swg;
+static bool btn_swg_isEnabled = false;
 IGPIO_HANDLER(on_btn_swg, pin)
 {
-	static bool isEnabled = false;
 
 	if(btn_swg_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_swg_isEnabled)
 	{
 		iPrint("-> SWG disabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_SLEEP);
-		isEnabled = false;
+		btn_swg_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> SWG enabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_swg_isEnabled = true;
 	}
 
 	btn_swg_debouncer = true;
@@ -222,11 +222,26 @@ ITHREAD_HANDLER(ble)
 
 			case BLEP_EVENT_DISCONNECTED:
 			{
-        acc_sleep();
-        adc_sleep();
-        swg_sleep();
-        iGpio_disable_interrupt(&interrupt);
-        iGpio_disable_interrupt(&btn_freq);
+        #if ENABLE_ACC
+          iPrint("-> ACC disabled\n")
+          acc_sleep();
+          btn_acc_isEnabled = false;
+        #endif  // ENABLE_ACC
+
+        #if ENABLE_ADC
+          iPrint("-> ADC disabled\n")
+          adc_sleep();
+          btn_adc_isEnabled = false;
+        #endif  // ENABLE_ADC
+
+        #if ENABLE_SWG
+          iPrint("-> SWG disabled\n")
+          swg_sleep();
+          iGpio_disable_interrupt(&interrupt);
+          iGpio_disable_interrupt(&btn_freq);
+          btn_swg_isEnabled = false;
+        #endif  // ENABLE_SWG
+
 			} break;
 
 			default: // NOTHING
@@ -314,13 +329,14 @@ ITHREAD_HANDLER(acc)
 
     	case ACC_EVENT_INT2: // Click
     	{
-				#if ENABLE_BLE
-					acc_click++;
+        acc_click++;
+
+        #if ENABLE_BLE
           // iPrint("ACC CLICK NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &acc_click, sizeof(acc_click));
-          iPrint("Click\n");
 				#endif	// ENABLE_BLE
 
+        // iPrint("Click\n");
 
 			} break;
 
