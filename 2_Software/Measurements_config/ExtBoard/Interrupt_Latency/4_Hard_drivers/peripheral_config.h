@@ -25,10 +25,10 @@
 #define ENABLE_ACC        1
 #define ENABLE_ADC        1
 #define ENABLE_SWG        1
-#define ENABLE_BLE        1
+#define ENABLE_BLE        0
 
 // Software interrupt-----------------------------------------------------------
-#define ENABLE_SOFT_INT     1
+#define ENABLE_SOFT_INT     0
 #define SOFT_INT_INTERVAL   10 // [ms]
 
 // Externa. Interrupt pin-------------------------------------------------------

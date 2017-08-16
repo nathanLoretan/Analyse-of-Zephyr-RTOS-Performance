@@ -77,6 +77,10 @@ do {\
 #define EXT_INT_LATENCY_PORT
 #define EXT_INT_LATENCY()       do{}while(0)
 
+#define SOFT_INT_LATENCY_PIN
+#define SOFT_INT_LATENCY_PORT
+#define SOFT_INT_LATENCY()       do{}while(0)
+
 #define BLE_ERROR_PIN
 #define BLE_ERROR_PORT
 #define BLE_ERROR(_flag)        do{}while(0)

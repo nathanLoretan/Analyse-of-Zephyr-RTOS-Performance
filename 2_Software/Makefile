@@ -39,8 +39,8 @@ else
 	# include $(PROJ_DIR)/Environment/E-Peripheral/Nordic/baremetal.mk
 	# include $(PROJ_DIR)/Environment/E-Peripheral/Zephyr/zephyr.mk
 
-	include $(PROJ_DIR)/Environment/Peripheral/Nordic/baremetal.mk
-	# include $(PROJ_DIR)/Environment/Peripheral/Zephyr/zephyr.mk
+	# include $(PROJ_DIR)/Environment/Peripheral/Nordic/baremetal.mk
+	include $(PROJ_DIR)/Environment/Peripheral/Zephyr/zephyr.mk
 
 	# include $(PROJ_DIR)/Environment/Test/Nordic/baremetal.mk
 	# include $(PROJ_DIR)/Environment/Test/Zephyr/zephyr.mk
