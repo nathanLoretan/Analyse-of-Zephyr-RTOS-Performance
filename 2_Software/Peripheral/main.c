@@ -89,6 +89,7 @@ bool btn_freq_debouncer = false;
 static iTimer_t debouncer_timer;
 ITIMER_HANDLER(on_debouncer_timer)
 {
+  iPrint("Debouncer\n");
 	btn_adc_debouncer  = false;
 	btn_acc_debouncer  = false;
 	btn_swg_debouncer  = false;
@@ -99,24 +100,24 @@ ITIMER_HANDLER(on_debouncer_timer)
 
 #if ENABLE_ADC
 static iGpio_t btn_adc;
+static bool btn_adc_isEnabled = false;
 IGPIO_HANDLER(on_btn_adc, pin)
 {
-	static bool isEnabled = false;
 
 	if(btn_adc_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_adc_isEnabled)
 	{
 		iPrint("-> ADC disabled\n");
     iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
-		isEnabled = false;
+		btn_adc_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ADC enabled\n");
     iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_adc_isEnabled = true;
 	}
 
 	btn_adc_debouncer = true;
@@ -127,24 +128,23 @@ IGPIO_HANDLER(on_btn_adc, pin)
 
 #if ENABLE_ACC
 static iGpio_t btn_acc;
+static bool btn_acc_isEnabled = false;
 IGPIO_HANDLER(on_btn_acc, pin)
 {
-	static bool isEnabled = false;
-
 	if(btn_acc_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_acc_isEnabled)
 	{
 		iPrint("-> ACC disabled\n");
     iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
-		isEnabled = false;
+		btn_acc_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> ACC enabled\n");
     iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_acc_isEnabled = true;
 	}
 
 	btn_acc_debouncer = true;
@@ -168,24 +168,24 @@ IGPIO_HANDLER(on_btn_freq, pin)
 }
 
 static iGpio_t btn_swg;
+static bool btn_swg_isEnabled = false;
 IGPIO_HANDLER(on_btn_swg, pin)
 {
-	static bool isEnabled = false;
 
 	if(btn_swg_debouncer)
 		return;
 
-	if(isEnabled)
+	if(btn_swg_isEnabled)
 	{
 		iPrint("-> SWG disabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_SLEEP);
-		isEnabled = false;
+		btn_swg_isEnabled = false;
 	}
 	else
 	{
 		iPrint("-> SWG enabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_WAKEUP);
-		isEnabled = true;
+		btn_swg_isEnabled = true;
 	}
 
 	btn_swg_debouncer = true;
@@ -222,6 +222,25 @@ ITHREAD_HANDLER(ble)
 
 			case BLEP_EVENT_DISCONNECTED:
 			{
+        #if ENABLE_ACC
+          iPrint("-> ACC disabled\n")
+          acc_sleep();
+          btn_acc_isEnabled = false;
+        #endif  // ENABLE_ACC
+
+        #if ENABLE_ADC
+          iPrint("-> ADC disabled\n")
+          adc_sleep();
+          btn_adc_isEnabled = false;
+        #endif  // ENABLE_ADC
+
+        #if ENABLE_SWG
+          iPrint("-> SWG disabled\n")
+          swg_sleep();
+          iGpio_disable_interrupt(&interrupt);
+          iGpio_disable_interrupt(&btn_freq);
+          btn_swg_isEnabled = false;
+        #endif  // ENABLE_SWG
 
 			} break;
 
@@ -310,13 +329,14 @@ ITHREAD_HANDLER(acc)
 
     	case ACC_EVENT_INT2: // Click
     	{
-				#if ENABLE_BLE
-					acc_click++;
+        acc_click++;
+
+        #if ENABLE_BLE
           // iPrint("ACC CLICK NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &acc_click, sizeof(acc_click));
-          iPrint("Click\n");
 				#endif	// ENABLE_BLE
 
+        // iPrint("Click\n");
 
 			} break;
 
@@ -398,9 +418,9 @@ int main()
 	  ble_init();
 	#endif  // ENABLE_BLE
 
-	#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+	#if ENABLE_SWG | ENABLE_ADC | ENABLE_ACC | ENABLE_SOFT_INT
 	  sys_init();
-	#endif	// ENABLE_SWG || ENABLE_ADC || ENABLE_ACC
+	#endif	// ENABLE_SWG | ENABLE_ADC | ENABLE_ACC | ENABLE_SOFT_INT
 
   while(1)
   {
@@ -427,11 +447,13 @@ void ble_init()
 }
 #endif	// ENABLE_BLE
 
-#if ENABLE_SWG || ENABLE_ADC || ENABLE_ACC || ENABLE_SOFT_INT
+#if ENABLE_SWG | ENABLE_ADC | ENABLE_ACC | ENABLE_SOFT_INT
 void sys_init()
 {
 
-  iTimer_init(&debouncer_timer, on_debouncer_timer);
+  #if ENABLE_SWG | ENABLE_ADC | ENABLE_ACC
+    iTimer_init(&debouncer_timer, on_debouncer_timer);
+  #endif  // ENABLE_SWG | ENABLE_ADC | ENABLE_ACC
 
   iPrint("\nInitialize ExtBoard\n");
   iPrint("-------------------\n");
@@ -460,11 +482,11 @@ void sys_init()
 
 	#if ENABLE_ADC
 
-	  iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
-		adc_init();
-    adc_sleep();
-
-		iThread_run(&adc_thread, adc);
+	  // iSpi_init(ADC_SPI, ADC_SPI_FREQUENCY, ADC_SPI_MODE, ADC_SPI_BIT_ORDER);
+		// adc_init();
+    // adc_sleep();
+    //
+		// iThread_run(&adc_thread, adc);
 
     iGpio_interrupt_init(&btn_adc,  BTN_ADC,  IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_adc);
     iGpio_enable_interrupt(&btn_adc);
@@ -473,15 +495,15 @@ void sys_init()
 
 	#if ENABLE_ACC
 
-	  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
-		acc_init();
-    acc_sleep();
+	  // iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
+		// acc_init();
+    // acc_sleep();
 
-    iThread_run(&acc_thread, acc);
+    // iThread_run(&acc_thread, acc);
 
-    iGpio_interrupt_init(&btn_acc, BTN_ACC, IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_acc);
+    iGpio_interrupt_init(&btn_acc,  BTN_ACC,  IGPIO_RISING_EDGE, IGPIO_PULL_UP, on_btn_acc);
     iGpio_enable_interrupt(&btn_acc);
 
 	#endif  // ENABLE_ACC
 }
-#endif	// ENABLE_SWG || ENABLE_ADC || ENABLE_ACC || ENABLE_SOFT_INT
+#endif	// ENABLE_SWG | ENABLE_ADC | ENABLE_ACC | ENABLE_SOFT_INT

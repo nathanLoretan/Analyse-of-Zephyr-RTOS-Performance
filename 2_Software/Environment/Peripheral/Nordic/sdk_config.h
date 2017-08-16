@@ -23,9 +23,6 @@
 #define I2C0_SDA           4
 
 // App Priority
-#define SPI1_IRQ_PRIORITY  	1
-#define SPI2_IRQ_PRIORITY  	1
-#define I2C0_IRQ_PRIORITY  	1
 #define TIMER_PRIORITY			1
 
 // <e> The interrupt priorities available to the application
@@ -39,6 +36,9 @@
 // APP_IRQ_PRIORITY_THREAD 	= 4
 
 // Peripheral Priority
+#define SPI1_IRQ_PRIORITY  	2
+#define SPI2_IRQ_PRIORITY  	2
+#define I2C0_IRQ_PRIORITY  	2
 #define GPIO_P0_PRIORITY		2	// 0,1 priorities reserved by the softdevice
 #define GPIO_P1_PRIORITY		2 // 0,1 priorities reserved by the softdevice
 #define CLOCK_PRIORITY			2 // 0,1 priorities reserved by the softdevice
