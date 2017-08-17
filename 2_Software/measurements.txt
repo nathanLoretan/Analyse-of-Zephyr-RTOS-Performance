@@ -49,13 +49,13 @@ Basic Power Consumption:
 Measured: The Power Consumption
 
  Z  B
-[ ][ ] Advertising, No Drivers
-[ ][ ] Advertising, with Drivers
+[*][*] Advertising, No Drivers
+[*][*] Advertising, with Drivers
 
 - For each scenario
 
-[ ][ ] Device connected, No Drivers
-[ ][ ] Device connected, with Drivers
+[*][*] Device connected, No Drivers
+[*][*] Device connected, with Drivers
 
 Behavior Advertising:
 ----------------------
@@ -64,8 +64,7 @@ Measured: The Interrupt Latency
 Measured: The Power Consumption
 
  Z  B
-[ ][ ] External Interrupt and Soft timer enabled, No Drivers
-[ ][ ] External Interrupt and Soft timer enabled, with Drivers
+[*][*] External Interrupt and Soft timer enabled
 
 Device Connected:
 -----------------
@@ -77,8 +76,8 @@ Measured: Stack propagation delay
 - For each scenario
 
  Z  B
-[ ][ ] External Interrupt and Soft timer enabled, No Drivers
-[ ][ ] External Interrupt and Soft timer enabled, with Drivers
+[*][*] External Interrupt and Soft timer enabled, No Drivers
+[*][*] External Interrupt and Soft timer enabled, with Drivers
 
 //------------------------------------------------------------------------------
 4. Central Measurements
@@ -153,34 +152,31 @@ Connection Interval max:  15ms
 Slave Latency:            0     (Normally 20)
 Timeout:                  500ms (Normally 3s)
 
-TX Buffer size: 10
-
-ADC Data:  240sps (4.16ms)
-ACC Data:  200sps (5ms)
+TX Buffer size: 15
+ADC Data:  240sps (4.16ms)  ADC DR 7
+ACC Data:  200sps (5ms)     ACC DR 6
 
 Scenario 2 (Glucose Meter):
 ---------------------------
-Connection Interval min:  10ms
+Connection Interval min:  50ms  (Normally 10ms)
 Connection Interval max:  100ms
 Slave Latency:            0
 Timeout:                  500ms (Normally 3s)
 
-TX Buffer size: 20
-
-ADC Data:  60sps (16.66ms)
-ACC Data:  50sps (20ms)
+TX Buffer size: 15
+ADC Data:  60sps (16.66ms)  ADC DR 5
+ACC Data:  50sps (20ms)     ACC DR 4
 
 Scenario 3 (Heart Rate):
 ------------------------
 Connection Interval min:  400ms
 Connection Interval max:  650ms
 Slave Latency:            0
-Timeout:                  500ms (Normally 3s)
+Timeout:                  1s (Normally 3s)
 
-TX Buffer size: 60
-
-ADC Data:  60sps (16.66ms)
-ACC Data:  10sps (100ms)
+TX Buffer size: 15
+ADC Data:  15sps (66.66ms)  ADC DR 5 single cycle
+ACC Data:  10sps (100ms)    ACC DR 2
 
 //------------------------------------------------------------------------------
 2. Central
@@ -197,7 +193,7 @@ Connection Interval max:  15ms
 Slave Latency:            0     (Normally 20)
 Timeout:                  500ms (Normally 3s)
 
-TX Buffer size: 15
+TX Buffer size: 10
 
 ADC Data:   4ms
 ACC Data:   5ms
@@ -205,7 +201,7 @@ ACC Click:  750ms
 
 Scenario 2 (Glucose Meter):
 ---------------------------
-Connection Interval min:  10ms
+Connection Interval min:  50ms  (Normally 10ms)
 Connection Interval max:  100ms
 Slave Latency:            0
 Timeout:                  500ms (Normally 3s)
@@ -221,10 +217,37 @@ Scenario 3 (Heart Rate):
 Connection Interval min:  400ms
 Connection Interval max:  650ms
 Slave Latency:            0
-Timeout:                  500ms (Normally 3s)
+Timeout:                  1s (Normally 3s)
 
 TX Buffer size: 60
 
-ADC Data:   16.5ms
+ADC Data:   65ms
 ACC Data:   100ms
 ACC Click:  750ms
+
+//------------------------------------------------------------------------------
+ACC
+---
+// High Resolution
+// 					 |  1	|  2  |  3	|  4	|   5	|   6	|   7 |	     9	|
+// DATA RATE |	1	| 10	| 25	| 50	| 100	| 200	| 400	| 1.344k	|  [Hz]
+//
+// Normal
+// 					 |  1	|  2  |  3	|  4	|   5	|   6	|   7 |	     9	|
+// DATA RATE |	1	| 10	| 25	| 50	| 100	| 200	| 400	| 1.344k	|  [Hz]
+//
+// Low-power
+// 					 | 1	|  2  |  3	|  4	|   5	|   6	|   7 |	   8	|      9	|
+// DATA RATE | 1	| 10	| 25 	| 50	| 100	| 200	| 400	| 1.6k	| 5.376k	|	[Hz]
+
+ADC
+---
+// Continuous Conversion [SCYCLE = 0]
+//  				 |	5	|	  6	|	  7	|   8	|
+// DATA RATE | 50	|	100 |	200	|	400	|	[sps]	LINEF=1
+// DATA RATE | 60	|	120	|	240	|	480	|	[sps]	LINEF=0
+//
+// Single-Cycle Conversion [SCYCLE = 1]
+//					 |    1 |    2  |    3  |    4  |    5  |  6  |  7  |   8
+// DATA RATE | 0.83	| 2.08	|	4.17	|	8.33	| 12.5	|	25	| 50	| 100  [sps]  LINEF=1
+// DATA RATE |    1	|  2.5	|    5	|   10	|   15	|	30	| 60	| 120  [sps]  LINEF=0

@@ -165,6 +165,12 @@ adc_error_t adc_getMeasurement(uint32_t* measurement)
 	ISPI_CONVERT_DATA((uint8_t*) measurement, rx_buf, 3);
 
 	(*measurement) = (*measurement) * (((float) VREF) / ((1 << RESOLUTION) - 1));
+	
+	if(ADC_CONVERSION_MODE == ADC_CONVERSION_SINGLE_CYCLE) {
+		// Configure Sample per second and start measurements
+		ISPI_CREATE_DATA(&tx_buf, START | MODE_COMMAND | ADC_DATA_RATE);
+		iSPI_write(spi, ADC_SPI_CS, tx_buf, 1);
+	}
 
 	return ADC_NO_ERROR;
 }
@@ -187,10 +193,14 @@ void adc_sleep()
 
 void adc_wakeup()
 {
-	uint8_t tx_buf[1];
+	uint8_t tx_buf[2];
 
 	// At the beginning to not lose another event
 	// iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
+
+	// Configure the conversion mode and the measurements format
+	ISPI_CREATE_DATA(&tx_buf, START | MODE_REGISTER | REGISTER_CTRL1 | WRITE, UNIPOLAR | ADC_CONVERSION_MODE);
+	iSPI_write(spi, ADC_SPI_CS, tx_buf, 2);
 
 	// Configure Sample per second and start measurements
 	ISPI_CREATE_DATA(tx_buf, START | MODE_COMMAND | ADC_DATA_RATE);

@@ -180,12 +180,32 @@ IGPIO_HANDLER(on_btn_swg, pin)
 		iPrint("-> SWG disabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_SLEEP);
 		btn_swg_isEnabled = false;
+
+    #if ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+      iPrint("-> ACC disabled\n");
+      iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
+    #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+
+    #if ENABLE_BLE_MEASUREMENT && ENABLE_ADC
+      iPrint("-> ADC disabled\n");
+      iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
+    #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ADC
 	}
 	else
 	{
 		iPrint("-> SWG enabled\n");
     iEventQueue_add(&swg_EventQueue, SWG_EVENT_WAKEUP);
 		btn_swg_isEnabled = true;
+
+    #if ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+      iPrint("-> ACC enabled\n");
+      iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
+    #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+
+    #if ENABLE_BLE_MEASUREMENT && ENABLE_ADC
+      iPrint("-> ADC enabled\n");
+      iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
+    #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ADC
 	}
 
 	btn_swg_debouncer = true;
@@ -217,12 +237,15 @@ ITHREAD_HANDLER(ble)
 		{
 			case BLEP_EVENT_CONNECTED:
 		  {
-        #if ENABLE_BLE_MEASUREMENT
-          iPrint("-> ACC enabled\n");
-          acc_wakeup();
-          iPrint("-> ADC enabled\n");
-          adc_wakeup();
-        #endif  // ENABLE_BLE_MEASUREMENT
+        // #if ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+        //   iPrint("-> ACC enabled\n");
+        //   acc_wakeup();
+        // #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ACC
+        //
+        // #if ENABLE_BLE_MEASUREMENT && ENABLE_ADC
+        //   iPrint("-> ADC enabled\n");
+        //   adc_wakeup();
+        // #endif  // ENABLE_BLE_MEASUREMENT && ENABLE_ADC
 		  } break;
 
 			case BLEP_EVENT_DISCONNECTED:
@@ -281,10 +304,14 @@ ITHREAD_HANDLER(swg)
 
       case SWG_EVENT_WAKEUP:
       {
-        swg_wakeup();
+        // swg_wakeup();
         iGpio_enable_interrupt(&interrupt);
         iGpio_enable_interrupt(&btn_freq);
         ext_int_freq = EXT_INT_FREQ;
+
+        if(ext_int_freq != 0) {
+          swg_set_frequency(ext_int_freq);
+        }
       } break;
 
       case SWG_EVENT_SLEEP:

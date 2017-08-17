@@ -139,7 +139,8 @@ static void _on_write_rsq(uint16_t conn_handle, ble_gatts_evt_write_t	const* wri
 	}
 
 	if(*next_write_handler != NULL) {
-		(*next_write_handler)->handler(conn_handle, write->handle, write->data, write->len, write->offset);
+		(*next_write_handler)->handler(conn_handle, write->handle,
+																		write->data, write->len, write->offset);
 	}
 }
 
@@ -150,8 +151,9 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 		case BLE_GAP_EVT_CONNECTED:
 		{
 			// For readibility.
-			ble_gap_evt_t const* gap_evt              = &ble_evt->evt.gap_evt;
-			ble_gap_conn_params_t  const* conn_params = &gap_evt->params.connected.conn_params;
+			ble_gap_evt_t const* gap_evt = &ble_evt->evt.gap_evt;
+			ble_gap_conn_params_t  const* conn_params;
+			conn_params = &gap_evt->params.connected.conn_params;
 
 			_on_connection(gap_evt, conn_params);
 		} break;
@@ -168,8 +170,9 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 		case BLE_GAP_EVT_CONN_PARAM_UPDATE:
 		{
 			// For readibility.
-			uint16_t const conn_handle                = ble_evt->evt.gap_evt.conn_handle;
-			ble_gap_conn_params_t const* conn_params  = &ble_evt->evt.gap_evt.params.connected.conn_params;
+			uint16_t const conn_handle = ble_evt->evt.gap_evt.conn_handle;
+			ble_gap_conn_params_t const* conn_params;
+			conn_params = &ble_evt->evt.gap_evt.params.conn_param_update.conn_params;
 
 			_on_conn_params_update(conn_handle, conn_params);
 
@@ -196,8 +199,9 @@ static void _on_ble_evt(ble_evt_t* ble_evt)
 		case BLE_GATTS_EVT_EXCHANGE_MTU_REQUEST:
 		{
 			// For readibility.
-			uint16_t const conn_handle                													= ble_evt->evt.gatts_evt.conn_handle;
-			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request    = &ble_evt->evt.gatts_evt.params.exchange_mtu_request;
+			uint16_t const conn_handle = ble_evt->evt.gatts_evt.conn_handle;
+			ble_gatts_evt_exchange_mtu_request_t const* exchange_mtu_request;
+			exchange_mtu_request = &ble_evt->evt.gatts_evt.params.exchange_mtu_request;
 
 			_on_gatts_exchange_mtu_request(conn_handle, exchange_mtu_request);
 

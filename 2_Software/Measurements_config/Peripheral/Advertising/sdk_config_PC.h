@@ -4,7 +4,7 @@
 //==========================================================
 // <h> GENERAL INFORMATION
 //==========================================================
-#define BLE_TX_BUF_COUNT		15
+#define BLE_TX_BUF_COUNT		230
 
 #define NRF5_GPIO_P0	0
 #define NRF5_GPIO_P1	32

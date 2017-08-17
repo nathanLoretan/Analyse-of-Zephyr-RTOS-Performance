@@ -16,6 +16,8 @@ int main()
 
   uint32_t measurement = 0;
 
+  adc_wakeup();
+
   while(1)
   {
     // Wait for event

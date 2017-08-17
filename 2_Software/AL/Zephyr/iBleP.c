@@ -76,8 +76,8 @@ static void _on_disconnection(struct bt_conn *conn, u8_t reason)
 }
 
 static void _on_conn_params_update(struct bt_conn *conn,
-                                        u16_t interval, u16_t latency,
-                                        u16_t timeout)
+                                   u16_t interval, u16_t latency,
+                                   u16_t timeout)
 {
   iPrint("\n-> Connection Parameters Update\n");
   iPrint("-------------------------------\n");

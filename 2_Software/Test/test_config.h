@@ -28,8 +28,8 @@
 #define ADV_TIMEOUT        IBLEP_ADV_TIMEOUT_NONE
 
 // Sensors Configuration--------------------------------------------------------
-#define ADC_DATA_RATE             ADC_DATA_RATE_7
-#define ADC_CONVERSION_MODE       ADC_CONVERSION_CONTINUOUS
+#define ADC_DATA_RATE             ADC_DATA_RATE_4
+#define ADC_CONVERSION_MODE       ADC_CONVERSION_SINGLE_CYCLE  //ADC_CONVERSION_CONTINUOUS
 
 #define ACC_DATA_RATE             ACC_DATA_RATE_6
 #define ACC_MODE                  ACC_MODE_HIGH_RESOLUTION

@@ -22,8 +22,8 @@
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_ACC        1
-#define ENABLE_ADC        1
+#define ENABLE_ACC        0
+#define ENABLE_ADC        0
 #define ENABLE_SWG        1
 #define ENABLE_BLE        1
 
@@ -48,16 +48,15 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define ADC_DATA_RATE             ADC_DATA_RATE_5
-#define ADC_CONVERSION_MODE       ADC_CONVERSION_SINGLE_CYCLE
-// #define ADC_CONVERSION_MODE       ADC_CONVERSION_CONTINUOUS
+#define ADC_CONVERSION_MODE       ADC_CONVERSION_CONTINUOUS
 
-#define ACC_DATA_RATE             ACC_DATA_RATE_2
+#define ACC_DATA_RATE             ACC_DATA_RATE_4
 #define ACC_MODE                  ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO                  1
 
 // Sensors Configuration--------------------------------------------------------
-#define EXT_INT_FREQ              1000          // [Hz]
-#define FREQ_STEP1                9000          // [Hz]
+#define EXT_INT_FREQ              0             // [Hz]
+#define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
 #define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ?\

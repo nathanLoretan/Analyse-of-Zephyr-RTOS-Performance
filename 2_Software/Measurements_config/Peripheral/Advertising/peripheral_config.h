@@ -3,7 +3,7 @@
 
 // Measurement------------------------------------------------------------------
 #define ENABLE_MEASUREMENT      1
-#define ENABLE_BLE_MEASUREMENT  0
+#define ENABLE_BLE_MEASUREMENT  1
 
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI                 SPI1
@@ -22,8 +22,8 @@
 #define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_ACC        1
-#define ENABLE_ADC        1
+#define ENABLE_ACC        0
+#define ENABLE_ADC        0
 #define ENABLE_SWG        1
 #define ENABLE_BLE        1
 
@@ -47,10 +47,10 @@
 #define ADV_TIMEOUT        IBLEP_ADV_TIMEOUT_NONE
 
 // Sensors Configuration--------------------------------------------------------
-#define ADC_DATA_RATE             ADC_DATA_RATE_7
+#define ADC_DATA_RATE             ADC_DATA_RATE_5
 #define ADC_CONVERSION_MODE       ADC_CONVERSION_CONTINUOUS
 
-#define ACC_DATA_RATE             ACC_DATA_RATE_6
+#define ACC_DATA_RATE             ACC_DATA_RATE_2
 #define ACC_MODE                  ACC_MODE_HIGH_RESOLUTION
 #define ACC_FIFO                  1
 
@@ -59,6 +59,7 @@
 #define FREQ_STEP1                1000          // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
-#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ? (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
+#define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ?\
+                                          (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
 
 #endif  // __PERIPHERAL_CONFIG_H__
