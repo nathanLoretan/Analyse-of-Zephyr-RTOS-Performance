@@ -2,8 +2,8 @@
 #define __PERIPHERAL_CONFIG_H__
 
 // Measurement------------------------------------------------------------------
-#define ENABLE_MEASUREMENT      1
-#define ENABLE_BLE_MEASUREMENT  0
+#define ENABLE_MEASUREMENT  1
+#define POWER_MEASUREMENT   0
 
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI                 SPI1
@@ -25,11 +25,11 @@
 #define ENABLE_ACC        1
 #define ENABLE_ADC        1
 #define ENABLE_SWG        1
-#define ENABLE_BLE        1
+#define ENABLE_BLE        0
 
 // Software interrupt-----------------------------------------------------------
-#define ENABLE_SOFT_INT     1
-#define SOFT_INT_INTERVAL   10 // [ms]
+#define ENABLE_SOFT_INT     0
+#define SOFT_INT_INTERVAL   1 // [ms]
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30

@@ -2,11 +2,10 @@
 #include "../components/components/device/nrf52840.h"
 #include "../components/components/device/nrf52840_bitfields.h"
 
-#define PORT 	NRF_P0
+#define PORT 			NRF_P0
 #define PIN_REG 	0x2000	// pin 12
 // #define PIN_REG 	0x20000	// pin 17
-
-#define INTERVAL 	1	// [ms]
+#define INTERVAL 	10	// [ms]
 
 int main()
 {

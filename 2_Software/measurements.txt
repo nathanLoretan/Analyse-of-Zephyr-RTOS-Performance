@@ -1,0 +1,230 @@
+//==============================================================================
+// I. MEASUREMENTS
+//==============================================================================
+
+1. Basic Measurements
+---------------------
+
+[*] GPIO Toggle and set/clear error
+[*] Power consumption Sleep with Zephyr
+[*] Sleep ms error with Zephyr
+[*] Power consumption Sleep with BareMetal
+[*] Sleep ms error with BareMetal
+
+//------------------------------------------------------------------------------
+2. Extension Boards (Only) Measurements
+---------------------------------------
+- With Zephyr and BareMetal
+- Always report an average, min, max
+
+Basic Power Consumption:
+------------------------
+Measured: The Power Consumption
+
+ Z  B
+[*][*] Drivers OFF Sleep mode
+[*][*] Drivers ON
+
+Interrupt Latency:
+------------------
+Measured: The Interrupt Latency
+Measured: The Power Consumption
+
+ Z  B
+[*][*] Hardware Interrupt Latency only
+[*][*] Software Interrupt Latency only
+[*][*] Hardware and Software Interrupt Latency
+[*][*] Hardware Interrupt Latency with drivers
+[*][*] Software Interrupt Latency with drivers
+[*][*] Hardware and Software Interrupt Latency with drivers
+
+//------------------------------------------------------------------------------
+3. Peripheral Measurements
+---------------------------
+- With Zephyr and BareMetal
+- Always report an average, min, max
+
+Basic Power Consumption:
+------------------------
+Measured: The Power Consumption
+
+ Z  B
+[ ][ ] Advertising, No Drivers
+[ ][ ] Advertising, with Drivers
+
+- For each scenario
+
+[ ][ ] Device connected, No Drivers
+[ ][ ] Device connected, with Drivers
+
+Behavior Advertising:
+----------------------
+Measured: The interval between each advertising packets
+Measured: The Interrupt Latency
+Measured: The Power Consumption
+
+ Z  B
+[ ][ ] External Interrupt and Soft timer enabled, No Drivers
+[ ][ ] External Interrupt and Soft timer enabled, with Drivers
+
+Device Connected:
+-----------------
+Measured: The Interrupt Latency
+Measured: The Power Consumption
+Measured: Still responding to the connection event
+Measured: Stack propagation delay
+
+- For each scenario
+
+ Z  B
+[ ][ ] External Interrupt and Soft timer enabled, No Drivers
+[ ][ ] External Interrupt and Soft timer enabled, with Drivers
+
+//------------------------------------------------------------------------------
+4. Central Measurements
+---------------------------
+- With Zephyr and BareMetal
+- Always report an average, min, max
+
+Basic Power Consumption:
+------------------------
+Measured: The Power Consumption
+
+ Z  B
+[ ][ ] Scanning
+
+- For each scenario
+
+[ ][ ] Central connected, 1 peripheral
+[ ][ ] Central connected, 4 peripherals
+[ ][ ] Central connected, 8 peripherals
+
+Behavior Scanning:
+------------------
+Measured: The Interrupt Latency
+Measured: The Power Consumption
+Measured: The interval between each scanning packets
+
+ Z  B
+[ ][ ] External Interrupt and Soft timer disabled
+[ ][ ] External Interrupt and Soft timer enabled
+
+Devices Connected:
+------------------
+Measured: The Interrupt Latency
+Measured: The Power Consumption
+Measured: The interval between each scanning packets
+Measured: The interval between each connection event packets
+
+- For each scenario
+
+ Z  B
+[ ][ ] Central connected to 1 peripheral
+[ ][ ] Central connected to 4 peripherals
+[ ][ ] Central connected to 8 peripherals
+[ ][ ] Central connected to 1 peripheral, External Interrupt and Soft timer enabled
+[ ][ ] Central connected to 4 peripherals, External Interrupt and Soft timer enabled
+[ ][ ] Central connected to 8 peripherals, External Interrupt and Soft timer enabled
+
+//==============================================================================
+// II. SCENARIOS
+//==============================================================================
+- MTU size 23 Bytes
+- Data Notified
+
+Services ACC
+  chrc data
+  chrc click
+
+Services ADC
+  chrc data
+
+1. Peripheral
+-------------
+
+Advertising:
+-----------
+Interval: 50ms
+
+Scenario 1 (Mouse):
+-------------------
+Connection Interval min:  7.5ms
+Connection Interval max:  15ms
+Slave Latency:            0     (Normally 20)
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 10
+
+ADC Data:  240sps (4.16ms)
+ACC Data:  200sps (5ms)
+
+Scenario 2 (Glucose Meter):
+---------------------------
+Connection Interval min:  10ms
+Connection Interval max:  100ms
+Slave Latency:            0
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 20
+
+ADC Data:  60sps (16.66ms)
+ACC Data:  50sps (20ms)
+
+Scenario 3 (Heart Rate):
+------------------------
+Connection Interval min:  400ms
+Connection Interval max:  650ms
+Slave Latency:            0
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 60
+
+ADC Data:  60sps (16.66ms)
+ACC Data:  10sps (100ms)
+
+//------------------------------------------------------------------------------
+2. Central
+----------
+
+Scanning:
+-----------
+Interval: 50ms
+
+Scenario 1 (Mouse):
+-------------------
+Connection Interval min:  7.5ms
+Connection Interval max:  15ms
+Slave Latency:            0     (Normally 20)
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 15
+
+ADC Data:   4ms
+ACC Data:   5ms
+ACC Click:  750ms
+
+Scenario 2 (Glucose Meter):
+---------------------------
+Connection Interval min:  10ms
+Connection Interval max:  100ms
+Slave Latency:            0
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 25
+
+ADC Data:   16.5ms
+ACC Data:   20ms
+ACC Click:  750ms
+
+Scenario 3 (Heart Rate):
+------------------------
+Connection Interval min:  400ms
+Connection Interval max:  650ms
+Slave Latency:            0
+Timeout:                  500ms (Normally 3s)
+
+TX Buffer size: 60
+
+ADC Data:   16.5ms
+ACC Data:   100ms
+ACC Click:  750ms

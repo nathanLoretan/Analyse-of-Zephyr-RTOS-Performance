@@ -23,6 +23,9 @@
 #define I2C0_SDA           4
 
 // App Priority
+#define SPI1_IRQ_PRIORITY  	1
+#define SPI2_IRQ_PRIORITY  	1
+#define I2C0_IRQ_PRIORITY  	1
 #define TIMER_PRIORITY			1
 
 // <e> The interrupt priorities available to the application
@@ -36,9 +39,6 @@
 // APP_IRQ_PRIORITY_THREAD 	= 4
 
 // Peripheral Priority
-#define SPI1_IRQ_PRIORITY  	2
-#define SPI2_IRQ_PRIORITY  	2
-#define I2C0_IRQ_PRIORITY  	2
 #define GPIO_P0_PRIORITY		2	// 0,1 priorities reserved by the softdevice
 #define GPIO_P1_PRIORITY		2 // 0,1 priorities reserved by the softdevice
 #define CLOCK_PRIORITY			2 // 0,1 priorities reserved by the softdevice
@@ -416,7 +416,7 @@
 
 	// <o> GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS - Number of lower power input pins
 	#ifndef GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS
-		#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 10
+		#define GPIOTE_CONFIG_NUM_OF_LOW_POWER_EVENTS 2
 	#endif
 
 	// <o> GPIOTE_CONFIG_IRQ_PRIORITY  - Interrupt priority
@@ -1052,7 +1052,7 @@
 // <e> NRF_LOG_BACKEND_SERIAL_USES_UART - If enabled data is printed over UART
 //==========================================================
 #ifndef NRF_LOG_BACKEND_SERIAL_USES_UART
-#define NRF_LOG_BACKEND_SERIAL_USES_UART 0
+#define NRF_LOG_BACKEND_SERIAL_USES_UART 1
 #endif
 #if  NRF_LOG_BACKEND_SERIAL_USES_UART
 // <o> NRF_LOG_BACKEND_SERIAL_UART_BAUDRATE  - Default Baudrate
@@ -1121,7 +1121,7 @@
 // <e> NRF_LOG_BACKEND_SERIAL_USES_RTT - If enabled data is printed using RTT
 //==========================================================
 #ifndef NRF_LOG_BACKEND_SERIAL_USES_RTT
-#define NRF_LOG_BACKEND_SERIAL_USES_RTT 0
+#define NRF_LOG_BACKEND_SERIAL_USES_RTT 1
 #endif
 #if  NRF_LOG_BACKEND_SERIAL_USES_RTT
 // <o> NRF_LOG_BACKEND_RTT_OUTPUT_BUFFER_SIZE - RTT output buffer size.
