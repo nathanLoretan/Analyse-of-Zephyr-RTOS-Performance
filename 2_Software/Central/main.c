@@ -265,10 +265,15 @@ ITHREAD_HANDLER(swg)
 
       case SWG_EVENT_WAKEUP:
       {
-        swg_wakeup();
+        // swg_wakeup();
         iGpio_enable_interrupt(&interrupt);
         iGpio_enable_interrupt(&btn_freq);
         ext_int_freq = EXT_INT_FREQ;
+
+        if(ext_int_freq != 0) {
+          swg_set_frequency(ext_int_freq);
+        }
+
       } break;
 
       case SWG_EVENT_SLEEP:

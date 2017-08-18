@@ -11,6 +11,7 @@ static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
+// static struct k_mutex 			_conn_mutex;
 
 static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
 static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
@@ -125,6 +126,8 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 		return;
 	}
 
+	// k_mutex_lock(&_conn_mutex, K_FOREVER);
+
 	// Create a connection with the new device
 	_new_conn = bt_conn_create_le(peer_addr, &_conn_params);
 	if(_new_conn == NULL) {
@@ -184,6 +187,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	{
 		link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
+		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return BT_GATT_ITER_STOP;
@@ -223,6 +227,7 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
+		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		return BT_GATT_ITER_STOP;
 	}
@@ -259,8 +264,8 @@ static void _start_discovery(struct bt_conn* conn)
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
+		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
-		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return;
 	}
 }
@@ -333,6 +338,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 	if(conn_err) {
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
+		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 	else if(_new_conn == conn)
@@ -342,7 +348,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		link[ref].conn_ref 	= conn;
 		link[ref].isReady 	= false;
 		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
-		memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
+		// memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
 
 		// iPrint("nbr handles %d\n", _nbr_handles);
 		// iPrint("table %d\n", link[1].attrs - link[0].attrs);
@@ -367,6 +373,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 	}
 	else {
 		iPrint("-> Connection to %d failed: error connection reference\n", ref);
+		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 }
@@ -396,11 +403,19 @@ static void _on_conn_parameters_update(struct bt_conn *conn,
                                         u16_t interval, u16_t latency,
                                         u16_t timeout)
 {
-  iPrint("\n-> Connection Parameters Update\n");
-  iPrint("-------------------------------\n");
+	uint8_t ref = _get_conn_ref(conn);
+
+  iPrint("\n-> Connection %d Parameters Update\n", ref);
+  iPrint("---------------------------------\n");
   iPrint("Connection Interval: %u[us]\n", interval * UNIT_1_25_MS);
   iPrint("Connection Slave Latency: %u\n", latency);
   iPrint("Connection Timeout: %u[ms]\n", timeout * UNIT_10_MS / 1000);
+}
+
+bool _on_param_req(struct bt_conn *conn, struct bt_le_conn_param *param)
+{
+	// Refuse the request to keep the connection event for measurements
+	return false;
 }
 
 static struct bt_conn_cb connection_callback =
@@ -408,6 +423,7 @@ static struct bt_conn_cb connection_callback =
 	.connected 		    = _on_connection,
 	.disconnected     = _on_disconnection,
 	.le_param_updated = _on_conn_parameters_update,
+	.le_param_req 		= _on_param_req
 };
 
 int iBleC_init(iBleC_conn_params_t* conn_params)
@@ -437,6 +453,8 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	bt_conn_cb_register(&connection_callback);
 
 	iEventQueue_init(&bleC_EventQueue);
+
+	// k_mutex_init(&_conn_mutex);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
@@ -474,7 +492,7 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
   }
 
 	// Add 20 for Generic Access and Generic Attribute
-  _nbr_handles = nbr_handles + 20;
+  _nbr_handles = nbr_handles + 10;
 	_nbr_attr_disc = nbr_attrs;
 	_attr_disc_list = attr_disc_list;
 }

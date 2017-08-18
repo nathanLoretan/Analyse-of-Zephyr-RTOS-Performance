@@ -34,7 +34,7 @@ ifeq ($(sys),zephyr)
 else
 
 	# include $(PROJ_DIR)/Environment/Central/Nordic/baremetal.mk
-	# include $(PROJ_DIR)/Environment/Central/Zephyr/zephyr.mk
+	include $(PROJ_DIR)/Environment/Central/Zephyr/zephyr.mk
 
 	# include $(PROJ_DIR)/Environment/E-Peripheral/Nordic/baremetal.mk
 	# include $(PROJ_DIR)/Environment/E-Peripheral/Zephyr/zephyr.mk
@@ -46,6 +46,6 @@ else
 	# include $(PROJ_DIR)/Environment/Test/Zephyr/zephyr.mk
 
 	# include $(PROJ_DIR)/Environment/Measurement/Nordic/baremetal.mk
-	include $(PROJ_DIR)/Environment/Measurement/Zephyr/zephyr.mk
+	# include $(PROJ_DIR)/Environment/Measurement/Zephyr/zephyr.mk
 
 endif

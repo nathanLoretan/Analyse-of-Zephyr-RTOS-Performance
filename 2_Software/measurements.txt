@@ -90,13 +90,13 @@ Basic Power Consumption:
 Measured: The Power Consumption
 
  Z  B
-[ ][ ] Scanning
+[*][*] Scanning
 
 - For each scenario
 
-[ ][ ] Central connected, 1 peripheral
-[ ][ ] Central connected, 4 peripherals
-[ ][ ] Central connected, 8 peripherals
+[*][*] Central connected, 1 peripheral
+[*][*] Central connected, 4 peripherals
+[*][*] Central connected, 8 peripherals
 
 Behavior Scanning:
 ------------------
@@ -105,8 +105,7 @@ Measured: The Power Consumption
 Measured: The interval between each scanning packets
 
  Z  B
-[ ][ ] External Interrupt and Soft timer disabled
-[ ][ ] External Interrupt and Soft timer enabled
+[*][*] External Interrupt and Soft timer enabled
 
 Devices Connected:
 ------------------
@@ -121,9 +120,11 @@ Measured: The interval between each connection event packets
 [ ][ ] Central connected to 1 peripheral
 [ ][ ] Central connected to 4 peripherals
 [ ][ ] Central connected to 8 peripherals
-[ ][ ] Central connected to 1 peripheral, External Interrupt and Soft timer enabled
-[ ][ ] Central connected to 4 peripherals, External Interrupt and Soft timer enabled
-[ ][ ] Central connected to 8 peripherals, External Interrupt and Soft timer enabled
+
+[ ][ ] Central connected to 1 peripheral, Notification
+[ ][ ] Central connected to 4 peripherals, Notification
+[ ][ ] Central connected to 8 peripherals, Notification
+
 
 //==============================================================================
 // II. SCENARIOS
@@ -184,7 +185,8 @@ ACC Data:  10sps (100ms)    ACC DR 2
 
 Scanning:
 -----------
-Interval: 50ms
+Interval: 200ms
+Window: 50ms
 
 Scenario 1 (Mouse):
 -------------------
