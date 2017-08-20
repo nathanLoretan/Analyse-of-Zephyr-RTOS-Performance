@@ -347,7 +347,7 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 		link[ref].conn_ref 	= conn;
 		link[ref].isReady 	= false;
-		link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
+		// link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
 		// memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
 
 		// iPrint("nbr handles %d\n", _nbr_handles);
@@ -432,9 +432,9 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 
 	for(int i = 0; i < IBLEC_MAX_CONN; i++) {
 		link[i].conn_ref 	= NULL;
-		// memset(link[i].attrs, 0, sizeof(link[i].attrs));
-		link[i].attrs 		= NULL;
 		link[i].isReady		= false;
+		// memset(link[i].attrs, 0, sizeof(link[i].attrs));
+		// link[i].attrs 		= NULL;
 	}
 
 	// Save the connection parameters
@@ -492,7 +492,7 @@ void iBleC_discovery_init(iBleC_attr_disc_t* attr_disc_list, uint16_t nbr_attrs)
   }
 
 	// Add 20 for Generic Access and Generic Attribute
-  _nbr_handles = nbr_handles + 10;
+  _nbr_handles = nbr_handles + 20;
 	_nbr_attr_disc = nbr_attrs;
 	_attr_disc_list = attr_disc_list;
 }

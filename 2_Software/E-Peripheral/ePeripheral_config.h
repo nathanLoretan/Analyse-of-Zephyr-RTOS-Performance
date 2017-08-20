@@ -10,8 +10,8 @@
 #define BTN_ADC_DATA          15
 
 // Data rate--------------------------------------------------------------------
-#define ADC_DATA_TIMER		750
-#define ACC_DATA_TIMER		750
+#define ADC_DATA_TIMER		4
+#define ACC_DATA_TIMER		5
 #define ACC_CLICK_TIMER		750
 
 // BLE Configuration------------------------------------------------------------

@@ -129,16 +129,19 @@ IBLEC_NOTIFY_HANDLER(on_acc_data, conn, params)
 {
 	acc_sample_t* sample = ((acc_sample_t*) params->data);
 	iPrint("NOTIFY ACC DATA %d, %lu, %lu, %lu\n", conn, (uint32_t) sample->x, (uint32_t) sample->y, (uint32_t) sample->z);
+  BLE_NOTIFY_TOGGLE();
 }
 
 IBLEC_NOTIFY_HANDLER(on_acc_click, conn, params)
 {
 	iPrint("NOTIFY ACC CLICK %d, %lu\n", conn, *((uint32_t*) params->data));
+  BLE_NOTIFY_TOGGLE();
 }
 
 IBLEC_NOTIFY_HANDLER(on_adc_data, conn, params)
 {
 	iPrint("NOTIFY ADC DATA %d, %lu\n", conn, *((uint32_t*) params->data));
+  BLE_NOTIFY_TOGGLE();
 }
 
 // Threads----------------------------------------------------------------------

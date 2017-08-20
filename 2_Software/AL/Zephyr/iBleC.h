@@ -213,8 +213,8 @@ typedef struct {
 
 struct {
 	struct bt_conn*	conn_ref;
-	// iBleC_attr_t attrs[100];
-	iBleC_attr_t* attrs;
+	iBleC_attr_t attrs[100];
+	// iBleC_attr_t* attrs;
 	volatile bool isReady;
 } link[CONFIG_BT_MAX_CONN];
 

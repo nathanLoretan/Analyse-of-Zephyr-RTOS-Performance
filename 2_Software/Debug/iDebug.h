@@ -49,6 +49,7 @@ do {\
 #define BLE_NOTIFY_PIN          2
 #define BLE_NOTIFY_PORT         NRF_P0
 #define BLE_NOTIFY(_flag)       DEBUG_PIN_SET(BLE_NOTIFY_PIN, BLE_NOTIFY_PORT, _flag)
+#define BLE_NOTIFY_TOGGLE()     DEBUG_PIN_TOGGLE(BLE_NOTIFY_PIN, BLE_NOTIFY_PORT)
 
 // Inspired by the State Machine from nRF52840 Datasheet p.252 Figure.35
 #define RADIO_TX_PIN            13

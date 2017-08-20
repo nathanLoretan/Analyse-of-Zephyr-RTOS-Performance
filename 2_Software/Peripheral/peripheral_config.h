@@ -57,7 +57,7 @@
 
 // Sensors Configuration--------------------------------------------------------
 #define EXT_INT_FREQ              1000          // [Hz]
-#define FREQ_STEP1                9000          // [Hz]
+#define FREQ_STEP1                10000         // [Hz]
 #define FREQ_STEP2                10000         // [Hz]
 #define FREQ_STEP_1TO2            10000         // [Hz]
 #define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ?\
