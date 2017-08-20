@@ -22,15 +22,15 @@
 
 // Software interrupt-----------------------------------------------------------
 #define ENABLE_SOFT_INT     1
-#define SOFT_INT_INTERVAL   1 // [ms]
+#define SOFT_INT_INTERVAL   10 // [ms]
 
 // BLE Configuration------------------------------------------------------------
 #define SCAN_INTERVAL				MSEC_TO_UNITS(200, UNIT_0_625_MS)
 #define SCAN_WINDOW					MSEC_TO_UNITS(50, UNIT_0_625_MS)
 #define SCAN_TIMEOUT        IBLEC_SCAN_TIMEOUT_NONE
 
-#define CONN_MIN_INTERVAL		MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
-#define CONN_MAX_INTERVAL		MSEC_TO_UNITS(7.5, UNIT_1_25_MS)
+#define CONN_MIN_INTERVAL		MSEC_TO_UNITS(400, UNIT_1_25_MS)
+#define CONN_MAX_INTERVAL		MSEC_TO_UNITS(400, UNIT_1_25_MS)
 #define CONN_TIMOUT					MSEC_TO_UNITS(4000, UNIT_10_MS)
 #define SLAVE_LATENCY				0
 
