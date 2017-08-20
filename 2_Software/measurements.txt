@@ -22,7 +22,7 @@ Basic Power Consumption:
 Measured: The Power Consumption
 
  Z  B
-[*][*] Drivers OFF Sleep mode
+[*][*] Drivers OFF
 [*][*] Drivers ON
 
 Interrupt Latency:
