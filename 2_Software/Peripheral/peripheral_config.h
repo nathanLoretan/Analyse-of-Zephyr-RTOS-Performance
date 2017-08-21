@@ -3,7 +3,7 @@
 
 // Measurement------------------------------------------------------------------
 #define ENABLE_MEASUREMENT      1
-#define ENABLE_BLE_MEASUREMENT  1
+#define ENABLE_BLE_MEASUREMENT  0
 
 // Serial Configuration---------------------------------------------------------
 #define ADC_SPI                 SPI1
@@ -29,7 +29,7 @@
 
 // Software interrupt-----------------------------------------------------------
 #define ENABLE_SOFT_INT     1
-#define SOFT_INT_INTERVAL   10 // [ms]
+#define SOFT_INT_INTERVAL   10// [ms]
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define ACC_INT2           30
@@ -56,10 +56,10 @@
 #define ACC_FIFO                  1
 
 // Sensors Configuration--------------------------------------------------------
-#define EXT_INT_FREQ              1000          // [Hz]
-#define FREQ_STEP1                10000         // [Hz]
-#define FREQ_STEP2                10000         // [Hz]
-#define FREQ_STEP_1TO2            10000         // [Hz]
+#define EXT_INT_FREQ              1000         // [Hz]
+#define FREQ_STEP1                9000         // [Hz]
+#define FREQ_STEP2                10000        // [Hz]
+#define FREQ_STEP_1TO2            10000        // [Hz]
 #define CHANGE_FREQUENCY(_freq)   _freq = ((_freq + FREQ_STEP1) <= FREQ_STEP_1TO2) ?\
                                           (_freq + FREQ_STEP1) : (_freq + FREQ_STEP2);
 

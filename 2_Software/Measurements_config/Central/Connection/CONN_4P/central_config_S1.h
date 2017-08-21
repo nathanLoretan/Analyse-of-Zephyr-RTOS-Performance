@@ -2,7 +2,7 @@
 #define __CENTRAL_CONFIG_H__
 
 // Measurement------------------------------------------------------------------
-#define ENABLE_MEASUREMENT      1
+#define ENABLE_MEASUREMENT  1
 #define ENABLE_BLE_MEASUREMENT  1
 
 // Serial Configuration---------------------------------------------------------
@@ -13,7 +13,7 @@
 #define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING
 
 // Drivers----------------------------------------------------------------------
-#define ENABLE_SWG        0
+#define ENABLE_SWG        1
 
 // Externa. Interrupt pin-------------------------------------------------------
 #define INTERRUPT_PIN		   39
@@ -21,7 +21,7 @@
 #define BTN_FREQ_PIN       25
 
 // Software interrupt-----------------------------------------------------------
-#define ENABLE_SOFT_INT     0
+#define ENABLE_SOFT_INT     1
 #define SOFT_INT_INTERVAL   10 // [ms]
 
 // BLE Configuration------------------------------------------------------------

@@ -62,7 +62,7 @@ IGPIO_HANDLER(on_interrupt, pin)
 }
 
 // Button-----------------------------------------------------------------------
-int debouncer_ms = 350;
+int debouncer_ms = 500;
 bool btn_swg_debouncer  = false;
 bool btn_freq_debouncer = false;
 

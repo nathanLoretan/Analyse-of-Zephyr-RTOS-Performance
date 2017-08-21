@@ -165,7 +165,7 @@ adc_error_t adc_getMeasurement(uint32_t* measurement)
 	ISPI_CONVERT_DATA((uint8_t*) measurement, rx_buf, 3);
 
 	(*measurement) = (*measurement) * (((float) VREF) / ((1 << RESOLUTION) - 1));
-	
+
 	if(ADC_CONVERSION_MODE == ADC_CONVERSION_SINGLE_CYCLE) {
 		// Configure Sample per second and start measurements
 		ISPI_CREATE_DATA(&tx_buf, START | MODE_COMMAND | ADC_DATA_RATE);

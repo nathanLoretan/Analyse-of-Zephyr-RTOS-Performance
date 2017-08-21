@@ -11,7 +11,7 @@
 
 // Data rate--------------------------------------------------------------------
 #define ADC_DATA_TIMER		65
-#define ACC_DATA_TIMER		100
+#define ACC_DATA_TIMER		10
 #define ACC_CLICK_TIMER		750
 
 // BLE Configuration------------------------------------------------------------

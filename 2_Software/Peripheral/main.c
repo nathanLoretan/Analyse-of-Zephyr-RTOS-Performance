@@ -80,7 +80,7 @@ IGPIO_HANDLER(on_interrupt, pin)
 
 // Button-----------------------------------------------------------------------
 #if ENABLE_ADC | ENABLE_ACC | ENABLE_SWG
-int debouncer_ms = 300;
+int debouncer_ms = 350;
 bool btn_adc_debouncer  = false;
 bool btn_acc_debouncer  = false;
 bool btn_swg_debouncer  = false;
