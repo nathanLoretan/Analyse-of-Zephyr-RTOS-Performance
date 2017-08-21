@@ -117,11 +117,9 @@ Measured: The interval between each connection event packets
 - For each scenario
 
  Z  B
-
-[ ][ ] Central connected to 1 peripheral, Notification
-[ ][ ] Central connected to 4 peripherals, Notification
-[ ][ ] Central connected to 8 peripherals, Notification
-
+[*][*] Central connected to 1 peripheral, Notification
+[*][*] Central connected to 4 peripherals, Notification
+[*][*] Central connected to 8 peripherals, Notification
 
 //==============================================================================
 // II. SCENARIOS

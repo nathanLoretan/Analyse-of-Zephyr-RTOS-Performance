@@ -10,7 +10,7 @@
 #define BTN_ADC_DATA          15
 
 // Data rate--------------------------------------------------------------------
-#define ADC_DATA_TIMER		60
+#define ADC_DATA_TIMER		65
 #define ACC_DATA_TIMER		100
 #define ACC_CLICK_TIMER		750
 
