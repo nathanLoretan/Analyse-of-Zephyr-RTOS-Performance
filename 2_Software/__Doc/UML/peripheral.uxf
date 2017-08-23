@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.2">
-  <zoom_level>2</zoom_level>
+  <zoom_level>12</zoom_level>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>706</x>
-      <y>342</y>
-      <w>46</w>
-      <h>10</h>
+      <x>1692</x>
+      <y>180</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>if Event in the Queue
 valign=center
@@ -18,10 +18,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>726</x>
-      <y>326</y>
-      <w>4</w>
-      <h>4</h>
+      <x>1812</x>
+      <y>84</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -29,10 +29,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>632</x>
-      <y>368</y>
-      <w>106</w>
-      <h>10</h>
+      <x>1248</x>
+      <y>336</y>
+      <w>636</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>handle event
 valign=center
@@ -43,10 +43,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>726</x>
-      <y>326</y>
-      <w>6</w>
-      <h>20</h>
+      <x>1812</x>
+      <y>84</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -54,10 +54,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>674</x>
-      <y>350</y>
-      <w>58</w>
-      <h>22</h>
+      <x>1500</x>
+      <y>228</y>
+      <w>348</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>Yes
 lt=-&gt;</panel_attributes>
@@ -66,10 +66,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>620</x>
-      <y>332</y>
-      <w>112</w>
-      <h>80</h>
+      <x>1176</x>
+      <y>120</y>
+      <w>672</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -78,10 +78,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>762</x>
-      <y>368</y>
-      <w>36</w>
-      <h>10</h>
+      <x>2028</x>
+      <y>336</y>
+      <w>216</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Wait for event
 valign=center
@@ -92,10 +92,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>726</x>
-      <y>350</y>
-      <w>58</w>
-      <h>22</h>
+      <x>1812</x>
+      <y>228</y>
+      <w>348</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>No
 lt=-&gt;</panel_attributes>
@@ -104,10 +104,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>736</x>
-      <y>370</y>
-      <w>30</w>
-      <h>8</h>
+      <x>1872</x>
+      <y>348</y>
+      <w>180</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Event occured
 lt=-&gt;</panel_attributes>
@@ -116,10 +116,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>628</x>
-      <y>392</y>
-      <w>24</w>
-      <h>8</h>
+      <x>1224</x>
+      <y>480</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Notify Click 
 valign=center
@@ -130,10 +130,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>654</x>
-      <y>392</y>
-      <w>32</w>
-      <h>8</h>
+      <x>1380</x>
+      <y>480</y>
+      <w>192</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Notify ACC value
 valign=center
@@ -144,10 +144,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>640</x>
-      <y>376</y>
-      <w>22</w>
-      <h>20</h>
+      <x>1296</x>
+      <y>384</y>
+      <w>132</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT INT2
 lt=-&gt;</panel_attributes>
@@ -156,10 +156,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>668</x>
-      <y>376</y>
-      <w>22</w>
-      <h>20</h>
+      <x>1464</x>
+      <y>384</y>
+      <w>132</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT INT1
 lt=-&gt;</panel_attributes>
@@ -168,10 +168,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>620</x>
-      <y>332</y>
-      <w>112</w>
-      <h>80</h>
+      <x>1176</x>
+      <y>120</y>
+      <w>672</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>250.0;340.0;250.0;380.0;10.0;380.0;10.0;10.0;540.0;10.0</additional_attributes>
@@ -179,10 +179,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>538</x>
-      <y>472</y>
-      <w>46</w>
-      <h>10</h>
+      <x>684</x>
+      <y>960</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>if Event in the Queue
 valign=center
@@ -193,10 +193,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>558</x>
-      <y>456</y>
-      <w>4</w>
-      <h>4</h>
+      <x>804</x>
+      <y>864</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -204,10 +204,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>490</x>
-      <y>498</y>
-      <w>72</w>
-      <h>10</h>
+      <x>396</x>
+      <y>1116</y>
+      <w>432</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>handle event
 valign=center
@@ -218,10 +218,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>558</x>
-      <y>456</y>
-      <w>6</w>
-      <h>20</h>
+      <x>804</x>
+      <y>864</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -229,10 +229,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>502</x>
-      <y>480</y>
-      <w>62</w>
-      <h>22</h>
+      <x>468</x>
+      <y>1008</y>
+      <w>372</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>Yes
 lt=-&gt;</panel_attributes>
@@ -241,10 +241,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>462</y>
-      <w>88</w>
-      <h>80</h>
+      <x>312</x>
+      <y>900</y>
+      <w>528</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -253,10 +253,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>584</x>
-      <y>498</y>
-      <w>36</w>
-      <h>10</h>
+      <x>960</x>
+      <y>1116</y>
+      <w>216</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Wait for event
 valign=center
@@ -267,10 +267,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>558</x>
-      <y>480</y>
-      <w>48</w>
-      <h>22</h>
+      <x>804</x>
+      <y>1008</y>
+      <w>288</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>No
 lt=-&gt;</panel_attributes>
@@ -279,10 +279,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>500</y>
-      <w>28</w>
-      <h>8</h>
+      <x>816</x>
+      <y>1128</y>
+      <w>168</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Event occured
 lt=-&gt;</panel_attributes>
@@ -291,10 +291,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>484</x>
-      <y>524</y>
-      <w>32</w>
-      <h>8</h>
+      <x>360</x>
+      <y>1272</y>
+      <w>192</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Notify ADC value 
 valign=center
@@ -305,10 +305,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>498</x>
-      <y>506</y>
-      <w>24</w>
-      <h>22</h>
+      <x>444</x>
+      <y>1164</y>
+      <w>144</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>EVENT DATA
 lt=-&gt;</panel_attributes>
@@ -317,10 +317,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>720</x>
-      <y>438</y>
-      <w>46</w>
-      <h>10</h>
+      <x>1776</x>
+      <y>756</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>if Event in the Queue
 valign=center
@@ -331,10 +331,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>642</x>
-      <y>464</y>
-      <w>120</w>
-      <h>10</h>
+      <x>1308</x>
+      <y>912</y>
+      <w>720</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>handle event
 valign=center
@@ -345,10 +345,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>658</x>
-      <y>446</y>
-      <w>88</w>
-      <h>22</h>
+      <x>1404</x>
+      <y>804</y>
+      <w>528</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>Yes
 lt=-&gt;</panel_attributes>
@@ -357,10 +357,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>428</y>
-      <w>124</w>
-      <h>110</h>
+      <x>1200</x>
+      <y>696</y>
+      <w>744</w>
+      <h>660</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -369,10 +369,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>786</x>
-      <y>464</y>
-      <w>36</w>
-      <h>10</h>
+      <x>2172</x>
+      <y>912</y>
+      <w>216</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Wait for event
 valign=center
@@ -383,10 +383,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>742</x>
-      <y>446</y>
-      <w>66</w>
-      <h>22</h>
+      <x>1908</x>
+      <y>804</y>
+      <w>396</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>No
 lt=-&gt;</panel_attributes>
@@ -395,10 +395,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>760</x>
-      <y>466</y>
-      <w>30</w>
-      <h>8</h>
+      <x>2016</x>
+      <y>924</y>
+      <w>180</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Event occured
 lt=-&gt;</panel_attributes>
@@ -407,10 +407,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>638</x>
-      <y>488</y>
-      <w>38</w>
-      <h>8</h>
+      <x>1284</x>
+      <y>1056</y>
+      <w>228</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Increase frequency
 valign=center
@@ -421,10 +421,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>658</x>
-      <y>472</y>
-      <w>24</w>
-      <h>20</h>
+      <x>1404</x>
+      <y>960</y>
+      <w>144</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT FREQ
 lt=-&gt;</panel_attributes>
@@ -433,10 +433,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>540</x>
-      <y>338</y>
-      <w>46</w>
-      <h>10</h>
+      <x>696</x>
+      <y>156</y>
+      <w>276</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>if Event in the Queue
 valign=center
@@ -447,10 +447,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>560</x>
-      <y>322</y>
-      <w>4</w>
-      <h>4</h>
+      <x>816</x>
+      <y>60</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -458,10 +458,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>492</x>
-      <y>364</y>
-      <w>60</w>
-      <h>10</h>
+      <x>408</x>
+      <y>312</y>
+      <w>360</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>handle event
 valign=center
@@ -472,10 +472,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>322</y>
-      <w>6</w>
-      <h>20</h>
+      <x>816</x>
+      <y>60</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -483,10 +483,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>532</x>
-      <y>346</y>
-      <w>34</w>
-      <h>22</h>
+      <x>648</x>
+      <y>204</y>
+      <w>204</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>Yes
 lt=-&gt;</panel_attributes>
@@ -495,10 +495,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>478</x>
-      <y>328</y>
-      <w>88</w>
-      <h>120</h>
+      <x>324</x>
+      <y>96</y>
+      <w>528</w>
+      <h>720</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -507,10 +507,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>576</x>
-      <y>364</y>
-      <w>36</w>
-      <h>10</h>
+      <x>912</x>
+      <y>312</y>
+      <w>216</w>
+      <h>60</h>
     </coordinates>
     <panel_attributes>Wait for event
 valign=center
@@ -521,10 +521,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>346</y>
-      <w>38</w>
-      <h>22</h>
+      <x>816</x>
+      <y>204</y>
+      <w>228</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>No
 lt=-&gt;</panel_attributes>
@@ -533,10 +533,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>550</x>
-      <y>366</y>
-      <w>30</w>
-      <h>8</h>
+      <x>756</x>
+      <y>324</y>
+      <w>180</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Event occured
 lt=-&gt;</panel_attributes>
@@ -545,10 +545,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
-      <y>388</y>
-      <w>28</w>
-      <h>8</h>
+      <x>384</x>
+      <y>456</y>
+      <w>168</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>ACC driver ON
 valign=center
@@ -559,10 +559,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>500</x>
-      <y>372</y>
-      <w>34</w>
-      <h>20</h>
+      <x>456</x>
+      <y>360</y>
+      <w>204</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT CONNECTED
 lt=-&gt;</panel_attributes>
@@ -571,10 +571,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>540</x>
-      <y>372</y>
-      <w>38</w>
-      <h>20</h>
+      <x>696</x>
+      <y>360</y>
+      <w>228</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT DISCONNECTED
 lt=-&gt;</panel_attributes>
@@ -583,13 +583,14 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>532</x>
-      <y>320</y>
-      <w>26</w>
-      <h>8</h>
+      <x>588</x>
+      <y>48</y>
+      <w>216</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>*BLE Thread*
 style=wordwrap
+fontsize=30
 bg=blue
 valign=center
 halign=center</panel_attributes>
@@ -598,14 +599,15 @@ halign=center</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>694</x>
-      <y>324</y>
-      <w>26</w>
-      <h>8</h>
+      <x>1548</x>
+      <y>72</y>
+      <w>228</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>*ACC Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -613,14 +615,15 @@ halign=center</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>528</x>
-      <y>454</y>
-      <w>26</w>
-      <h>8</h>
+      <x>540</x>
+      <y>852</y>
+      <w>240</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>*ADC Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -628,14 +631,16 @@ halign=center</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>712</x>
-      <y>420</y>
-      <w>26</w>
-      <h>8</h>
+      <x>1608</x>
+      <y>648</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>*SWG Thread*
 style=wordwrap
 bg=blue
+fontsize=30
+lw=2.5
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -643,10 +648,10 @@ halign=center</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>524</y>
-      <w>22</w>
-      <h>8</h>
+      <x>564</x>
+      <y>1272</y>
+      <w>132</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver ON 
 valign=center
@@ -657,10 +662,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>542</x>
-      <y>524</y>
-      <w>24</w>
-      <h>8</h>
+      <x>708</x>
+      <y>1272</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver OFF 
 valign=center
@@ -671,10 +676,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>726</x>
-      <y>488</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1812</x>
+      <y>1056</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver OFF 
 valign=center
@@ -685,10 +690,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>678</x>
-      <y>508</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1524</x>
+      <y>1176</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>IRQ ON
 valign=center
@@ -699,10 +704,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>528</x>
-      <y>506</y>
-      <w>28</w>
-      <h>22</h>
+      <x>624</x>
+      <y>1164</y>
+      <w>168</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>EVENT WAKEUP
 lt=-&gt;</panel_attributes>
@@ -711,10 +716,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>552</x>
-      <y>506</y>
-      <w>24</w>
-      <h>22</h>
+      <x>768</x>
+      <y>1164</y>
+      <w>144</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>EVENT SLEEP
 lt=-&gt;</panel_attributes>
@@ -723,10 +728,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>688</x>
-      <y>392</y>
-      <w>24</w>
-      <h>8</h>
+      <x>1584</x>
+      <y>480</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver ON 
 valign=center
@@ -737,10 +742,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>714</x>
-      <y>392</y>
-      <w>24</w>
-      <h>8</h>
+      <x>1740</x>
+      <y>480</y>
+      <w>144</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver OFF 
 valign=center
@@ -751,10 +756,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>462</y>
-      <w>88</w>
-      <h>80</h>
+      <x>312</x>
+      <y>900</y>
+      <w>528</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -763,10 +768,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>476</x>
-      <y>462</y>
-      <w>88</w>
-      <h>80</h>
+      <x>312</x>
+      <y>900</y>
+      <w>528</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -775,10 +780,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>698</x>
-      <y>376</y>
-      <w>28</w>
-      <h>20</h>
+      <x>1644</x>
+      <y>384</y>
+      <w>168</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT WAKEUP
 lt=-&gt;</panel_attributes>
@@ -787,10 +792,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>724</x>
-      <y>376</y>
-      <w>24</w>
-      <h>20</h>
+      <x>1800</x>
+      <y>384</y>
+      <w>144</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT SLEEP
 lt=-&gt;</panel_attributes>
@@ -799,10 +804,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>620</x>
-      <y>332</y>
-      <w>112</w>
-      <h>80</h>
+      <x>1176</x>
+      <y>120</y>
+      <w>672</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>400.0;340.0;400.0;380.0;10.0;380.0;10.0;10.0;540.0;10.0</additional_attributes>
@@ -810,10 +815,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>620</x>
-      <y>332</y>
-      <w>112</w>
-      <h>80</h>
+      <x>1176</x>
+      <y>120</y>
+      <w>672</w>
+      <h>480</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>530.0;340.0;530.0;380.0;10.0;380.0;10.0;10.0;540.0;10.0</additional_attributes>
@@ -821,10 +826,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>488</x>
-      <y>398</y>
-      <w>28</w>
-      <h>8</h>
+      <x>384</x>
+      <y>516</y>
+      <w>168</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>ADC driver ON
 valign=center
@@ -835,10 +840,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>678</x>
-      <y>488</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1524</x>
+      <y>1056</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Reset frequency 
 valign=center
@@ -849,10 +854,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>678</x>
-      <y>498</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1524</x>
+      <y>1116</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>Driver ON 
 valign=center
@@ -863,10 +868,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>726</x>
-      <y>498</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1812</x>
+      <y>1116</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>IRQ OFF
 valign=center
@@ -877,10 +882,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>678</x>
-      <y>518</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1524</x>
+      <y>1236</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>BTN New frequency ON
 valign=center
@@ -891,10 +896,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>726</x>
-      <y>508</y>
-      <w>46</w>
-      <h>8</h>
+      <x>1812</x>
+      <y>1176</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>BTN New frequency OFF
 valign=center
@@ -905,10 +910,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>742</x>
-      <y>422</y>
-      <w>4</w>
-      <h>4</h>
+      <x>1908</x>
+      <y>660</y>
+      <w>24</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>type=initial</panel_attributes>
     <additional_attributes/>
@@ -916,10 +921,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>742</x>
-      <y>422</y>
-      <w>6</w>
-      <h>20</h>
+      <x>1908</x>
+      <y>660</y>
+      <w>36</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=-&gt;</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;80.0</additional_attributes>
@@ -927,10 +932,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>428</y>
-      <w>124</w>
-      <h>110</h>
+      <x>1200</x>
+      <y>696</y>
+      <w>744</w>
+      <h>660</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -939,10 +944,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>624</x>
-      <y>428</y>
-      <w>128</w>
-      <h>110</h>
+      <x>1200</x>
+      <y>696</y>
+      <w>768</w>
+      <h>660</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>
@@ -951,10 +956,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>700</x>
-      <y>472</y>
-      <w>28</w>
-      <h>20</h>
+      <x>1656</x>
+      <y>960</y>
+      <w>168</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT WAKEUP
 lt=-&gt;</panel_attributes>
@@ -963,10 +968,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>748</x>
-      <y>472</y>
-      <w>24</w>
-      <h>20</h>
+      <x>1944</x>
+      <y>960</y>
+      <w>144</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>EVENT SLEEP
 lt=-&gt;</panel_attributes>
@@ -975,10 +980,10 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>408</y>
-      <w>46</w>
-      <h>8</h>
+      <x>564</x>
+      <y>576</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>SWG Driver OFF 
 valign=center
@@ -989,10 +994,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>418</y>
-      <w>46</w>
-      <h>8</h>
+      <x>564</x>
+      <y>636</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>IRQ OFF
 valign=center
@@ -1003,10 +1008,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>428</y>
-      <w>46</w>
-      <h>8</h>
+      <x>564</x>
+      <y>696</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>BTN New frequency OFF
 valign=center
@@ -1017,10 +1022,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>388</y>
-      <w>46</w>
-      <h>8</h>
+      <x>564</x>
+      <y>456</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>ACC driver OFF
 valign=center
@@ -1031,10 +1036,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>518</x>
-      <y>398</y>
-      <w>46</w>
-      <h>8</h>
+      <x>564</x>
+      <y>516</y>
+      <w>276</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>ADC driver OFF
 valign=center
@@ -1045,10 +1050,10 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>478</x>
-      <y>328</y>
-      <w>88</w>
-      <h>120</h>
+      <x>324</x>
+      <y>96</y>
+      <w>528</w>
+      <h>720</h>
     </coordinates>
     <panel_attributes>lt=-&gt;
 </panel_attributes>

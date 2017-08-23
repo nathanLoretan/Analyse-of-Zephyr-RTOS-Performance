@@ -453,29 +453,15 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>560</x>
-      <y>288</y>
-      <w>208</w>
-      <h>64</h>
-    </coordinates>
-    <panel_attributes>*BLE Thread*
-style=wordwrap
-bg=blue
-valign=center
-halign=center</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1600</x>
+      <x>1504</x>
       <y>32</y>
-      <w>208</w>
+      <w>304</w>
       <h>64</h>
     </coordinates>
     <panel_attributes>*ACC Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -483,14 +469,15 @@ halign=center</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1440</x>
+      <x>1328</x>
       <y>736</y>
-      <w>208</w>
+      <w>320</w>
       <h>64</h>
     </coordinates>
     <panel_attributes>*ADC Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -575,6 +562,22 @@ lw=2.5</panel_attributes>
 valign=center
 fontsize=18
 lw=2.5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>464</x>
+      <y>288</y>
+      <w>304</w>
+      <h>64</h>
+    </coordinates>
+    <panel_attributes>*BLE Thread*
+style=wordwrap
+bg=blue
+fontsize=30
+valign=center
+halign=center</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

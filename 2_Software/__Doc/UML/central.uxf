@@ -258,14 +258,15 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>345</x>
+      <x>255</x>
       <y>90</y>
-      <w>195</w>
+      <w>285</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>*BLE Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
@@ -273,14 +274,15 @@ halign=center</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1575</x>
+      <x>1470</x>
       <y>75</y>
-      <w>195</w>
+      <w>300</w>
       <h>60</h>
     </coordinates>
     <panel_attributes>*SWG Thread*
 style=wordwrap
 bg=blue
+fontsize=30
 valign=center
 halign=center</panel_attributes>
     <additional_attributes/>
