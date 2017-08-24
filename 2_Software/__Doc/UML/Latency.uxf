@@ -4,8 +4,8 @@
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>228</x>
-      <y>817</y>
+      <x>817</x>
+      <y>798</y>
       <w>437</w>
       <h>95</h>
     </coordinates>
@@ -18,8 +18,8 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLSpecialState</id>
     <coordinates>
-      <x>418</x>
-      <y>665</y>
+      <x>1007</x>
+      <y>646</y>
       <w>38</w>
       <h>38</h>
     </coordinates>
@@ -29,8 +29,8 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>418</x>
-      <y>665</y>
+      <x>1007</x>
+      <y>646</y>
       <w>57</w>
       <h>190</h>
     </coordinates>
@@ -40,8 +40,8 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>133</x>
-      <y>741</y>
+      <x>722</x>
+      <y>722</y>
       <w>342</w>
       <h>513</h>
     </coordinates>
@@ -52,8 +52,8 @@ lw=2.5</panel_attributes>
   <element>
     <id>UMLState</id>
     <coordinates>
-      <x>266</x>
-      <y>1026</y>
+      <x>855</x>
+      <y>1007</y>
       <w>342</w>
       <h>95</h>
     </coordinates>
@@ -66,8 +66,8 @@ lw=2.5</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>418</x>
-      <y>893</y>
+      <x>1007</x>
+      <y>874</y>
       <w>152</w>
       <h>171</h>
     </coordinates>
@@ -78,8 +78,8 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>931</x>
-      <y>437</y>
+      <x>1482</x>
+      <y>627</y>
       <w>323</w>
       <h>57</h>
     </coordinates>
@@ -89,8 +89,8 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1083</x>
-      <y>475</y>
+      <x>1634</x>
+      <y>665</y>
       <w>57</w>
       <h>323</h>
     </coordinates>
@@ -100,8 +100,8 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1482</x>
-      <y>475</y>
+      <x>2033</x>
+      <y>665</y>
       <w>57</w>
       <h>323</h>
     </coordinates>
@@ -111,19 +111,19 @@ lt=-&gt;</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>1349</x>
-      <y>437</y>
+      <x>1900</x>
+      <y>627</y>
       <w>323</w>
       <h>57</h>
     </coordinates>
-    <panel_attributes>register GPIO</panel_attributes>
+    <panel_attributes>GPIO Peripheral</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>893</x>
-      <y>513</y>
+      <x>1444</x>
+      <y>703</y>
       <w>247</w>
       <h>114</h>
     </coordinates>
@@ -134,8 +134,8 @@ lt=&lt;-</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1083</x>
-      <y>589</y>
+      <x>1634</x>
+      <y>779</y>
       <w>456</w>
       <h>76</h>
     </coordinates>
@@ -146,8 +146,8 @@ lt=&lt;-</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>893</x>
-      <y>627</y>
+      <x>1444</x>
+      <y>817</y>
       <w>247</w>
       <h>114</h>
     </coordinates>
