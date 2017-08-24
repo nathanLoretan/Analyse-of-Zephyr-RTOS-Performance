@@ -1,5 +1,0 @@
-- Communication max speed for:
-	- Audio
-	- Video
-	- ...
-	

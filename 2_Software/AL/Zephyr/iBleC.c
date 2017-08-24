@@ -385,7 +385,7 @@ static void _on_disconnection(struct bt_conn* conn, u8_t reason)
 
 
 	bt_conn_unref(link[ref].conn_ref);
-	k_free(link[ref].attrs);
+	// k_free(link[ref].attrs);
 	link[ref].isReady	= false;
 	link[ref].conn_ref = NULL;
 	_nbr_conn--;
