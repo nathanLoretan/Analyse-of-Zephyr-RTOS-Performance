@@ -5,9 +5,9 @@
 #define LED_CONNECTED         18
 #define LED_STARTED           17
 
-#define BTN_ACC_DATA          13
-#define BTN_ACC_CLICK         14
-#define BTN_ADC_DATA          15
+#define BTN_ACC_DATA          13  // Button 1
+#define BTN_ACC_CLICK         14  // Button 2
+#define BTN_ADC_DATA          15  // Button 3
 
 // Data rate--------------------------------------------------------------------
 #define ADC_DATA_TIMER		65
