@@ -350,9 +350,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 		// link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
 		// memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
 
-		// iPrint("nbr handles %d\n", _nbr_handles);
-		// iPrint("table %d\n", link[1].attrs - link[0].attrs);
-
 		_nbr_conn++;
 
 		struct bt_conn_info info;

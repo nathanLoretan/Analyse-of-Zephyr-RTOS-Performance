@@ -271,10 +271,6 @@ void acc_init()
 	II2C_CREATE_DATA(tx_buf, DISABLE_FILTER);
 	iI2C_write(i2c, SAD | SA0, REGISTER_CTRL_REG2, tx_buf, 1);
 
-	// // Bind the interrupts to the pin INT1
-	// II2C_CREATE_DATA(tx_buf, INT1_ZYXDA);
-	// iI2C_write(i2c, SAD | SA0, REGISTER_CTRL_REG3, tx_buf, 1);
-
   // Bind the interrupts to the pin INT1
 	II2C_CREATE_DATA(tx_buf, INT1_FIFO_WTM);
 	iI2C_write(i2c, SAD | SA0, REGISTER_CTRL_REG3, tx_buf, 1);
@@ -324,33 +320,10 @@ void acc_init()
 	// Configure the interrupt on pins INT1 and INT2
 	iGpio_interrupt_init(&int1, ACC_INT1, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_acc_int1);
 	iGpio_interrupt_init(&int2, ACC_INT2, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, on_acc_int2);
-	// iGpio_enable_interrupt(&int1);
-	// iGpio_enable_interrupt(&int2);
   iEventQueue_init(&acc_EventQueue);
 
   iPrint("[INIT] ACC initialized\n");
 }
-
-// static acc_status_t acc_getStatus()
-// {
-// 	uint8_t rx_buf[1];
-//
-//   iI2c_read(i2c, SAD | SA0, REGISTER_STATUS_REG, rx_buf, 1);
-//
-//   acc_status_t acc_status =
-//   {
-//     .axis_overrun_123			= (rx_buf[0] & 0x80) >> 7,
-//     .axis_overrun_3				= (rx_buf[0] & 0x40) >> 6,
-//     .axis_overrun_2				= (rx_buf[0] & 0x20) >> 5,
-//     .axis_overrun_1				= (rx_buf[0] & 0x10) >> 4,
-//     .data_available_123		= (rx_buf[0] & 0x08) >> 3,
-//     .data_available_3			= (rx_buf[0] & 0x04) >> 2,
-//   	.data_available_2			= (rx_buf[0] & 0x02) >> 1,
-//   	.data_available_1			= (rx_buf[0] & 0x01)
-//   };
-//
-// 	return acc_status;
-// }
 
 static acc_fifo_status_t acc_getFifoStatus()
 {
@@ -366,51 +339,11 @@ static acc_fifo_status_t acc_getFifoStatus()
     .fifo_unread_samples	= (rx_buf[0] & 0x1F),
   };
 
-  // iPrint("WTM: %d\n", acc_fifo_status.fifo_watermark);
-  // iPrint("OVRN: %d\n", acc_fifo_status.fifo_overrun);
-  // iPrint("EMPTY: %d\n", acc_fifo_status.fifo_empty);
-  // iPrint("UNREAD SAMPLES: %d\n", acc_fifo_status.fifo_unread_samples);
-
 	return acc_fifo_status;
 }
 
 acc_error_t acc_getXYZ(acc_sample_t* samples, uint8_t nbr_samples)
 {
-  // uint8_t tx_buf[1];
-  // uint8_t rx_buf[sizeof(acc_sample_t) * nbr_samples];
-  //
-	// // Check the status register
-	// acc_status_t acc_status	= acc_getStatus();
-	// if(!acc_status.data_available_123) {
-  // 	return ACC_ERROR_NO_DATA_AVAILABLE;
-	// }
-  //
-  // // Check the fifo status register
-  // acc_fifo_status_t acc_fifo_status = acc_getFifoStatus();
-  // if(acc_fifo_status.fifo_watermark == 0) {
-  //   return ACC_ERROR_NO_DATA_AVAILABLE;
-  // }
-  //
-  // iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, sizeof(acc_sample_t) * nbr_samples);
-  // II2C_CONVERT_DATA(samples, rx_buf, sizeof(acc_sample_t) * nbr_samples);
-  //
-  // acc_fifo_status = acc_getFifoStatus();
-  // if(acc_fifo_status.fifo_unread_samples > 0)  // If the fifo has other samples
-  // {
-  //   iEventQueue_add(&acc_EventQueue, ACC_EVENT_INT1);
-  // }
-  // else  // When the fifo is empty, it must be reset to enable the fifo interrupt
-  // {
-  //   // Reset the FIFO. The FIFO must be first set to bypass mode and then enabled
-  //   II2C_CREATE_DATA(tx_buf, MODE_BYPASS | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
-  //   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
-  //
-  //   II2C_CREATE_DATA(tx_buf, MODE_FIFO | FIFO_EVENT_ON_INT1 | FIFO_NBR_SAMPLE);
-  //   iI2C_write(i2c, SAD | SA0, REGISTER_FIFO_CTRL_REG, tx_buf, 1);
-  //
-  //   // This read allows the acceleromter to correctly empty the fifo
-  //   iI2c_read(i2c, SAD | SA0, AUTO_INCREMENT | REGISTER_OUT_X_L, rx_buf, 1);
-  // }
 
   uint8_t tx_buf[1];
   uint8_t rx_buf[sizeof(acc_sample_t) * nbr_samples];
@@ -447,9 +380,6 @@ void acc_sleep()
   iGpio_disable_interrupt(&int1);
   iGpio_disable_interrupt(&int2);
 
-  // At the end to not lose another event
-  // iEventQueue_add(&acc_EventQueue, ACC_EVENT_SLEEP);
-
   isSleeping = true;
 }
 
@@ -457,9 +387,6 @@ void acc_wakeup()
 {
 	uint8_t tx_buf[1];
   uint8_t rx_buf[6];
-
-  // At the beginning to not lose another event
-  // iEventQueue_add(&acc_EventQueue, ACC_EVENT_WAKEUP);
 
   // Define the data rate and enable the axis
   II2C_CREATE_DATA(tx_buf, ACC_DATA_RATE | MODE_LOW_POWER_ENABLE | Z_EN | Y_EN | X_EN);

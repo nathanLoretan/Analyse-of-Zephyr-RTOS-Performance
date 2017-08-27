@@ -1,10 +1,5 @@
 #include "adc.h"
 
-// CS active low
-// Data IN on rising edge
-// Data OUT on falling edge
-// CLK high when no data
-
 #define VREF				3000000	// Voltage reference in [uV]
 #define RESOLUTION	24
 
@@ -185,18 +180,12 @@ void adc_sleep()
 
 	iTimer_stop(&adc_timer);
 
-	// At the end to not lose another event
-	// iEventQueue_add(&adc_EventQueue, ADC_EVENT_SLEEP);
-
 	isSleeping = true;
 }
 
 void adc_wakeup()
 {
 	uint8_t tx_buf[2];
-
-	// At the beginning to not lose another event
-	// iEventQueue_add(&adc_EventQueue, ADC_EVENT_WAKEUP);
 
 	// Configure the conversion mode and the measurements format
 	ISPI_CREATE_DATA(&tx_buf, START | MODE_REGISTER | REGISTER_CTRL1 | WRITE, UNIPOLAR | ADC_CONVERSION_MODE);

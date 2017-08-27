@@ -165,11 +165,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_CONNECTED_BASE + 6:
 			case BLEC_EVENT_CONNECTED_BASE + 7:
 		  {
-        // #if ENABLE_SWG
-        //   swg_wakeup();
-        //   iGpio_enable_interrupt(&interrupt);
-        // 	iGpio_enable_interrupt(&btn_freq);
-        // #endif  // ENABLE_SWG
 
 		  } break;
 
@@ -182,10 +177,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_READY_BASE + 6:
 			case BLEC_EVENT_READY_BASE + 7:
       {
-        // iPrint("---------------------\n");
-        // iPrint("%d, value Handle 0x%04x\n",(int)  ble_event - BLEC_EVENT_READY_BASE,
-        //                                     (int)  iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA));
-        // iPrint("cccd Handle 0x%04x\n", (int)  iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902));
 
 				iBleC_notify_params_t notify_params;
 				notify_params.handler				= on_adc_data;
@@ -193,20 +184,10 @@ ITHREAD_HANDLER(ble)
 				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ADC_SVC, ADC_CHRC_DATA, 0x2902);
 				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
 
-        // iPrint("---------------------\n");
-        // iPrint("%d, value Handle 0x%04x\n", (int) ble_event - BLEC_EVENT_READY_BASE,
-        //                                     (int)  iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA));
-        // iPrint("cccd Handle 0x%04x\n", (int)  iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902));
-
 				notify_params.handler				= on_acc_data;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA);
 				notify_params.ccc_handle		= iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_DATA, 0x2902);
 				iBleC_subscribe_notify(ble_event - BLEC_EVENT_READY_BASE, &notify_params);
-
-        // iPrint("---------------------\n");
-        // iPrint("%d, value Handle 0x%04x\n", (int) ble_event - BLEC_EVENT_READY_BASE,
-        //                                     (int) iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK));
-        // iPrint("cccd Handle 0x%04x\n", (int)  iBleC_get_desc_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK, 0x2902));
 
 				notify_params.handler				= on_acc_click;
 				notify_params.value_handle	= iBleC_get_chrc_val_handle(ble_event - BLEC_EVENT_READY_BASE, ACC_SVC, ACC_CHRC_CLICK);
@@ -224,14 +205,6 @@ ITHREAD_HANDLER(ble)
 			case BLEC_EVENT_DISCONNECTED_BASE + 6:
 			case BLEC_EVENT_DISCONNECTED_BASE + 7:
 		  {
-        // if(!iBleC_get_nbr_connection())
-        // {
-        //   #if ENABLE_SWG
-        //     swg_sleep();
-        //     iGpio_disable_interrupt(&interrupt);
-        //     iGpio_disable_interrupt(&btn_freq);
-        //   #endif// ENABLE_SWG
-        // }
 
 		  } break;
 

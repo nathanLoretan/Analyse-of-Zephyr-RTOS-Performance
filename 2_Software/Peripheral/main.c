@@ -349,11 +349,8 @@ ITHREAD_HANDLER(acc)
 		    acc_getXYZ(&sample, 1);
 
 				#if ENABLE_BLE
-          // iPrint("ACC DATA NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[1], (uint8_t*) &sample, sizeof(sample));
 				#endif	// ENABLE_BLE
-
-				// iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
 
 			} break;
 
@@ -362,11 +359,8 @@ ITHREAD_HANDLER(acc)
         acc_click++;
 
         #if ENABLE_BLE
-          // iPrint("ACC CLICK NOTIFY\n");
 					iBleP_svc_notify(&acc_svc.attrs[4], (uint8_t*) &acc_click, sizeof(acc_click));
 				#endif	// ENABLE_BLE
-
-        // iPrint("Click\n");
 
 			} break;
 
@@ -407,12 +401,9 @@ ITHREAD_HANDLER(adc)
 				adc_getMeasurement(&adc_measurement);
 
 				#if ENABLE_BLE
-            // iPrint("ADC DATA NOTIFY\n");
 				    iBleP_svc_notify(&adc_svc.attrs[1], (uint8_t*) &adc_measurement,
                              sizeof(adc_measurement));
 				#endif	// ENABLE_BLE
-
-				// iPrint("Measurement: %u[uV]\n", adc_measurement);
 
 			} break;
 

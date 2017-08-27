@@ -1,33 +1,33 @@
 PROJ_DIR := /home/nathanloretan/Desktop/Bachelor/2_Software
 # PROJ_DIR := /home/nathan/Desktop/Bachelor/2_Software
 
-ifeq ($(sys),baremetal)
+ifeq ($(sys),b)
 
-	ifeq ($(app),central)
+	ifeq ($(app),c)
 		include $(PROJ_DIR)/Environment/Central/Nordic/baremetal.mk
 	endif
 
-	ifeq ($(app), e-peripheral)
+	ifeq ($(app), e)
 		include $(PROJ_DIR)/Environment/E-Peripheral/Nordic/baremetal.mk
 	endif
 
-	ifeq ($(app), peripheral)
+	ifeq ($(app), p)
 		include $(PROJ_DIR)/Environment/Peripheral/Nordic/baremetal.mk
 	endif
 
 endif
 
-ifeq ($(sys),zephyr)
+ifeq ($(sys),z)
 
-	ifeq ($(app),central)
+	ifeq ($(app),c)
 		include $(PROJ_DIR)/Environment/Central/Zephyr/zephyr.mk
 	endif
 
-	ifeq ($(app), e-peripheral)
+	ifeq ($(app), e)
 		include $(PROJ_DIR)/Environment/E-Peripheral/Zephyr/zephyr.mk
 	endif
 
-	ifeq ($(app), peripheral)
+	ifeq ($(app), p)
 		include $(PROJ_DIR)/Environment/Peripheral/Zephyr/zephyr.mk
 	endif
 

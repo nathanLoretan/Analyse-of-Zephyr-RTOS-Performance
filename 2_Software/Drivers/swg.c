@@ -1,9 +1,5 @@
 #include "swg.h"
 
-// CS active low
-// Data IN on falling edge
-// CLK high when no data
-
 //CLOCK REFERENCE MHz-------------------
 #define MASTER_CLOCK            16000000
 

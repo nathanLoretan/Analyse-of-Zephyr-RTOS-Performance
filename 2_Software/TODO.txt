@@ -1,8 +1,0 @@
-TODO:
-
-- BLE packet
-- Nbr connection max 8  limited in softedvice specifications S132 p26
-
-- central
-- test central
-- test E-Peripheral notification
