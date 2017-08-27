@@ -5,12 +5,12 @@
 static uint8_t _nbr_conn = 0;
 static struct bt_conn* _new_conn;
 
-static struct bt_le_conn_param _conn_params;
-static struct bt_le_scan_param _scan_params;
-static iBleC_attr_disc_t* 	_attr_disc_list;
-static uint8_t 							_nbr_attr_disc;
-static uint8_t 							_disc_ref;
-static uint8_t 							_nbr_handles;
+static struct bt_le_conn_param 	_conn_params;
+static struct bt_le_scan_param 	_scan_params;
+static iBleC_attr_disc_t* 			_attr_disc_list;
+static uint8_t 									_nbr_attr_disc;
+static uint8_t 									_disc_ref;
+static uint8_t 									_nbr_handles;
 
 static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
 static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
