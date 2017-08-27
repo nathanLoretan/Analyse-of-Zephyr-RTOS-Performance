@@ -11,7 +11,6 @@ static iBleC_attr_disc_t* 	_attr_disc_list;
 static uint8_t 							_nbr_attr_disc;
 static uint8_t 							_disc_ref;
 static uint8_t 							_nbr_handles;
-// static struct k_mutex 			_conn_mutex;
 
 static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
 static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
@@ -105,7 +104,7 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 	char complete_local_name_str[complete_local_name.len+1];
 	memset(complete_local_name_str, 0, complete_local_name.len+1);
 	memcpy(complete_local_name_str, complete_local_name.data, complete_local_name.len);
-	// iPrint("-> Device found %s\n", complete_local_name_str);
+	iPrint("-> Device found %s\n", complete_local_name_str);
 
 	// Control the size of the peripheral's name, the \0 is not include in the device's name
 	if(complete_local_name.len != sizeof(IBLE_SEARCHED_DEVICE)-1) {
@@ -125,8 +124,6 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 		iPrint("/!\\ Stop scan failed: error %d\n", error);
 		return;
 	}
-
-	// k_mutex_lock(&_conn_mutex, K_FOREVER);
 
 	// Create a connection with the new device
 	_new_conn = bt_conn_create_le(peer_addr, &_conn_params);
@@ -187,7 +184,6 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	{
 		link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return BT_GATT_ITER_STOP;
@@ -227,7 +223,6 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		return BT_GATT_ITER_STOP;
 	}
@@ -264,7 +259,6 @@ static void _start_discovery(struct bt_conn* conn)
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		return;
 	}
@@ -338,7 +332,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 	if(conn_err) {
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 	else if(_new_conn == conn)
@@ -347,8 +340,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 		link[ref].conn_ref 	= conn;
 		link[ref].isReady 	= false;
-		// link[ref].attrs 		= (iBleC_attr_t*) k_malloc(sizeof(iBleC_attr_t) * _nbr_handles);
-		// memset(link[ref].attrs, 0, sizeof(iBleC_attr_t) * _nbr_handles);
 
 		_nbr_conn++;
 
@@ -370,7 +361,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 	}
 	else {
 		iPrint("-> Connection to %d failed: error connection reference\n", ref);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 }
@@ -382,7 +372,6 @@ static void _on_disconnection(struct bt_conn* conn, u8_t reason)
 
 
 	bt_conn_unref(link[ref].conn_ref);
-	// k_free(link[ref].attrs);
 	link[ref].isReady	= false;
 	link[ref].conn_ref = NULL;
 	_nbr_conn--;
@@ -430,8 +419,6 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	for(int i = 0; i < IBLEC_MAX_CONN; i++) {
 		link[i].conn_ref 	= NULL;
 		link[i].isReady		= false;
-		// memset(link[i].attrs, 0, sizeof(link[i].attrs));
-		// link[i].attrs 		= NULL;
 	}
 
 	// Save the connection parameters
@@ -450,8 +437,6 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 	bt_conn_cb_register(&connection_callback);
 
 	iEventQueue_init(&bleC_EventQueue);
-
-	// k_mutex_init(&_conn_mutex);
 
 	iPrint("[INIT] Bluetooth initialized\n");
 	return 0;
@@ -618,7 +603,6 @@ uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
 {
   for(int i = 0; i < _nbr_handles; i++)
   {
-		// iPrint("SVC 0x%04x, 0x%04x \n", i, link[conn].attrs[i].uuid16);
     if(link[conn].attrs[i].type == IBLEC_ATTR_SVC && link[conn].attrs[i].uuid16 == svc_uuid) {
       return i;
      }
@@ -634,7 +618,6 @@ uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16
 
   for(int i = svc_handle; i < _nbr_handles; i++)
   {
-		// iPrint("CHRC 0x%04x \n", i);
     if(link[conn].attrs[i].type == IBLEC_ATTR_CHRC && link[conn].attrs[i].uuid16 == chrc_uuid) {
       return i;
     }
@@ -655,7 +638,6 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
 
   for(int i = chrc_handle; i <= _nbr_handles; i++)
   {
-		// iPrint("DESC 0x%04x \n", i);
     if(link[conn].attrs[i].type == IBLEC_ATTR_DESC && link[conn].attrs[i].uuid16 == desc_uuid) {
       return i;
     }

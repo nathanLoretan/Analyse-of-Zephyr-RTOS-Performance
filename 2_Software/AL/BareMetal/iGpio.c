@@ -28,7 +28,6 @@ void iGpio_interrupt_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_edge_t edge,
 		iPrint("Interrupt init failed: error %d\n", error);
 		return ;
 	}
-
 }
 
 void iGpio_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_dir_t dir, iGpio_pull_t pull)

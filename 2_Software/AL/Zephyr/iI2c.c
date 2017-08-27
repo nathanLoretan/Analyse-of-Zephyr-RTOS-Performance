@@ -16,37 +16,41 @@ int iI2c_init(iI2c_id_t id, iI2c_frequency_t freq)
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 	_i2c0 = device_get_binding(CONFIG_I2C_0_NAME);
-								if(_i2c0 == NULL) {
-									iPrint("/!\\ Could not find I2C0 driver\n");
-									return -1;
-								}
+		case I2C0:
+		{
+		 	_i2c0 = device_get_binding(CONFIG_I2C_0_NAME);
+			if(_i2c0 == NULL) {
+				iPrint("/!\\ Could not find I2C0 driver\n");
+				return -1;
+			}
 
-								error = i2c_configure(_i2c0, freq | I2C_MODE_MASTER);
-								if(error) {
-									iPrint("/!\\ I2C0 configuration failed: error %d\n", error);
-									return error;
-								}
+			error = i2c_configure(_i2c0, freq | I2C_MODE_MASTER);
+			if(error) {
+				iPrint("/!\\ I2C0 configuration failed: error %d\n", error);
+				return error;
+			}
 
-								iPrint("[INIT] I2C0 initialized\n");
-		break;
+			iPrint("[INIT] I2C0 initialized\n");
+		} break;
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 	_i2c1 = device_get_binding(CONFIG_I2C_1_NAME);
-								if(_i2c1 == NULL) {
-									iPrint("/!\\ Could not find I2C1 driver\n");
-									return -1;
-								}
+		case I2C1:
+		{
+	 		_i2c1 = device_get_binding(CONFIG_I2C_1_NAME);
+			if(_i2c1 == NULL) {
+				iPrint("/!\\ Could not find I2C1 driver\n");
+				return -1;
+			}
 
-								error = i2c_configure(_i2c1, freq | I2C_MODE_MASTER);
-								if(error) {
-									iPrint("/!\\ I2C1 configuration failed: error %d\n", error);
-									return error;
-								}
+			error = i2c_configure(_i2c1, freq | I2C_MODE_MASTER);
+			if(error) {
+				iPrint("/!\\ I2C1 configuration failed: error %d\n", error);
+				return error;
+			}
 
-								iPrint("[INIT] I2C1 initialized\n");
-		break;
+			iPrint("[INIT] I2C1 initialized\n");
+		} break;
 	#endif	// CONFIG_I2C_1
 
 		default:	// Nothing
@@ -78,19 +82,23 @@ int iI2c_read(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg, 
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 		error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
-									if(error) {
-										return error;
-									}
-		break;
+		case I2C0:
+		{
+			error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
+			if(error) {
+				return error;
+			}
+		} break;
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 		error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
-									if(error) {
-										return error;
-									}
-		break;
+		case I2C1:
+		{
+	 		error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
+			if(error) {
+				return error;
+			}
+		} break;
 	#endif	// CONFIG_I2C_1
 
 		default:	// Nothing
@@ -122,19 +130,23 @@ int iI2C_write(iI2c_id_t id, iI2c_addr_dev_t addr_dev, iI2c_addr_reg_t addr_reg,
 	switch(id)
 	{
 	#if CONFIG_I2C_0
-		case I2C0: 		error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
-									if(error) {
-										return error;
-									}
-		break;
+		case I2C0:
+		{
+ 			error = i2c_transfer(_i2c0, &msgs[0], 2, addr_dev);
+			if(error) {
+				return error;
+			}
+		} break;
 	#endif	// CONFIG_I2C_0
 
 	#if CONFIG_I2C_1
-		case I2C1: 		error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
-									if(error) {
-										return error;
-									}
-		break;
+		case I2C1:
+		{
+ 			error = i2c_transfer(_i2c1, &msgs[0], 2, addr_dev);
+			if(error) {
+				return error;
+			}
+		} break;
 	#endif	// CONFIG_I2C_1
 
 		default:	// Nothing

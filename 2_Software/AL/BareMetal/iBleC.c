@@ -5,21 +5,21 @@
 extern void iTimer_sys_init();
 
 // GAP init
-#define CONN_CFG_TAG						  1
+#define CONN_CFG_TAG    1
 
 // Defined by the bluetooth core
-#define CCC_NOTIFY    1
-#define CCC_INDICATE  2
+#define CCC_NOTIFY      1
+#define CCC_INDICATE    2
 
 static nrf_ble_gatt_t   gatt_module;
 
-static ble_gap_conn_params_t _conn_params;
-static ble_gap_scan_params_t _scan_params;
-static iBleC_attr_disc_t* 	_attr_disc_list;
-static uint8_t 							_nbr_attr_disc;
-static uint8_t 							_disc_ref;
-static uint8_t 							_nbr_handles;
-volatile static nrf_mtx_t	 	_subscribe_mutex;
+static ble_gap_conn_params_t    _conn_params;
+static ble_gap_scan_params_t    _scan_params;
+static iBleC_attr_disc_t*       _attr_disc_list;
+static uint8_t                  _nbr_attr_disc;
+static uint8_t                  _disc_ref;
+static uint8_t                  _nbr_handles;
+volatile static nrf_mtx_t       _subscribe_mutex;
 
 static ble_uuid_t uuid = {0};
 
@@ -74,6 +74,7 @@ static uint32_t _ad_parse(uint8_t type, uint8_array_t* p_advdata, uint8_array_t*
     }
     index += field_length + 1;
   }
+
   return NRF_ERROR_NOT_FOUND;
 }
 
@@ -277,8 +278,6 @@ static void _on_write_rsp(uint16_t conn_handle, ble_gattc_evt_write_rsp_t const*
 
   if(link[ref].attrs[handle].type != IBLEC_ATTR_DESC)
   {
-  	// link[conn_handle].attrs[handle].write_params.data    = write_rsp->data;
-  	// link[conn_handle].attrs[handle].write_params.length  = write_rsp->len;
   	link[ref].attrs[handle].write_params.handler(conn_handle, &link[ref].attrs[handle].write_params);
   }
 }
@@ -435,15 +434,6 @@ static void _on_ble_evt(ble_evt_t const* ble_evt)
       _on_conn_params_update(conn_handle, conn_params);
 		} break;
 
-		// case BLE_GAP_EVT_CONN_PARAM_UPDATE_REQUEST:
-    // {
-		// 	error = sd_ble_gap_conn_param_update(ble_evt->evt.gap_evt.conn_handle, _conn_params);
-		// 	if(error) {
-		// 		iPrint("/!\\ Connection parameters update request failed: error %d\n", error);
-		// 		return;
-		// 	}
-		// } break;
-
     case BLE_GATTC_EVT_TIMEOUT:
 		{
 			// For readibility.
@@ -588,15 +578,6 @@ int iBleC_init(iBleC_conn_params_t* conn_params)
 		iPrint("/!\\ Fail to fetch the start address of the application RAM: error %d\n", error);
 		return error;
 	}
-
-  // // Configure number of custom UUIDS.
-	// memset(&ble_cfg, 0, sizeof(ble_cfg));
-	// ble_cfg.common_cfg.vs_uuid_cfg.vs_uuid_count = 1;
-	// error = sd_ble_cfg_set(BLE_COMMON_CFG_VS_UUID, &ble_cfg, ram_start);
-	// if(error) {
-	// 	iPrint("/!\\ fail to configure the number of custom UUIDS: error %d\n", error);
-	// 	return error;
-	// }
 
 	// Configure the maximum number of connections.
 	memset(&ble_cfg, 0, sizeof(ble_cfg));

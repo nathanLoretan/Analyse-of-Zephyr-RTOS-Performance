@@ -130,25 +130,6 @@ typedef struct {
 	uint16_t timeout;
 } iBleC_conn_params_t;
 
-// // Interval and Windows in 0,625 Unit
-// #define DEFINE_IBLEC_SCAN_PARAMS(_scan_params, _type, _interval, _window)
-// 	iBleC_scan_params_t _scan_params =
-// 	{
-// 		.type       = _type,
-// 		.window     = _window,
-// 		.interval   = _interval,
-// 		.filter_dup = BT_HCI_LE_SCAN_FILTER_DUP_DISABLE,
-// 	}
-//
-// #define DEFINE_IBLEC_CONN_PARAMS(_conn_params, _interval_min, _interval_max, _latency, _timeout)
-// 	iBleC_conn_params_t _conn_params =
-// 	{
-// 		.interval_min	= _interval_min,
-// 		.interval_max	= _interval_max,
-// 		.latency			= _latency,
-// 		.timeout			= _timeout,
-// 	}
-
 struct iBleC_write_params_t;
 struct iBleC_read_params_t;
 struct iBleC_notify_params_t;

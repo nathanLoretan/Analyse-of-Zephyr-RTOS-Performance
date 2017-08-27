@@ -30,13 +30,15 @@
 #define ISPI_FREQ_4M				4000000
 #define ISPI_FREQ_8M				8000000
 
-#define ISPI_CREATE_DATA(_tx_data, _bytes...)									memcpy(_tx_data, (uint8_t[]) {_bytes}, sizeof( (uint8_t[]) {_bytes}))
-#define ISPI_CONVERT_DATA(_data_conv, _data, _data_length)		{																										\
-																																for(int i = 0; i < _data_length; i++)							\
-																																{																									\
-																																	(_data_conv)[i] = _data[_data_length-1 - i];		\
-																																}																									\
-																															}
+#define ISPI_CREATE_DATA(_tx_data, _bytes...)\
+				memcpy(_tx_data, (uint8_t[]) {_bytes}, sizeof( (uint8_t[]) {_bytes}))
+#define ISPI_CONVERT_DATA(_data_conv, _data, _data_length)
+	{\
+		for(int i = 0; i < _data_length; i++)\
+		{\
+			(_data_conv)[i] = _data[_data_length-1 - i];\
+		}\
+	}
 
 typedef enum {
 	SPI0 = 0,
@@ -56,7 +58,8 @@ typedef uint8_t 	iSpi_mode_t;
 typedef uint8_t		iSpi_bit_order_t;
 
 int iSpi_init(iSpi_id_t id, iSpi_frequency_t freq, iSpi_mode_t mode, iSpi_bit_order_t order);
-int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length, uint8_t* rx_data, size_t rx_data_length);
+int iSpi_transmit(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length,
+	 								uint8_t* rx_data, size_t rx_data_length);
 int iSPI_read(iSpi_id_t id, iSpi_slave_t slave, uint8_t* rx_data, size_t rx_data_length);
 int iSPI_write(iSpi_id_t id, iSpi_slave_t slave, uint8_t* tx_data, size_t tx_data_length);
 

@@ -64,11 +64,15 @@ gpio_add_callback((_gpio)->device, &gpio_cb_##_handler);\
 // 																																				gpio_init_callback(&gpio_cb_##_handler, _handler, BIT((_gpio)->pin));
 // 																																				gpio_add_callback((_gpio)->device, &gpio_cb_##_handler);
 
-#define iGpio_enable_interrupt(_gpio)			gpio_pin_enable_callback((_gpio)->device, (_gpio)->pin)
-#define iGpio_disable_interrupt(_gpio)		gpio_pin_disable_callback((_gpio)->device, (_gpio)->pin)
+#define iGpio_enable_interrupt(_gpio)\
+        gpio_pin_enable_callback((_gpio)->device, (_gpio)->pin)
+#define iGpio_disable_interrupt(_gpio)\
+        gpio_pin_disable_callback((_gpio)->device, (_gpio)->pin)
 
 void 		iGpio_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_dir_t dir, iGpio_pull_t pull);
-#define iGpio_write(_gpio, _value)			gpio_pin_write((_gpio)->device, (_gpio)->pin, _value)
-#define	iGpio_read(_gpio, _value)				gpio_pin_read((_gpio)->device, (_gpio)->pin, _value)
+#define iGpio_write(_gpio, _value)\
+        gpio_pin_write((_gpio)->device, (_gpio)->pin, _value)
+#define	iGpio_read(_gpio, _value)\
+        gpio_pin_read((_gpio)->device, (_gpio)->pin, _value)
 
 #endif	// __IGPIO__

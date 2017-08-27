@@ -14,12 +14,13 @@ typedef struct {
   size_t              stack_size;
 } iThread_t;
 
-#define DEFINE_ITHREAD(_thread, _stack_size, _prio)   iThread_t _thread =                 \
-                                                      {                                   \
-                                                        .prio   = _prio,                  \
-                                                        .stack      = NULL,               \
-                                                        .stack_size = _stack_size         \
-                                                      }
+#define DEFINE_ITHREAD(_thread, _stack_size, _prio)\
+  iThread_t _thread =\
+  {\
+    .prio   = _prio,\
+    .stack      = NULL,\
+    .stack_size = _stack_size\
+  }
 
 void iThread_run(iThread_t* thread, iThread_handler_t handler);
 void iThreads_start();

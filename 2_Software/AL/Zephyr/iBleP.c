@@ -17,18 +17,6 @@ ssize_t on_read_rsq(struct bt_conn *conn, const struct bt_gatt_attr *attr,
                            attr->user_data, sizeof(*attr->user_data));
 }
 
-// static void _on_mtu_request(struct bt_conn* conn, u8_t err,
-//                              struct bt_gatt_exchange_params* params)
-// {
-//   iPrint("\n-> MTU Parameters Update\n");
-//   iPrint("------------------------\n");
-//   iPrint("Connection MTU: %u[Bytes]\n",  bt_gatt_get_mtu(conn));
-// }
-//
-// static struct bt_gatt_exchange_params mtu_req = {
-//   .func = _on_mtu_request,
-// };
-
 static void _on_connection(struct bt_conn *conn, u8_t error)
 {
 	if (error) {
@@ -52,13 +40,6 @@ static void _on_connection(struct bt_conn *conn, u8_t error)
     iPrint("Connection Interval: %u[us]\n", info.le.interval * UNIT_1_25_MS);
     iPrint("Connection Slave Latency: %u\n", info.le.latency);
     iPrint("Connection Timeout: %u[ms]\n", info.le.timeout * UNIT_10_MS / 1000);
-
-    // Set the MTU for futur transmition
-    // error = bt_gatt_exchange_mtu(conn, &mtu_req);
-    // if(error)
-    // {
-    //   iPrint("/!\\ MTU exchange failed: error %d\n", error);
-    // }
 	}
 }
 

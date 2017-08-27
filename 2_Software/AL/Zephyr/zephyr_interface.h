@@ -25,9 +25,8 @@
   #define iPrint(...)						do{}while(0);
 #endif
 
-#define iSleep()							k_sleep(K_FOREVER)
-// #define iSleep()              k_cpu_idle()
-// #define iSleep()              k_sleep(600000) // 10min
+// #define iSleep()							k_sleep(K_FOREVER)
+#define iSleep()              k_sleep(600000) // 10min
 #define iSleep_ms(ms)					k_sleep(ms)
 
 #endif	// __ZEPHYR_INTERFACE_H__
