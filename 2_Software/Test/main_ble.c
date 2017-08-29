@@ -78,7 +78,7 @@ iBleP_svc_t my_svc = {
 
 int main()
 {
-  iPrint("BLE test started\n");
+  iPrint("\nBLE test started\n");
   iPrint("----------------\n");
 
   iDebug_init();

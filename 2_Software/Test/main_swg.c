@@ -12,7 +12,7 @@ IGPIO_HANDLER(on_ext_int, pin) {
 
 int main()
 {
-  iPrint("SWG test started\n");
+  iPrint("\nSWG test started\n");
   iPrint("----------------\n");
 
   iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);

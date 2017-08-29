@@ -11,7 +11,7 @@
 
 int main()
 {
-  iPrint("Debug test started\n");
+  iPrint("\nDebug test started\n");
   iPrint("------------------\n");
 
   iDebug_init();

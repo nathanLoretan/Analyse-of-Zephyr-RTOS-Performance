@@ -44,7 +44,7 @@ ITIMER_HANDLER(timer_handler2)
 
 int main()
 {
-  iPrint("Gpio test started\n");
+  iPrint("\nGpio test started\n");
   iPrint("-----------------\n");
 
   iGpio_interrupt_init(&int1, 39, IGPIO_RISING_EDGE, IGPIO_PULL_NORMAL, handler1);

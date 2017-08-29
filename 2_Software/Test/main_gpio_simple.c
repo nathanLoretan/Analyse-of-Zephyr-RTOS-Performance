@@ -7,7 +7,7 @@ iGpio_t gpio1;
 
 int main()
 {
-  iPrint("Gpio simple test started\n");
+  iPrint("\nGpio simple test started\n");
   iPrint("------------------------\n");
 
   iGpio_init(&gpio1, 33, IGPIO_PIN_OUT, IGPIO_PULL_NORMAL);

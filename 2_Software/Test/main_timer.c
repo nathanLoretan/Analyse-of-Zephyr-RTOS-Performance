@@ -16,7 +16,7 @@ ITIMER_HANDLER(timer_handler)
 
 int main()
 {
-  iPrint("Timer test started\n");
+  iPrint("\nTimer test started\n");
   iPrint("------------------\n");
 
   iTimer_start(&timer, timer_handler, 1000);

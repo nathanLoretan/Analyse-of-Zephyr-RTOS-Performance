@@ -56,7 +56,7 @@
  * @brief help to convert data received via SPI
  *
  */
-#define ISPI_CONVERT_DATA(_data_conv, _data, _data_length)
+#define ISPI_CONVERT_DATA(_data_conv, _data, _data_length)\
 	{\
 		for(int i = 0; i < _data_length; i++)\
 		{\

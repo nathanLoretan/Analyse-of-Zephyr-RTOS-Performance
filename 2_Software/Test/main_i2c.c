@@ -7,10 +7,10 @@ iI2c_id_t i2c = I2C0;
 
 int main()
 {
-  iPrint("I2c test started\n");
+  iPrint("\nI2c test started\n");
   iPrint("----------------\n");
 
-  iI2c_init(i2c, ACC_I2C_FREQEUNCY);
+  iI2c_init(i2c, ACC_I2C_FREQUENCY);
 
   uint8_t cmd      = 0x12;
   uint8_t addr_dev = 0x01;

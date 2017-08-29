@@ -5,7 +5,7 @@
 
 int main()
 {
-  iPrint("ADC test started\n");
+  iPrint("\nADC test started\n");
   iPrint("----------------\n");
 
   iSpi_init(SWG_SPI, SWG_SPI_FREQUENCY, SWG_SPI_MODE, SWG_SPI_BIT_ORDER);

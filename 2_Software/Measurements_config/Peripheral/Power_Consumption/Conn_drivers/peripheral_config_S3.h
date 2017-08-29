@@ -19,7 +19,7 @@
 #define SWG_SPI_MODE            ISPI_MODE_SCK_LOW_CAPTURE_LEADING
 
 #define ACC_I2C                 I2C0
-#define ACC_I2C_FREQEUNCY       II2C_FREQ_FAST
+#define ACC_I2C_FREQUENCY       II2C_FREQ_FAST
 
 // Drivers----------------------------------------------------------------------
 #define ENABLE_ACC        1
