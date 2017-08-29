@@ -284,12 +284,14 @@ static int i2c_nrf5_init(struct device *dev)
 
 	SYS_LOG_DBG("");
 
+// MODIFICATION ----------------------------------------------------------------
 	if(CONFIG_I2C_NRF5_GPIO_PORT == 0) {
 		data->gpio = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 	}
 	else if (CONFIG_I2C_NRF5_GPIO_PORT == 1) {
 		data->gpio = device_get_binding(CONFIG_GPIO_NRF5_P1_DEV_NAME);
 	}
+// MODIFICATION END-------------------------------------------------------------
 	// data->gpio = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 
 	k_sem_init(&data->sem, 0, UINT_MAX);
@@ -310,8 +312,10 @@ static int i2c_nrf5_init(struct device *dev)
 				    | GPIO_DS_DISCONNECT_HIGH);
 	__ASSERT_NO_MSG(status == 0);
 
-	twi->PSELSCL = CONFIG_I2C_NRF5_GPIO_SCL_PIN | ((port << TWI_PSEL_SCL_PORT_Pos) & TWI_PSEL_SCL_PORT_Msk);
-	twi->PSELSDA = CONFIG_I2C_NRF5_GPIO_SCA_PIN | ((port << TWI_PSEL_SDA_PORT_Pos) & TWI_PSEL_SDA_PORT_Msk);
+// MODIFICATION ----------------------------------------------------------------
+	twi->PSELSCL = CONFIG_I2C_NRF5_GPIO_SCL_PIN | ((CONFIG_I2C_NRF5_GPIO_PORT << TWI_PSEL_SCL_PORT_Pos) & TWI_PSEL_SCL_PORT_Msk);
+	twi->PSELSDA = CONFIG_I2C_NRF5_GPIO_SCA_PIN | ((CONFIG_I2C_NRF5_GPIO_PORT << TWI_PSEL_SDA_PORT_Pos) & TWI_PSEL_SDA_PORT_Msk);
+// MODIFICATION END-------------------------------------------------------------
 	twi->ERRORSRC = twi->ERRORSRC;
 	twi->EVENTS_TXDSENT = 0;
 	twi->EVENTS_RXDREADY = 0;

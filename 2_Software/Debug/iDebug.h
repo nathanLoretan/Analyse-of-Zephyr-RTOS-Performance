@@ -108,6 +108,11 @@ do {\
 
 #endif  // ENABLE_MEASUREMENT
 
+/**
+ * @brief Initialze the GPIO, PPI and GPIOTE peripheral to analyse
+ * the behaviour of the system
+ *
+ */
 void iDebug_init();
 
 #endif // __DEBUG_NRF52840__

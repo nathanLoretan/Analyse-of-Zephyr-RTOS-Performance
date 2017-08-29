@@ -7,7 +7,7 @@ static struct bt_conn* _new_conn;
 
 static struct bt_le_conn_param 	_conn_params;
 static struct bt_le_scan_param 	_scan_params;
-static iBleC_attr_disc_t* 			_attr_disc_list;
+static iBleC_attr_disc_t*				_attr_disc_list;
 static uint8_t 									_nbr_attr_disc;
 static uint8_t 									_disc_ref;
 static uint8_t 									_nbr_handles;
@@ -609,7 +609,7 @@ uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
   }
 
 	iPrint("SVC 0x%04x not found\n", svc_uuid);
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }
 
 uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
@@ -624,7 +624,7 @@ uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16
   }
 
 	iPrint("CHRC 0x%04x not found\n", chrc_uuid);
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }
 
 uint16_t iBleC_get_chrc_val_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
@@ -644,7 +644,7 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
   }
 
 	iPrint("DESC 0x%04x not found\n", desc_uuid);
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }
 
 #endif	// CONFIG_BT_CENTRAL

@@ -843,7 +843,7 @@ uint16_t iBleC_get_svc_handle(iBleC_conn_t conn, uint16_t svc_uuid)
      }
   }
 
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }
 
 uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
@@ -860,7 +860,7 @@ uint16_t iBleC_get_chrc_decl_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16
       }
     }
   }
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }
 
 uint16_t iBleC_get_chrc_val_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t chrc_uuid)
@@ -879,5 +879,5 @@ uint16_t iBleC_get_desc_handle(iBleC_conn_t conn, uint16_t svc_uuid, uint16_t ch
     }
   }
 
-  return 0xFFFF;
+  return IBLEC_NOT_HANDLE_FOUND;
 }

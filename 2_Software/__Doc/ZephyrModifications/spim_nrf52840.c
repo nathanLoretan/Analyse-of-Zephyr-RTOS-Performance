@@ -31,7 +31,9 @@ struct spim_nrf52_config {
 	volatile NRF_SPIM_Type *base;
 	void (*irq_config_func)(struct device *dev);
 	struct spi_config default_cfg;
+// MODIFICATION ----------------------------------------------------------------
         u8_t port;
+// MODIFICATION END-------------------------------------------------------------
 	struct {
 		u8_t sck;
 		u8_t mosi;
@@ -323,14 +325,17 @@ static int spim_nrf52_init(struct device *dev)
 
 	SYS_LOG_DBG("%s", dev->config->name);
 
-	// data->gpio_port = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 
+  // MODIFICATION --------------------------------------------------------------
+  
+  // data->gpio_port = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 	if(config->port == 0) {
 		data->gpio_port = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 	}
 	else if (config->port == 1) {
 		data->gpio_port = device_get_binding(CONFIG_GPIO_NRF5_P1_DEV_NAME);
 	}
+  // MODIFICATION END-----------------------------------------------------------
 
 	k_sem_init(&data->sem, 0, UINT_MAX);
 
@@ -394,7 +399,9 @@ static const struct spim_nrf52_config spim_nrf52_config_0 = {
 		.config = CONFIG_SPI_0_DEFAULT_CFG,
 		.max_sys_freq = CONFIG_SPI_0_DEFAULT_BAUD_RATE,
 	},
+// MODIFICATION ----------------------------------------------------------------
         .port = CONFIG_SPIM0_NRF52_GPIO_PORT,
+// MODIFICATION END-------------------------------------------------------------
 	.psel = {
 		.sck = CONFIG_SPIM0_NRF52_GPIO_SCK_PIN,
 		.mosi = CONFIG_SPIM0_NRF52_GPIO_MOSI_PIN,
@@ -433,7 +440,9 @@ static const struct spim_nrf52_config spim_nrf52_config_1 = {
 		.config = CONFIG_SPI_1_DEFAULT_CFG,
 		.max_sys_freq = CONFIG_SPI_1_DEFAULT_BAUD_RATE,
 	},
+// MODIFICATION ----------------------------------------------------------------
         .port = CONFIG_SPIM1_NRF52_GPIO_PORT,
+// MODIFICATION END-------------------------------------------------------------
 	.psel = {
 		.sck = CONFIG_SPIM1_NRF52_GPIO_SCK_PIN,
 		.mosi = CONFIG_SPIM1_NRF52_GPIO_MOSI_PIN,
@@ -462,7 +471,8 @@ static void spim_nrf52_config_func_1(struct device *dev)
 }
 #endif /* CONFIG_SPIM1_NRF52 && !CONFIG_I2C_1 */
 
-#if defined(CONFIG_SPIM2_NRF52) && !defined(CONFIG_I2C_2)
+// MODIFICATION ----------------------------------------------------------------
+#if defined(CONFIG_SPIM2_NRF52)
 static void spim_nrf52_config_func_2(struct device *dev);
 
 static const struct spim_nrf52_config spim_nrf52_config_2 = {
@@ -499,4 +509,6 @@ static void spim_nrf52_config_func_2(struct device *dev)
 
 	irq_enable(NRF52_IRQ_SPIM2_SPIS2_SPI2_IRQn);
 }
-#endif /* CONFIG_SPIM2_NRF52 && !CONFIG_I2C_2 */
+#endif /* CONFIG_SPIM2_NRF52
+
+// MODIFICATION END-------------------------------------------------------------

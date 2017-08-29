@@ -383,51 +383,7 @@ config SPIM2_NRF52_ORC
 
 endif # SPIM2_NRF52
 
-if SPIS2_NRF52
-
-config SPIS2_NRF52_GPIO_PORT
-	int "SPIS2 Port number"
-	range 0 1
-	default 0
-	help
-	  SPIS2 GPIO port number
-
-config SPIS2_NRF52_GPIO_SCK_PIN
-	int "SCK pin number"
-	range 0 31
-	help
-	  GPIO pin number for SCK
-
-config SPIS2_NRF52_GPIO_MOSI_PIN
-	int "MOSI pin number"
-	range 0 31
-	help
-	  GPIO pin number for MOSI
-
-config SPIS2_NRF52_GPIO_MISO_PIN
-	int "MISO pin number"
-	range 0 31
-	help
-	  GPIO pin number for MISO
-
-config SPIS2_NRF52_GPIO_CSN_PIN
-	int "CSN pin number"
-	range 0 255
-	default 255
-	help
-	  GPIO pin number for slave select (chip select). Not used value
-	  is 255 (0xff).
-
-config SPIS2_NRF52_DEF
-	hex "Default character"
-	default 0
-	help
-	  Default character. Character clocked out in case of an ignored
-	  transaction.
-
-endif # SPIS2_NRF5
-
-endif # SPI_2 && !I2C_2
+endif # SPI_2
 
 # hidden compile options
 config SPIM_NRF52

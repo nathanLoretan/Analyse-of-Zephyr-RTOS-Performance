@@ -65,6 +65,8 @@ struct _gpiote {
 	__IO u32_t CONFIG[8];
 };
 
+// MODIFICATION ----------------------------------------------------------------
+
 /** Configuration data */
 struct gpio_nrf5_config {
 	/* GPIO module base address */
@@ -91,6 +93,8 @@ static const struct gpiote_nrf5_config {
 	u32_t gpiote_base_addr;
 }_gpiote_nrf5_config = { .gpiote_base_addr = NRF_GPIOTE_BASE };
 
+// MODIFICATION END-------------------------------------------------------------
+
 /* convenience defines for GPIO */
 #define DEV_GPIO_CFG(dev) \
 	((const struct gpio_nrf5_config * const)(dev)->config->config_info)
@@ -99,9 +103,11 @@ static const struct gpiote_nrf5_config {
 #define GPIO_STRUCT(dev) \
 	((volatile struct _gpio *)(DEV_GPIO_CFG(dev))->gpio_base_addr)
 
+// MODIFICATION ----------------------------------------------------------------
 /* convenience defines for GPIOTE */
 #define GPIOTE_STRUCT() \
 	((volatile struct _gpiote *) _gpiote_nrf5_config.gpiote_base_addr)
+// MODIFICATION END-------------------------------------------------------------
 
 #define GPIO_SENSE_DISABLE    (GPIO_PIN_CNF_SENSE_Disabled << GPIO_PIN_CNF_SENSE_Pos)
 #define GPIO_SENSE_ENABLE     (GPIO_PIN_CNF_SENSE_Enabled << GPIO_PIN_CNF_SENSE_Pos)
@@ -131,6 +137,7 @@ static const struct gpiote_nrf5_config {
 #define GPIOTE_CFG_PIN_GET(config) ((config & GPIOTE_CONFIG_PSEL_Msk) >> \
 				GPIOTE_CONFIG_PSEL_Pos)
 
+// MODIFICATION ----------------------------------------------------------------
 #define GPIOTE_CFG_PORT(port) ((port << GPIOTE_CONFIG_PORT_Pos) & GPIOTE_CONFIG_PORT_Msk)
 #define GPIOTE_CFG_PORT_GET(config) ((config & GPIOTE_CONFIG_PORT_Msk) >> \
 				GPIOTE_CONFIG_PORT_Pos)
@@ -152,6 +159,7 @@ static int gpiote_find_channel(struct device *dev, u32_t pin)
 
 	return -ENODEV;
 }
+// MODIFICATION END-------------------------------------------------------------
 
 /**
  * @brief Configure pin or port
@@ -240,6 +248,7 @@ static int gpio_nrf5_config(struct device *dev,
 			i = __builtin_ffs(~(_gpiote_nrf5_data.gpiote_chan_mask)) - 1;
 		}
 
+// MODIFICATION ----------------------------------------------------------------
 		_gpiote_nrf5_data.gpiote_chan_mask |= BIT(i);
 
 		/* configure GPIOTE channel */
@@ -255,7 +264,7 @@ static int gpio_nrf5_config(struct device *dev,
 
 		gpiote->CONFIG[i] = config;
 	}
-
+// MODIFICATION END-------------------------------------------------------------
 
 	return 0;
 }
@@ -353,6 +362,7 @@ static int gpio_nrf5_disable_callback(struct device *dev,
  *
  * @return N/A
  */
+ // MODIFICATION ----------------------------------------------------------------
 static void gpio_nrf5_port_isr(void *arg)
 {
 	struct device *dev = arg;
@@ -457,5 +467,7 @@ static int gpio_nrf5_P1_init(struct device *dev)
 
 	return 0;
 }
+
+// MODIFICATION END-------------------------------------------------------------
 
 #endif /* CONFIG_GPIO_NRF5_P1 */

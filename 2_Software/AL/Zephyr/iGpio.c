@@ -11,6 +11,7 @@ void iGpio_init(iGpio_t* gpio, iGpio_pin_t pin, iGpio_dir_t dir, iGpio_pull_t pu
 		gpio->pin = pin - NRF_P0_PIN_NUM;
 	}
 
+	// If nRF52 GPIO Port 1 driver is not added
 	// gpio->device = device_get_binding(CONFIG_GPIO_NRF5_P0_DEV_NAME);
 	// gpio->pin = pin;
 
