@@ -513,7 +513,7 @@ void sys_init()
 
   #if ENABLE_ACC
 
-    iI2c_init(ACC_I2C, ACC_I2C_FREQUENCY);
+    iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
     acc_init();
     acc_sleep();
 

@@ -10,7 +10,7 @@
 #endif
 
 #ifdef BAREMETALE_USED
-  #include "AL/SD-SDK/nrf5x_interface.h"
+  #include "AL/BareMetal/nrf5x_interface.h"
 #endif
 
 #ifdef CENTRAL_CONFIG

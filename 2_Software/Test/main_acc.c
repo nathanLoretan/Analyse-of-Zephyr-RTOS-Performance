@@ -7,13 +7,12 @@ volatile bool wakeUp;
 
 int main()
 {
-  iPrint("\nACC test started\n");
+  iPrint("ACC test started\n");
   iPrint("----------------\n");
 
-  iI2c_init(ACC_I2C, ACC_I2C_FREQUENCY);
+  iI2c_init(ACC_I2C, ACC_I2C_FREQEUNCY);
 
   acc_init();
-  acc_wakeup();
 
   while(1)
   {
@@ -23,11 +22,12 @@ int main()
     iEvent_t accEvent = iEventQueue_get(&acc_EventQueue);
     if(accEvent == ACC_EVENT_INT1)  // data ready
     {
-      acc_sample_t sample;
+      acc_sample_t samples[ACC_FIFO];
 
-      acc_getXYZ(&sample, 1);
+      acc_getXYZ(samples, ACC_FIFO);
 
-      iPrint("XYZ: 0x%04x, 0x%04x, 0x%04x\n", sample.x, sample.y, sample.z);
+      for(int i = 0; i < ACC_FIFO; i++)
+        iPrint("%d XYZ: 0x%04x, 0x%04x, 0x%04x\n", i, samples[i].x, samples[i].y, samples[i].z);
     }
     else if(accEvent == ACC_EVENT_INT2) // click
     {

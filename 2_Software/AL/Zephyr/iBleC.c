@@ -11,7 +11,6 @@ static iBleC_attr_disc_t*				_attr_disc_list;
 static uint8_t 									_nbr_attr_disc;
 static uint8_t 									_disc_ref;
 static uint8_t 									_nbr_handles;
-// static struct k_mutex 					_conn_mutex;
 
 static struct bt_uuid_16 uuid16 = BT_UUID_INIT_16(0);
 static struct bt_uuid_128 uuid128 = BT_UUID_INIT_128(0);
@@ -126,8 +125,6 @@ static void _on_device_found(const bt_addr_le_t* peer_addr, s8_t rssi,
 		return;
 	}
 
-	// k_mutex_lock(&_conn_mutex, K_FOREVER);
-
 	// Create a connection with the new device
 	_new_conn = bt_conn_create_le(peer_addr, &_conn_params);
 	if(_new_conn == NULL) {
@@ -187,7 +184,6 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	{
 		link[ref].isReady = true;
 		iPrint("-> Peripheral %d Discovery finished\n", ref);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		iEventQueue_add(&bleC_EventQueue, BLEC_EVENT_READY_BASE + ref);
 		return BT_GATT_ITER_STOP;
@@ -227,7 +223,6 @@ static u8_t _on_discovery(struct bt_conn* conn,
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		return BT_GATT_ITER_STOP;
 	}
@@ -264,7 +259,6 @@ static void _start_discovery(struct bt_conn* conn)
 	error = bt_gatt_discover(conn, &discover_params);
 	if(error) {
 		iPrint("Start Discovery failed: error %d\n", error);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 		return;
 	}
@@ -338,7 +332,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 
 	if(conn_err) {
 		iPrint("-> Connection to %d failed: error %u\n", ref, conn_err);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 	else if(_new_conn == conn)
@@ -368,7 +361,6 @@ static void _on_connection(struct bt_conn* conn, u8_t conn_err)
 	}
 	else {
 		iPrint("-> Connection to %d failed: error connection reference\n", ref);
-		// k_mutex_unlock(&_conn_mutex);
 		iBleC_scan_start(NULL);
 	}
 }
@@ -468,8 +460,6 @@ int iBleC_scan_start(iBleC_scan_params_t* scan_params)
     iPrint("/!\\ Scanning failed to start: error %d\n", error);
     return error;
   }
-
-	// k_mutex_init(&_conn_mutex);
 
   iPrint("-> Scanning started\n");
   return 0;
